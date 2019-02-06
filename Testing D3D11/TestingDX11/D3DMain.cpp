@@ -1,6 +1,15 @@
 #include <Windows.h>
-int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
+#include"System.h"
+#pragma comment (lib, "d3d11.lib")
+#pragma comment (lib, "d3dcompiler.lib")
+int WINAPI wWinMain(HINSTANCE hInstance,
+	HINSTANCE hPrevInstance, 
+	LPWSTR lpCmdLine, 
+	int nCmdShow)
 {
 
-	return 0;
+	System sys = System(hInstance, "coolagubben", nCmdShow);
+	sys.initialize();
+	sys.run();//loop
+	return (int)sys.getMsgWParam();
 }
