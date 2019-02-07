@@ -1,6 +1,7 @@
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
 #include "D3D.h"
+#include "Camera.h"
 const bool FULL_SCREEN = false; 
 const bool VSYNC_ENABLED = true;
 const float SCREEN_DEPTH = 1000.0f;
@@ -9,7 +10,7 @@ class Graphics
 {
 private:
 	D3D* Direct3D;
-	//Camera* Camera
+	Camera* Camera;
 	//Model* Model;
 	//TextureShader* TextureShader;
 

@@ -18,6 +18,7 @@ bool Graphics::render()
 Graphics::Graphics()
 {
 	this->Direct3D = nullptr;
+	this->Camera = nullptr;
 }
 
 Graphics::~Graphics()
