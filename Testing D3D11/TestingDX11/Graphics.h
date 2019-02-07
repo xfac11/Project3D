@@ -9,6 +9,9 @@ class Graphics
 {
 private:
 	D3D* Direct3D;
+	//Camera* Camera
+	//Model* Model;
+	//TextureShader* TextureShader;
 
 	bool render(); //float [4]color
 public:
