@@ -2,27 +2,23 @@
 #define MODEL_H
 #include <d3d11.h>
 #include <directxmath.h>
+#include"QuadHandler.h"
 class Model
 {
-private:
-	ID3D11Buffer *vertexBuffer;
-	ID3D11Buffer* indexBuffer;
-	int vertexCount;
-	int indexCount;
-
-	bool InitializeBuffers(ID3D11Device*);
-	void ShutdownBuffers();
-	void RenderBuffers(ID3D11DeviceContext*);
 public:
 	Model();
-	Model(const Model&);
 	~Model();
+	void addQuads(Vertex3D newQuad[6], ID3D11Device *& gDevice);
+	void shutdown();
+	void setVertexBuffer(ID3D11DeviceContext *& gDeviceContext);
+	int getVertexCount()const;
+private:
+	ID3D11Buffer *vertexBuffer;
+	ID3D11Buffer *indexBuffer;
+	ID3D11Buffer *constantBuffer;
 
-
-	bool Initialize(ID3D11Device*);
-	void Shutdown();
-	void Render(ID3D11DeviceContext*);
-
-	int GetIndexCount();
+	int vertexCount;
+	int indexCount;
+	QuadHandler quads;
 };
-#endif
+#endif // !MODEL_H
