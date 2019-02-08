@@ -244,9 +244,10 @@ void ColorShader::OutputShaderErrorMessage(ID3D10Blob * errorMessage, HWND hwnd,
 bool ColorShader::SetShaderParameters(ID3D11DeviceContext * deviceContext, DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix)
 {
 	HRESULT result;
-	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	MatrixBufferType* dataPtr;
-	unsigned int bufferNumber;
+	D3D11_MAPPED_SUBRESOURCE mappedMemory;
+//	MatrixBufferType* dataPtr;
+	//PerFrameMatrices* matricesPerFrame;
+	//unsigned int bufferNumber;
 
 	//Make sure to transpose matrices before sending them into the shader, this is a requirement for DirectX 11.
 
@@ -254,35 +255,36 @@ bool ColorShader::SetShaderParameters(ID3D11DeviceContext * deviceContext, Direc
 	worldMatrix = XMMatrixTranspose(worldMatrix);
 	viewMatrix = XMMatrixTranspose(viewMatrix);
 	projectionMatrix = XMMatrixTranspose(projectionMatrix);
-
+	DirectX::XMMATRIX WorldView = DirectX::XMMatrixMultiply(viewMatrix, worldMatrix);
+	DirectX::XMMATRIX WorldViewProj = DirectX::XMMatrixMultiply(projectionMatrix, WorldView);
+	WorldViewProj = DirectX::XMMatrixTranspose(WorldViewProj);
+	matricesPerFrame->worldMatrix = WorldViewProj;
 	//Lock the m_matrixBuffer, set the new matrices inside it, and then unlock it.
 
 		// Lock the constant buffer so it can be written to.
-		result = deviceContext->Map(m_matrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	result = deviceContext->Map(MatrixPerFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
 	if (FAILED(result))
 	{
 		return false;
 	}
 
 	// Get a pointer to the data in the constant buffer.
-	dataPtr = (MatrixBufferType*)mappedResource.pData;
-
-	// Copy the matrices into the constant buffer.
-	dataPtr->world = worldMatrix;
-	dataPtr->view = viewMatrix;
-	dataPtr->projection = projectionMatrix;
-
+	//matricesPerFrame = (PerFrameMatrices*)mappedMemory.pData; //was in tutorial
+	memcpy(mappedMemory.pData, matricesPerFrame, sizeof(PerFrameMatrices));
+	
 	// Unlock the constant buffer.
-	deviceContext->Unmap(m_matrixBuffer, 0);
+	deviceContext->Unmap(MatrixPerFrameBuffer, 0);
 
-	Now set the updated matrix buffer in the HLSL vertex shader.
+	//Now set the updated matrix buffer in the HLSL vertex shader.
 
 		// Set the position of the constant buffer in the vertex shader.
-		bufferNumber = 0;
+	//bufferNumber = 0;
 
 	// Finanly set the constant buffer in the vertex shader with the updated values.
-	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
-
+	//deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
+	deviceContext->PSSetConstantBuffers(0, 1, &ConstantBuffer);
+	deviceContext->VSSetConstantBuffers(0, 1, &ConstantBuffer); //could have bufferNumber = 0 dno why tho
+	deviceContext->GSSetConstantBuffers(0, 1, &MatrixPerFrameBuffer);
 
 	return false;
 }
@@ -312,6 +314,29 @@ ColorShader::ColorShader()
 	this->vertexLayout = nullptr;
 	//PerFrameMatrices* gMatricesPerFrame;
 	//this->matrixBuffer = nullptr;
+}
+
+bool ColorShader::Initialize(ID3D11Device *device, HWND hwnd)
+{
+	bool result=false;
+	gConstantBufferData = (CBData*)_aligned_malloc(sizeof(CBData), 16);
+	gConstantBufferData->colour[0] = 0.5f;
+	gConstantBufferData->colour[1] = 0.5f;
+	gConstantBufferData->colour[2] = 0.5f;
+	gConstantBufferData->colour[3] = 1.0f;
+	gConstantBufferData->offset = 0.0f;
+
+	
+
+	// Initialize the vertex and pixel shaders.
+	result = InitializeShader(device, hwnd);//, L"../Engine/color.vs", L"../Engine/color.ps");
+	if (!result)
+	{
+		result = false;
+	}
+	else
+		result = true;
+	return result;
 }
 
 bool ColorShader::Render(ID3D11DeviceContext* deviceContext, int count, DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix)
