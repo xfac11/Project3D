@@ -20,13 +20,13 @@ QuadHandler::~QuadHandler()
 	delete[] this->Quads;
 }
 
-bool QuadHandler::addQuad(Vertex3D newQuad[6], ID3D11Device *& gDevice, ID3D11Buffer *& gVertexBuffer)
+bool QuadHandler::addQuad(Vertex3D newQuad[6], ID3D11Device *& gDevice, ID3D11Buffer *& gVertexBuffer,int & vertexCount)
 {
 	bool result = false;
 	if (nrOfQuads < CAP)
 	{
 		result = true;
-		Quads[nrOfQuads] = new QuadVertex(newQuad, gDevice, gVertexBuffer);
+		Quads[nrOfQuads] = new QuadVertex(newQuad, gDevice, gVertexBuffer,vertexCount);
 		nrOfQuads++;
 	}
 	return result;

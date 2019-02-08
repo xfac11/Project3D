@@ -14,8 +14,8 @@ Model::~Model()
 
 }
 
-void Model::addQuads(Vertex3D newQuad[6], ID3D11Device *& gDevice)
-{
+void Model::addQuads(Vertex3D newQuad[6], ID3D11Device *& gDevice) 
+{//Will change vertexbuffer and vertexcount
 	quads.addQuad(newQuad, gDevice, this->vertexBuffer,this->vertexCount);
 }
 
@@ -27,6 +27,8 @@ void Model::shutdown()
 		this->indexBuffer->Release();
 	if(this->constantBuffer!=nullptr)
 		this->constantBuffer->Release();
+	if (this->SamplerState != nullptr)
+		this->SamplerState->Release();
 }
 
 void Model::setVertexBuffer(ID3D11DeviceContext *& gDeviceContext)
@@ -42,4 +44,27 @@ void Model::setVertexBuffer(ID3D11DeviceContext *& gDeviceContext)
 int Model::getVertexCount() const
 {
 	return this->vertexCount;
+}
+
+void Model::setTheTexture(TextureData * txt, ID3D11Device * gDevice)
+{
+	this->texture.setTexture(txt, gDevice);
+}
+
+void Model::setSampler(ID3D11Device* gDevice)
+{
+	D3D11_SAMPLER_DESC desc;
+	ZeroMemory(&desc, sizeof(desc));
+	desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	desc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	desc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	desc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	desc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+	desc.MinLOD = 0;
+	desc.MaxLOD = D3D11_FLOAT32_MAX;
+	HRESULT hr = gDevice->CreateSamplerState(&desc, &this->SamplerState);
+	if (FAILED(hr))
+	{
+		//deal with error. Log it maybe
+	}
 }

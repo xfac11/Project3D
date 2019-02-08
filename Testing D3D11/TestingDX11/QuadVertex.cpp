@@ -5,14 +5,21 @@ void QuadVertex::update(ID3D11Device *& gDevice, ID3D11Buffer *& gVertexBuffer)
 	gDevice->CreateBuffer(&this->bufferDesc, &this->data, &gVertexBuffer);
 }
 
-QuadVertex::QuadVertex(Vertex3D newQuad[6], ID3D11Device *& gDevice, ID3D11Buffer *& gVertexBuffer)
+QuadVertex::QuadVertex(Vertex3D newQuad[6], ID3D11Device *& gDevice, ID3D11Buffer *& gVertexBuffer, int & vertexCount)
 {
 	Quad[0] = newQuad[0];
+	vertexCount++;
 	Quad[1] = newQuad[1];
+	vertexCount++;
 	Quad[2] = newQuad[2];
+	vertexCount++;
 	Quad[3] = newQuad[3];
+	vertexCount++;
 	Quad[4] = newQuad[4];
+	vertexCount++;
 	Quad[5] = newQuad[5];
+	vertexCount++;
+
 
 	memset(&this->bufferDesc, 0, sizeof(this->bufferDesc));
 	this->bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
