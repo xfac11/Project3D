@@ -157,15 +157,17 @@ bool D3D::initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 	//this->gIncrement += 0.8f * ImGui::GetIO().DeltaTime; 
 	//gConstantBufferData->offset = sin(this->gIncrement);
 
-	fieldOfView = 3.141592654f / 4.0f;
+	//fieldOfView = 3.141592654f / 4.0f; //0.785
+	fieldOfView = 0.45f*DirectX::XM_PI;
 	screenAspect = (float)screenWidth / (float)screenHeight;
 
 
 	//move to ColorShader
-	this->projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, screenNear, screenDepth);
+	this->projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, 0.1f, 20.f);
+	//this->projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, screenNear, screenDepth);
 	//this->worldMatrix = DirectX::XMMatrixIdentity();
 	this->worldMatrix = DirectX::XMMatrixRotationY(this->gIncrement);
-	this->worldMatrix = DirectX::XMMatrixTranspose(worldMatrix);
+	//this->worldMatrix = DirectX::XMMatrixTranspose(worldMatrix); //moved to colorshader
 	//this->orthoMatrix = DirectX::XMMatrixOrthographicLH((float)screenWidth, (float)screenHeight, screenNear, screenDepth);
 
 	return true;
@@ -251,12 +253,12 @@ void D3D::EndScene()
 	}
 }
 
-ID3D11Device * D3D::GetDevice()
+ID3D11Device *& D3D::GetDevice()
 {
 	return device;
 }
 
-ID3D11DeviceContext * D3D::GetDeviceContext()
+ID3D11DeviceContext *& D3D::GetDeviceContext()
 {
 	return deviceContext;
 }

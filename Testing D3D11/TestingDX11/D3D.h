@@ -25,7 +25,7 @@ private:
 	DirectX::XMMATRIX worldMatrix;
 	DirectX::XMMATRIX orthoMatrix;  //switch to 
 
-
+	//maybe D3D should have CBData instead of ColorShader
 
 	float dist;
 	float gIncrement;

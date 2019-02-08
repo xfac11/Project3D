@@ -6,7 +6,7 @@ void Graphics::initImgui(HWND hWnd)
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); // (void)io;
 	ImGui_ImplWin32_Init(hWnd);
-	ImGui_ImplDX11_Init(this->Direct3D.GetDevice(), this->Direct3D.GetDeviceContext());
+	ImGui_ImplDX11_Init(this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext());
 	ImGui::StyleColorsDark();
 }
 
@@ -29,22 +29,24 @@ void Graphics::renderImgui()
 bool Graphics::render()
 {
 	this->renderImgui();
-	Direct3D.BeginScene(this->color);
+	Direct3D->BeginScene(this->color);
 
 	//campos mappedmemory
 
-	this->Model->setVertexBuffer(this->Direct3D.GetDeviceContext());
+	this->Model->setVertexBuffer(this->Direct3D->GetDeviceContext());
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-	Direct3D.EndScene();
+	Direct3D->EndScene();
 
 	return true;
 }
 
 Graphics::Graphics()
 {
-	//this->Direct3D = nullptr;
+	this->Direct3D = nullptr;
 	this->Camera = nullptr;
+	this->Model = nullptr;
+	this->ColorShader = nullptr;
 	this->color[0] = 0.5f;
 	this->color[1] = 0.5f;
 	this->color[2] = 0.5f;
@@ -59,13 +61,13 @@ Graphics::~Graphics()
 bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 {
 	bool result = false;
-	Direct3D = D3D();
+	Direct3D = new D3D;
 
 	/*if (!Direct3D)
 	{
 		result = false;
 	}*/
-	result = Direct3D.initialize(screenWidth, screenHeight, VSYNC_ENABLED, hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
+	result = Direct3D->initialize(screenWidth, screenHeight, VSYNC_ENABLED, hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
 	if (!result)
 	{
 		MessageBox(hwnd, "Could not initialize Direct3D", "Error", MB_OK); //L"", L"", ;
@@ -103,14 +105,14 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 						1.f, 1.f, 1.f,
 						0.5f, -0.5f, 0.f,
 	};
-	this->Model->addQuads(TwoTris, this->Direct3D.GetDevice());
+	this->Model->addQuads(TwoTris, this->Direct3D->GetDevice());
 	TextureData* txt = nullptr;
 	txt = new TextureData;
 	txt->IMAGE_DATA = BTH_IMAGE_DATA;
 	txt->IMAGE_HEIGHT = BTH_IMAGE_HEIGHT;
 	txt->IMAGE_WIDTH = BTH_IMAGE_WIDTH;
-	this->Model->setTheTexture(txt, this->Direct3D.GetDevice());
-	this->Model->setSampler(this->Direct3D.GetDevice());
+	this->Model->setTheTexture(txt, this->Direct3D->GetDevice());
+	this->Model->setSampler(this->Direct3D->GetDevice());
 	return result;
 }
 
@@ -123,7 +125,7 @@ void Graphics::Shutdown()
 		Direct3D = NULL;
 	}*/
 	this->Model->shutdown();
-	Direct3D.Shutdown();
+	Direct3D->Shutdown();
 	ImGui_ImplDX11_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
