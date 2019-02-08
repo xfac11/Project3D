@@ -2,6 +2,7 @@
 #define GRAPHICS_H
 #include "D3D.h"
 #include "Camera.h"
+#include "ColorShader.h"
 #include "Model.h"
 #include "bth_image.h"
 #include "imgui/imgui.h"
@@ -17,8 +18,8 @@ private:
 	D3D Direct3D;
 	Camera* Camera;
 	Model* Model;
+	ColorShader* ColorShader;
 	float color[4]; //parameter color?
-	//TextureShader* TextureShader;
 	void renderImgui();
 
 	bool render(); //float [4]color
