@@ -3,6 +3,7 @@
 #include <math.h>
 //#include<Keyboard.h>
 #include <d3d11.h>
+#include"Graphics.h"
 #include <DirectXMath.h>
 //#include"headerFiles.h"
 #include<string>
@@ -35,7 +36,7 @@ private:
 	MSG msg;
 	int nCMDShow;
 	//Input* input;
-	//Graphics* graphics;
+	Graphics* graphics;
 
 };
 #endif

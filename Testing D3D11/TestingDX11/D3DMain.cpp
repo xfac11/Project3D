@@ -8,8 +8,8 @@ int WINAPI wWinMain(HINSTANCE hInstance,
 	int nCmdShow)
 {
 
-	System sys = System(hInstance, "coolagubben", nCmdShow);
-	sys.initialize();
+	System sys = System(hInstance, "coolagubben", 1);
+	sys.initialize();						
 	sys.run();//loop
 	return (int)sys.getMsgWParam();
 }

@@ -3,6 +3,10 @@
 #include "D3D.h"
 #include "Camera.h"
 #include "Model.h"
+#include "bth_image.h"
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_win32.h"
+#include "imgui/imgui_impl_dx11.h"
 const bool FULL_SCREEN = false;
 const bool VSYNC_ENABLED = true;
 const float SCREEN_DEPTH = 1000.0f;
@@ -13,12 +17,15 @@ private:
 	D3D Direct3D;
 	Camera* Camera;
 	Model* Model;
+	float color[4]; //parameter color?
 	//TextureShader* TextureShader;
+	void renderImgui();
 
 	bool render(); //float [4]color
 public:
 	Graphics();
 	~Graphics();
+	void initImgui(HWND hWnd);
 
 	bool Initialize(int screenWidth, int screenHeight, HWND hwnd);
 
