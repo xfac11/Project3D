@@ -316,6 +316,10 @@ ColorShader::ColorShader()
 	//this->matrixBuffer = nullptr;
 }
 
+ColorShader::~ColorShader()
+{
+}
+
 bool ColorShader::Initialize(ID3D11Device *device, HWND hwnd)
 {
 	bool result=false;
@@ -336,7 +340,98 @@ bool ColorShader::Initialize(ID3D11Device *device, HWND hwnd)
 	}
 	else
 		result = true;
+
+
+
+
+	D3D11_BUFFER_DESC desc;
+	ZeroMemory(&desc, sizeof(desc));
+	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	desc.ByteWidth = sizeof(CBData);
+	desc.Usage = D3D11_USAGE_DYNAMIC;
+	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+	D3D11_SUBRESOURCE_DATA pData;
+	ZeroMemory(&pData, sizeof(pData));
+	pData.pSysMem = gConstantBufferData;
+	pData.SysMemPitch = 0;
+	pData.SysMemSlicePitch = 0;
+
+	HRESULT hr;
+	hr = device->CreateBuffer(&desc, &pData, &ConstantBuffer);
+	if (FAILED(hr))
+	{
+		// deal with error...
+		result = false;
+	}
+
+	matricesPerFrame = (PerFrameMatrices*)_aligned_malloc(sizeof(PerFrameMatrices), 16);
+	ZeroMemory(&desc, sizeof(desc));
+	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	desc.ByteWidth = sizeof(PerFrameMatrices);
+	desc.Usage = D3D11_USAGE_DYNAMIC;
+	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+	ZeroMemory(&pData, sizeof(pData));
+	pData.pSysMem = gConstantBufferData;
+	pData.SysMemPitch = 0;
+	pData.SysMemSlicePitch = 0;
+
+	hr = device->CreateBuffer(&desc, &pData, &MatrixPerFrameBuffer);
+	if (FAILED(hr))
+	{
+		// deal with error...
+		result = false;
+	}
+
 	return result;
+}
+
+void ColorShader::Shutdown()
+{
+	if (matricesPerFrame)
+	{
+		_aligned_free(matricesPerFrame);
+	}
+	if (MatrixPerFrameBuffer)
+	{
+		MatrixPerFrameBuffer->Release();
+		MatrixPerFrameBuffer = nullptr;
+	}
+	if(gConstantBufferData)
+	{
+		_aligned_free(gConstantBufferData); //struct
+	}
+	if (ConstantBuffer)
+	{
+		ConstantBuffer->Release();
+		ConstantBuffer = nullptr;
+	}
+	// Release the layout.
+	if (vertexLayout)
+	{
+		vertexLayout->Release();
+		vertexLayout = nullptr;
+	}
+
+	// Release the pixel shader.
+	if (pixelShader)
+	{
+		pixelShader->Release();
+		pixelShader = nullptr;
+	}
+
+	// Release the vertex shader.
+	if (vertexShader)
+	{
+		vertexShader->Release();
+		vertexShader = nullptr;
+	}
+	if (geometryShader)
+	{
+		geometryShader->Release();
+		geometryShader = nullptr;
+	}
 }
 
 bool ColorShader::Render(ID3D11DeviceContext* deviceContext, int count, DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix)
