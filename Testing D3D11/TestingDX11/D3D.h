@@ -20,11 +20,15 @@ private:
 	ID3D11Texture2D* depthStencilBuffer;
 	ID3D11DepthStencilState* depthStencilState;
 	ID3D11DepthStencilView* depthStencilView;
-	ID3D11RasterizerState* rasterState;
+	//ID3D11RasterizerState* rasterState;
 	DirectX::XMMATRIX projectionMatrix;
 	DirectX::XMMATRIX worldMatrix;
 	DirectX::XMMATRIX orthoMatrix;  //switch to 
 
+
+
+	float dist;
+	float gIncrement;
 	/*
 	XMVECTOR CamPos = XMVectorSet(0.0, 0.0, -2, 0.0);  //-dist 
 	XMVECTOR LookAt = XMVectorSet(0.0, 0.0, 0.0, 0.0); //change to first person view
@@ -37,7 +41,7 @@ private:
 
 public:
 	D3D();
-	~D3D();
+	virtual~D3D();
 
 	bool initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen, float screenDepth, float screenNear);
 	void Shutdown();
@@ -49,8 +53,8 @@ public:
 
 	DirectX::XMMATRIX& GetProjectionMatrix();
 	DirectX::XMMATRIX& GetWorldMatrix();
-	DirectX::XMMATRIX& GetOrthoMatrix();
+	//DirectX::XMMATRIX& GetOrthoMatrix();
 
-	int & GetVideoCardInfo(char* cardName)//(, int& memory);
+	int & GetVideoCardInfo(char* cardName);//(, int& memory);
 };
 #endif

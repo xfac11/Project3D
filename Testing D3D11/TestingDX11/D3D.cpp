@@ -2,14 +2,17 @@
 
 D3D::D3D()
 {
-	swapChain = nullptr;
-	device = nullptr;
-	deviceContext = nullptr;
-	renderTargetView = nullptr;
-	depthStencilBuffer = nullptr;
-	depthStencilState = nullptr;
-	depthStencilView = nullptr;
-	rasterState = nullptr;
+	this->swapChain = 0;// nullptr;
+	this->device = 0; //nullptr;
+	this->deviceContext = 0; //nullptr;
+	this->renderTargetView = 0; //nullptr;
+	this->depthStencilBuffer = 0;// nullptr;
+	this->depthStencilState = 0; //nullptr;
+	this->depthStencilView = 0; //nullptr;
+	//rasterState = nullptr;
+
+	this->dist = 0.1f;
+	this->gIncrement = 0;
 }
 
 D3D::~D3D()
@@ -18,17 +21,18 @@ D3D::~D3D()
 
 bool D3D::initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen, float screenDepth, float screenNear) 
 {
+	//bool result = false;
 	HRESULT result;
 	//IDXGIFactory* factory;
 	//IDXGIAdapter* adapter;
 	//IDXGIOutput* adapterOutput;
-	unsigned int numModes, i, numerator, denominator;
-	unsigned long long stringLength;
-	DXGI_MODE_DESC* displayModeList;
-	DXGI_ADAPTER_DESC adapterDesc;
-	int error;
-	DXGI_SWAP_CHAIN_DESC swapchainDesc;
-	D3D_FEATURE_LEVEL featureLevel;
+	//unsigned int numModes, i, numerator, denominator;
+	//unsigned long long stringLength;
+	//DXGI_MODE_DESC* displayModeList;
+	//DXGI_ADAPTER_DESC adapterDesc;
+	//int error;
+	//DXGI_SWAP_CHAIN_DESC swapchainDesc;
+	//D3D_FEATURE_LEVEL featureLevel;
 	//ID3D11Texture2D* backBufferPtr = nullptr;
 	//D3D11_TEXTURE2D_DESC depthBufferDesc;
 	//D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
@@ -39,6 +43,7 @@ bool D3D::initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 
 	vSync_enabled = vsync;
 
+	DXGI_SWAP_CHAIN_DESC swapchainDesc;
 	ZeroMemory(&swapchainDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
 	//swapchainDesc.BufferDesc.Width = 0;
 	//swapchainDesc.BufferDesc.Height = 0; //defualt to window size
@@ -80,6 +85,7 @@ bool D3D::initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 		swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
 		if (FAILED(result))
 		{
+			//result = false;
 			return false;
 		}
 
@@ -87,6 +93,7 @@ bool D3D::initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 		device->CreateRenderTargetView(backBufferPtr, NULL, &renderTargetView);
 		if (FAILED(result))
 		{
+			//result = false;
 			return false;
 		}
 		backBufferPtr->Release();
@@ -118,7 +125,6 @@ bool D3D::initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 		}
 		deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
 
-
 		//the depth Stencil State
 		D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
 		ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
@@ -137,8 +143,6 @@ bool D3D::initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 	}
 
 
-
-
 	//void SetViewport()
 	D3D11_VIEWPORT vp;
 	vp.Width = (float)screenWidth;
@@ -149,11 +153,17 @@ bool D3D::initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 	vp.TopLeftY = 0;
 	deviceContext->RSSetViewports(1, &vp);
 
+	//do this later
+	//this->gIncrement += 0.8f * ImGui::GetIO().DeltaTime; 
+	//gConstantBufferData->offset = sin(this->gIncrement);
+
 	fieldOfView = 3.141592654f / 4.0f;
 	screenAspect = (float)screenWidth / (float)screenHeight;
 	this->projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, screenNear, screenDepth);
-	this->worldMatrix = DirectX::XMMatrixIdentity();
-	this->orthoMatrix = DirectX::XMMatrixOrthographicLH((float)screenWidth, (float)screenHeight, screenNear, screenDepth);
+	//this->worldMatrix = DirectX::XMMatrixIdentity();
+	this->worldMatrix = DirectX::XMMatrixRotationY(this->gIncrement);
+	this->worldMatrix = DirectX::XMMatrixTranspose(worldMatrix);
+	//this->orthoMatrix = DirectX::XMMatrixOrthographicLH((float)screenWidth, (float)screenHeight, screenNear, screenDepth);
 
 	return true;
 }
@@ -165,11 +175,11 @@ void D3D::Shutdown()
 	{
 		swapChain->SetFullscreenState(false, NULL);
 	}
-	if (rasterState)
-	{
-		rasterState->Release();
-		rasterState = nullptr;
-	}
+	//if (rasterState)
+	//{
+	//	rasterState->Release();
+	//	rasterState = nullptr;
+	//}
 	if (depthStencilView)
 	{
 		depthStencilView->Release();
@@ -258,10 +268,10 @@ DirectX::XMMATRIX & D3D::GetWorldMatrix()
 	return  worldMatrix;
 }
 
-DirectX::XMMATRIX & D3D::GetOrthoMatrix()
+/*DirectX::XMMATRIX & D3D::GetOrthoMatrix()
 {
 	return orthoMatrix;
-}
+}*/
 
 int & D3D::GetVideoCardInfo(char * cardName)//, int & memory)
 {
