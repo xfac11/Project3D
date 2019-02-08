@@ -50,11 +50,11 @@ void Camera::Render()
 	DirectX::XMVECTOR LookAt= DirectX::XMVectorSet(0.0, 0.0, 0.0, 0.0);
 	DirectX::XMFLOAT3 YawPitchRoll = DirectX::XMFLOAT3(this->rotation.x*radians, this->rotation.y*radians, this->rotation.z*radians);
 	DirectX::XMMATRIX rotationMatrix= DirectX::XMMatrixRotationRollPitchYaw(YawPitchRoll.x,YawPitchRoll.y,YawPitchRoll.z);
-	LookAt = DirectX::XMVector3TransformCoord(LookAt, rotationMatrix);
-	Up = XMVector3TransformCoord(Up, rotationMatrix);
-	LookAt = DirectX::XMVectorAdd(CamPos, LookAt);
+	//LookAt = DirectX::XMVector3TransformCoord(LookAt, rotationMatrix);
+	//Up = XMVector3TransformCoord(Up, rotationMatrix);
+	//LookAt = DirectX::XMVectorAdd(CamPos, LookAt);
 	this->viewMatrix =  DirectX::XMMatrixLookAtLH(CamPos, LookAt, Up);
-	this->viewMatrix = DirectX::XMMatrixTranspose(View); //maybe
+	this->viewMatrix = DirectX::XMMatrixTranspose(viewMatrix); //maybe
 }
 
 DirectX::XMMATRIX& Camera::GetViewMatrix()
