@@ -54,6 +54,30 @@
     <ClCompile Include="D3DMain.cpp">
       <Filter>Source Files\Project cpp</Filter>
     </ClCompile>
+    <ClCompile Include="System.cpp">
+      <Filter>Source Files\Project cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics.cpp">
+      <Filter>Source Files\Project cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="D3D.cpp">
+      <Filter>Source Files\Project cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="myCamera.cpp">
+      <Filter>Source Files\Project cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Source Files\Project cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Source Files\Project cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="ColorShader.cpp">
+      <Filter>Source Files\Project cpp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\imconfig.h">
@@ -107,9 +131,6 @@
     <ClInclude Include="Model.h">
       <Filter>Header Files\Project Headers</Filter>
     </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>Header Files\Project Headers</Filter>
-    </ClInclude>
     <ClInclude Include="D3D.h">
       <Filter>Header Files\Project Headers</Filter>
     </ClInclude>
@@ -119,11 +140,24 @@
     <ClInclude Include="Texture.h">
       <Filter>Header Files\Project Headers</Filter>
     </ClInclude>
+    <ClInclude Include="headerFiles.h">
+      <Filter>Header Files\Project Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="myCamera.h">
+      <Filter>Header Files\Project Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Header Files\Project Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="ColorShader.h">
+      <Filter>Header Files\Project Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui\imgui.ini">
       <Filter>Source Files\imgui</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Fragment.hlsl">

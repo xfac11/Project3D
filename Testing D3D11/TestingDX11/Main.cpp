@@ -10,7 +10,7 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_win32.h"
 #include "imgui/imgui_impl_dx11.h"
-
+#include"headerFiles.h"
 #pragma comment (lib, "d3d11.lib")
 #pragma comment (lib, "d3dcompiler.lib")
 #define WIDTH 768.0f
@@ -62,6 +62,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	
 	MSG msg = { 0 };
 	HWND wndHandle = InitWindow(hInstance);
+	int nmcShow = nCmdShow;
 	QuadHandler quadHandler;
 	Vertex3D TwoTris[6] = {
 						-0.5f, -0.5f, 0.f,	//pos
@@ -99,6 +100,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	float gClearColour[3] = { 0.2f,0.5f,0.1f };
 	float gIncrement = 0;
 	float dist = 0.1f;
+	float xPart = 0.0f;
 	if (wndHandle)
 	{
 		CreateDirect3DContext(wndHandle);
@@ -107,9 +109,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		createConstantBuffer();
 		setSampler();
 		CreateQuadData(TwoTris, quadHandler);
-		ShowWindow(wndHandle, nCmdShow);
+		ShowWindow(wndHandle, nmcShow);
 
-
+		std::unique_ptr<DirectX::Keyboard> m_keyboard;
+		
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); // (void)io;
@@ -119,6 +122,26 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 		while (WM_QUIT != msg.message)
 		{
+			if (msg.message == WM_KEYDOWN)
+			{
+				if (msg.wParam == 'W')
+				{
+					dist += 0.01f;
+				}
+				else if (msg.wParam == 'S')
+				{
+					dist -= 0.01f;
+				}
+				if (msg.wParam == 'A')
+				{
+					xPart -= 0.01f;
+				}
+				else if (msg.wParam == 'D')
+				{
+					xPart += 0.01f;
+				}
+			}
+			
 			if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
 			{
 				TranslateMessage(&msg);
@@ -126,6 +149,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 			}
 			else
 			{
+				
 				ImGui_ImplDX11_NewFrame();
 				ImGui_ImplWin32_NewFrame();
 				ImGui::NewFrame();
@@ -138,10 +162,20 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 				ImGui::ColorEdit4("Triangle data", (float*)gConstantBufferData);
 				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 				ImGui::End();
-
-				if (dist < 3.0f)
-					dist += 0.001f;
-				gIncrement += 0.8f * ImGui::GetIO().DeltaTime;
+				//keyboard inputs from dxtk(DirectX Tool Kit) Which we can use for window and hopefully keyboard and mouse
+				/*
+				m_keyboard = std::make_unique<Keyboard>();
+				auto kb = m_keyboard->GetState();
+				if (kb.Escape)
+				{
+					//ExitGame();
+				}
+				else if (kb.W)
+				{
+					//Forward
+				}
+				*/
+				//gIncrement += 0.8f * ImGui::GetIO().DeltaTime;
 				gConstantBufferData->offset = sin(gIncrement);
 
 				D3D11_MAPPED_SUBRESOURCE mappedMemory;
@@ -149,8 +183,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 				memcpy(mappedMemory.pData, gConstantBufferData, sizeof(CBData));
 				gDeviceContext->Unmap(gConstantBuffer, 0);
 
-				XMVECTOR CamPos = XMVectorSet(0.0, 0.0, -2, 0.0);  //-dist 
-				XMVECTOR LookAt = XMVectorSet(0.0, 0.0, 0.0, 0.0); //change to first person view
+				XMVECTOR CamPos = XMVectorSet(xPart, 0.0, -dist, 0.0);  //-dist 
+				XMVECTOR LookAt = XMVectorSet(0.0, 0.0, 0.0, 0.0)+CamPos; //change to first person view
 				XMVECTOR Up = XMVectorSet(0.0, 1.0, 0.0, 0.0);
 				XMMATRIX View = XMMatrixLookAtLH(CamPos, LookAt, Up);
 				XMMATRIX World = XMMatrixRotationY(gIncrement);
@@ -545,7 +579,7 @@ void Render(float gClearColour[3])
 {
 	gDeviceContext->ClearRenderTargetView(gBackbufferRTV, gClearColour);
 	gDeviceContext->ClearDepthStencilView(pDSV, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
+	//
 	gDeviceContext->PSSetConstantBuffers(0, 1, &gConstantBuffer);
 	gDeviceContext->VSSetConstantBuffers(0, 1, &gConstantBuffer);
 	gDeviceContext->GSSetConstantBuffers(0, 1, &gMatrixPerFrameBuffer);
@@ -655,4 +689,7 @@ void createConstantBuffer()
 		// deal with error...
 	}
 }
-	
+void updateCamera()
+{
+
+}
