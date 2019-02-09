@@ -14,17 +14,17 @@ public:
 	void shutdown();
 	void setVertexBuffer(ID3D11DeviceContext *& gDeviceContext);
 	int getVertexCount()const;
-	void setTheTexture(TextureData* txt, ID3D11Device* gDevice);
+	void setTheTexture( ID3D11Device*& gDevice, ID3D11DeviceContext *&gDeviceContext);
 	void setSampler(ID3D11Device* gDevice);
 private:
 	ID3D11Buffer *vertexBuffer;
-	ID3D11Buffer *indexBuffer;
+	//ID3D11Buffer *indexBuffer;
 	ID3D11Buffer *constantBuffer;
 	ID3D11SamplerState* SamplerState;
 
 	Texture texture;
 	int vertexCount;
-	int indexCount;
+	//int indexCount;
 	QuadHandler quads;
 };
 #endif // !MODEL_H

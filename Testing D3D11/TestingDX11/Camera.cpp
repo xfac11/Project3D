@@ -4,6 +4,7 @@ Camera::Camera()
 {
 	this->position = DirectX::XMFLOAT3(0.f, 0.f, 0.f);
 	this->rotation = DirectX::XMFLOAT3(0.f, 0.f, 0.f);
+
 }
 
 Camera::~Camera()
@@ -47,13 +48,13 @@ void Camera::Render()
 
 	DirectX::XMVECTOR Up = DirectX::XMVectorSet(0, 1.f, 0, 0.0);
 	DirectX::XMVECTOR CamPos = DirectX::XMVectorSet(this->position.x, this->position.y, this->position.z, 0.0);
-	DirectX::XMVECTOR LookAt= DirectX::XMVectorSet(0.0, 0.0, 0.0, 0.0);
+	DirectX::XMVECTOR LookAt = DirectX::XMVectorSet(0.0, 0.0, 0.0, 0.0);
 	DirectX::XMFLOAT3 YawPitchRoll = DirectX::XMFLOAT3(this->rotation.x*radians, this->rotation.y*radians, this->rotation.z*radians);
-	DirectX::XMMATRIX rotationMatrix= DirectX::XMMatrixRotationRollPitchYaw(YawPitchRoll.x,YawPitchRoll.y,YawPitchRoll.z);
+	DirectX::XMMATRIX rotationMatrix = DirectX::XMMatrixRotationRollPitchYaw(YawPitchRoll.x, YawPitchRoll.y, YawPitchRoll.z);
 	//LookAt = DirectX::XMVector3TransformCoord(LookAt, rotationMatrix);
 	//Up = XMVector3TransformCoord(Up, rotationMatrix);
 	//LookAt = DirectX::XMVectorAdd(CamPos, LookAt);
-	this->viewMatrix =  DirectX::XMMatrixLookAtLH(CamPos, LookAt, Up);
+	this->viewMatrix = DirectX::XMMatrixLookAtLH(CamPos, LookAt, Up);
 	//this->viewMatrix = DirectX::XMMatrixTranspose(viewMatrix); //moved to shader
 }
 

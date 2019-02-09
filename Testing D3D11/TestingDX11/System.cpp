@@ -34,11 +34,11 @@ HWND System::InitWindow(HINSTANCE hInstance, float height, float width)
 		nullptr);
 	return hwnd;
 }
-//extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lParam);
+extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lParam);
 LRESULT CALLBACK System::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 { //event-handling, event happens to window
-	//if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
-		//return true;
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
+		return true;
 	switch (message)
 	{
 	case WM_DESTROY:
@@ -48,17 +48,19 @@ LRESULT CALLBACK System::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 	return DefWindowProc(hWnd, message, wParam, lParam);
 }
 
-System::System()
-{
-}
+//System::System()
+//{
+//}
 
 System::System(HINSTANCE hInstance, LPCSTR name, int nCmdShow)
 {
 	this->hinstance = hInstance;
 	this->applicationName = name;
-	this->hwnd = hwnd;
+	this->hwnd = InitWindow(this->hinstance, HEIGHT, WIDTH);
 	this->nCMDShow = nCmdShow;
 	this->msg = { 0 };
+	graphics = nullptr;
+	graphics = new Graphics;
 }
 
 System::~System()
@@ -68,6 +70,7 @@ System::~System()
 bool System::initialize()
 {
 	this->hwnd = InitWindow(this->hinstance, HEIGHT, WIDTH);
+	
 	return this->hwnd;
 }
 
@@ -75,8 +78,9 @@ void System::run()
 {
 	if (this->hwnd)
 	{
+		graphics->Initialize(768, 768, this->hwnd);
 		ShowWindow(this->hwnd, this->nCMDShow);
-
+		graphics->initImgui(this->hwnd);
 		while (WM_QUIT != msg.message)
 		{
 			if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
@@ -87,6 +91,7 @@ void System::run()
 			else
 			{
 				//Game
+				graphics->Frame();
 			}
 		}
 		shutDown();

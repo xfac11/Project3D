@@ -48,4 +48,3 @@ void QuadVertex::setColor(int id, float rgb[3], ID3D11Device *& gDevice, ID3D11B
 
 	update(gDevice, gVertexBuffer);
 }
-

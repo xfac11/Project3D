@@ -30,10 +30,10 @@ bool Graphics::render()
 {
 	this->renderImgui();
 	Direct3D->BeginScene(this->color);
-
+	//Direct3D->initialize();
 	//campos mappedmemory
 
-	this->Model->setVertexBuffer(this->Direct3D->GetDeviceContext());
+	this->theModel->setVertexBuffer(this->Direct3D->GetDeviceContext());
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 	Direct3D->EndScene();
@@ -44,11 +44,11 @@ bool Graphics::render()
 Graphics::Graphics()
 {
 	this->Direct3D = nullptr;
-	this->Camera = nullptr;
-	this->Model = nullptr;
-	this->ColorShader = nullptr;
-	this->color[0] = 0.5f;
-	this->color[1] = 0.5f;
+	this->theCamera = nullptr;
+	this->theModel = nullptr;
+	this->theColorShader = nullptr;
+	this->color[0] = 0.1f;
+	this->color[1] = 0.9f;
 	this->color[2] = 0.5f;
 	this->color[3] = 0.5f;
 }
@@ -61,18 +61,54 @@ Graphics::~Graphics()
 bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 {
 	bool result = false;
-	Direct3D = new D3D;
+	//if (this->Direct3D == nullptr)
+	//	throw std::bad_alloc();
+	this->Direct3D = new D3D;
+	//this->Direct3D = (D3D*)::operator new (sizeof(D3D));
+	//this->Direct3D = (D3D*)_aligned_malloc(sizeof(D3D), 16);
 
-	/*if (!Direct3D)
-	{
-		result = false;
-	}*/
 	result = Direct3D->initialize(screenWidth, screenHeight, VSYNC_ENABLED, hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
 	if (!result)
 	{
 		MessageBox(hwnd, "Could not initialize Direct3D", "Error", MB_OK); //L"", L"", ;
 		result = false;
 	}
+	theCamera = new Camera;
+	//theCamera = (Camera*)_aligned_malloc(sizeof(Camera), 16);
+	if (!theCamera)
+	{
+		MessageBox(hwnd, "My B, Could not initialize Camera", "Error", MB_OK);
+		result = false;
+	}
+	theCamera->SetPosition(0.0f, 0.0f, -5.0f);
+
+	theModel = new Model;
+	if (theModel)
+	{
+		MessageBox(hwnd, "My B, Could not initialize Model", "Error", MB_OK);
+		result = false;
+	}
+	//result = theModel->Initialize(Direct3D->GetDevice());
+	//if (!result)
+	//{
+	//	MessageBox(hwnd, "Could not initialize the model object.", L"Error", MB_OK);
+	//	return false;
+	//}
+
+	theColorShader = new ColorShader;
+	if (!theColorShader)
+	{
+		return false;
+	}
+
+	// Initialize the color shader object.
+	result = theColorShader->Initialize(Direct3D->GetDevice(), hwnd);
+	if (!result)
+	{
+		MessageBox(hwnd, "Could not initialize the color shader object.", "Error", MB_OK);
+		return false;
+	}
+
 	Vertex3D TwoTris[6] = {
 						-0.5f, -0.5f, 0.f,	//pos
 						//0.f, 0.f, 0.f,	//color
@@ -105,14 +141,16 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 						1.f, 1.f, 1.f,
 						0.5f, -0.5f, 0.f,
 	};
-	this->Model->addQuads(TwoTris, this->Direct3D->GetDevice());
-	TextureData* txt = nullptr;
-	txt = new TextureData;
-	txt->IMAGE_DATA = BTH_IMAGE_DATA;
-	txt->IMAGE_HEIGHT = BTH_IMAGE_HEIGHT;
-	txt->IMAGE_WIDTH = BTH_IMAGE_WIDTH;
-	this->Model->setTheTexture(txt, this->Direct3D->GetDevice());
-	this->Model->setSampler(this->Direct3D->GetDevice());
+	this->theModel->addQuads(TwoTris, this->Direct3D->GetDevice());
+	//TextureData* txt = nullptr;
+	//txt = new TextureData(BTH_IMAGE_WIDTH, BTH_IMAGE_HEIGHT, BTH_IMAGE_DATA, sizeof(BTH_IMAGE_DATA));
+	//unsigned char* image_data = BTH_IMAGE_DATA;
+	//txt->IMAGE_DATA= BTH_IMAGE_DATA;
+	//txt->IMAGE_HEIGHT = BTH_IMAGE_HEIGHT;
+	//txt->IMAGE_WIDTH = BTH_IMAGE_WIDTH;
+	this->theModel->setSampler(this->Direct3D->GetDevice());
+	this->theModel->setTheTexture(this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext());
+	
 	return result;
 }
 
@@ -124,7 +162,11 @@ void Graphics::Shutdown()
 		delete Direct3D;
 		Direct3D = NULL;
 	}*/
-	this->Model->shutdown();
+	if (Direct3D)
+	{
+		_aligned_free(Direct3D);
+	}
+	this->theModel->shutdown();
 	Direct3D->Shutdown();
 	ImGui_ImplDX11_Shutdown();
 	ImGui_ImplWin32_Shutdown();

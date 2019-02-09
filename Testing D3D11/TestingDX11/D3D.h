@@ -6,7 +6,7 @@
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "d3dcompiler.lib")
 //using namespace DirectX;
-class D3D
+__declspec(align(16)) class D3D
 {
 
 private:
@@ -41,15 +41,24 @@ private:
 
 public:
 	D3D();
-	virtual~D3D();
+	~D3D();
+	void* operator new(size_t i) //test
+	{
+		return _mm_malloc(i, 16);
+	}
+
+	void operator delete(void* p)
+	{
+		_mm_free(p);
+	}
 
 	bool initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen, float screenDepth, float screenNear);
 	void Shutdown();
 	void BeginScene(float color[4]);
 	void EndScene();
 
-	ID3D11Device* GetDevice();
-	ID3D11DeviceContext* GetDeviceContext();
+	ID3D11Device*& GetDevice();
+	ID3D11DeviceContext*& GetDeviceContext();
 
 	DirectX::XMMATRIX& GetProjectionMatrix();
 	DirectX::XMMATRIX& GetWorldMatrix();

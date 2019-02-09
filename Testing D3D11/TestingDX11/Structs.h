@@ -12,12 +12,12 @@ struct CBData //ConstantBufferData
 	float offset;
 	float padding1, padding2, padding3;
 };
-struct TextureData
-{
-	unsigned int IMAGE_WIDTH;
-	unsigned int IMAGE_HEIGHT;
-
-	//Image data stored in 8-bit RGBA format
-	unsigned char * IMAGE_DATA;
-};
+//struct TextureData
+//{
+//	unsigned int IMAGE_WIDTH;
+//	unsigned int IMAGE_HEIGHT;
+//
+//	//Image data stored in 8-bit RGBA format
+//	unsigned char IMAGE_DATA[16384];
+//};
 #endif

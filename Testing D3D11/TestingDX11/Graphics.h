@@ -4,7 +4,8 @@
 #include "Camera.h"
 #include "ColorShader.h"
 #include "Model.h"
-#include "bth_image.h"
+//#include "TextureData.h"
+//#include "bth_image.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_win32.h"
 #include "imgui/imgui_impl_dx11.h"
@@ -16,9 +17,9 @@ class Graphics
 {
 private:
 	D3D* Direct3D;
-	Camera* Camera;
-	Model* Model;
-	ColorShader* ColorShader;
+	Camera* theCamera;
+	Model* theModel;
+	ColorShader* theColorShader;
 	float color[4]; //parameter color?
 	void renderImgui();
 

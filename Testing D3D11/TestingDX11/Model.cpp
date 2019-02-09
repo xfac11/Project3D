@@ -3,9 +3,9 @@
 Model::Model()
 {
 	this->vertexBuffer = nullptr;
-	this->indexBuffer = nullptr;
+	//this->indexBuffer = nullptr;
 	this->constantBuffer = nullptr;
-	this->indexCount = 0;
+	//this->indexCount = 0;
 	this->vertexCount = 0;
 }
 
@@ -14,18 +14,18 @@ Model::~Model()
 
 }
 
-void Model::addQuads(Vertex3D newQuad[6], ID3D11Device *& gDevice) 
+void Model::addQuads(Vertex3D newQuad[6], ID3D11Device *& gDevice)
 {//Will change vertexbuffer and vertexcount
-	quads.addQuad(newQuad, gDevice, this->vertexBuffer,this->vertexCount);
+	quads.addQuad(newQuad, gDevice, this->vertexBuffer, this->vertexCount);
 }
 
 void Model::shutdown()
 {
-	if(this->vertexBuffer!=nullptr)
+	if (this->vertexBuffer != nullptr)
 		this->vertexBuffer->Release();
-	if(this->indexBuffer!=nullptr)
-		this->indexBuffer->Release();
-	if(this->constantBuffer!=nullptr)
+	//if (this->indexBuffer != nullptr)
+		//this->indexBuffer->Release();
+	if (this->constantBuffer != nullptr)
 		this->constantBuffer->Release();
 	if (this->SamplerState != nullptr)
 		this->SamplerState->Release();
@@ -46,9 +46,9 @@ int Model::getVertexCount() const
 	return this->vertexCount;
 }
 
-void Model::setTheTexture(TextureData * txt, ID3D11Device * gDevice)
+void Model::setTheTexture( ID3D11Device *& gDevice, ID3D11DeviceContext *&gDeviceContext)
 {
-	this->texture.setTexture(txt, gDevice);
+	this->texture.setTexture(gDevice, gDeviceContext);
 }
 
 void Model::setSampler(ID3D11Device* gDevice)

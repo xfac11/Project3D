@@ -2,13 +2,17 @@
 
 D3D::D3D()
 {
-	this->swapChain = 0;// nullptr;
-	this->device = 0; //nullptr;
-	this->deviceContext = 0; //nullptr;
-	this->renderTargetView = 0; //nullptr;
-	this->depthStencilBuffer = 0;// nullptr;
-	this->depthStencilState = 0; //nullptr;
-	this->depthStencilView = 0; //nullptr;
+	this->vSync_enabled = NULL;
+	this->videoCardMemory = NULL;
+	this->videoCardDescription[128] = NULL;
+
+	this->swapChain =  nullptr;
+	this->device = nullptr;
+	this->deviceContext = nullptr;
+	this->renderTargetView = nullptr;
+	this->depthStencilBuffer = nullptr;
+	this->depthStencilState = nullptr;
+	this->depthStencilView = nullptr;
 	//rasterState = nullptr;
 
 	this->dist = 0.1f;
@@ -101,8 +105,8 @@ bool D3D::initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 
 		
 		D3D11_TEXTURE2D_DESC descDepth;
-		descDepth.Width = (float)screenWidth;
-		descDepth.Height = (float)screenHeight;
+		descDepth.Width = (UINT)screenWidth;
+		descDepth.Height = (UINT)screenHeight;
 		descDepth.MipLevels = 1;
 		descDepth.ArraySize = 1;
 		descDepth.Format = DXGI_FORMAT_D24_UNORM_S8_UINT; //DXGI_FORMAT_R32_TYPELESS;

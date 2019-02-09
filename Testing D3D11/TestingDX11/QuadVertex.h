@@ -10,7 +10,7 @@ private:
 	D3D11_SUBRESOURCE_DATA data;
 	void update(ID3D11Device *& gDevice, ID3D11Buffer *& gVertexBuffer);
 public:
-	QuadVertex(Vertex3D newQuad[6], ID3D11Device *& gDevice, ID3D11Buffer *& gVertexBuffer);
+	QuadVertex(Vertex3D newQuad[6], ID3D11Device *& gDevice, ID3D11Buffer *& gVertexBuffer,int & vertexCount);
 	~QuadVertex();
 	UINT32 getSize()const;
 	void setColor(int id, float rgb[3], ID3D11Device *& gDevice, ID3D11Buffer *& gVertexBuffer);

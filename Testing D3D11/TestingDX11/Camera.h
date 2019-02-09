@@ -1,7 +1,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 #include <directxmath.h>
-class Camera
+__declspec(align(16)) class Camera
 {
 private:
 	DirectX::XMFLOAT3 position;
@@ -11,6 +11,15 @@ private:
 public:
 	Camera();
 	~Camera();
+	void* operator new(size_t i) //test
+	{
+		return _mm_malloc(i, 16);
+	}
+
+	void operator delete(void* p)
+	{
+		_mm_free(p);
+	}
 	void SetPosition(float x, float y , float z);
 	void SetPosition(DirectX::XMFLOAT3 position);
 	void SetRotation(float x, float y , float z);

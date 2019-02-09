@@ -16,7 +16,7 @@ using namespace DirectX;
 class System
 {
 public:
-	System();
+	//System();
 	System(HINSTANCE hInstance, LPCSTR name, int nCmdShow);
 	~System();
 	System(const System& obj);
@@ -28,7 +28,7 @@ public:
 private:
 	bool frame();
 	void initializeWindows(float height, float width);
-	HWND InitWindow(HINSTANCE hInstance,float height,float width);
+	HWND InitWindow(HINSTANCE hInstance, float height, float width);
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 	LPCSTR applicationName;
 	HINSTANCE hinstance;
