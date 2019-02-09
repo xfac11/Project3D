@@ -41,7 +41,6 @@ void Texture::setTexture(ID3D11Device*& gDevice, ID3D11DeviceContext  *&gDeviceC
 
 	gDevice->CreateTexture2D(&texDesc, &texInitData, &tex);
 	gDevice->CreateShaderResourceView(tex, NULL, &this->textureView);
-	gDeviceContext->PSSetShaderResources(0, 1, &this->textureView);
 }
 
 ID3D11ShaderResourceView *& Texture::getTexture()

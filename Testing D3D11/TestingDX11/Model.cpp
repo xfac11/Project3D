@@ -36,6 +36,7 @@ void Model::setVertexBuffer(ID3D11DeviceContext *& gDeviceContext)
 	UINT32 vertexSize = sizeof(Vertex3D);
 
 	UINT32 offset = 0;
+	gDeviceContext->PSSetShaderResources(0, 1, &this->texture.getTexture());
 	gDeviceContext->IASetVertexBuffers(0, 1, &this->vertexBuffer, &vertexSize, &offset);
 	gDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	//gDeviceContext->GSSetShader(nullptr, nullptr, 0); //already initilized?+
@@ -51,7 +52,7 @@ void Model::setTheTexture( ID3D11Device *& gDevice, ID3D11DeviceContext *&gDevic
 	this->texture.setTexture(gDevice, gDeviceContext);
 }
 
-void Model::setSampler(ID3D11Device* gDevice)
+void Model::setSampler(ID3D11Device*& gDevice)
 {
 	D3D11_SAMPLER_DESC desc;
 	ZeroMemory(&desc, sizeof(desc));

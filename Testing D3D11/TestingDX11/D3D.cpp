@@ -121,7 +121,7 @@ bool D3D::initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 		{
 			return false;
 		}
-		result = device->CreateDepthStencilView(depthStencilBuffer, &depthStencilViewDesc, &depthStencilView); // &depthStencilViewDesc was NULL
+		result = device->CreateDepthStencilView(depthStencilBuffer, NULL, &depthStencilView); // &depthStencilViewDesc was NULL
 		if (FAILED(result))
 		{
 			// deal with error...
@@ -240,6 +240,8 @@ void D3D::BeginScene(float color[4])
 	deviceContext->ClearRenderTargetView(renderTargetView, color);
 	// Clear the depth buffer.
 	deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	deviceContext->OMSetDepthStencilState(this->depthStencilState, 0); //1
+
 }
 
 void D3D::EndScene()

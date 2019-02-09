@@ -1,6 +1,6 @@
 #include "ColorShader.h"
 
-bool ColorShader::InitializeShader(ID3D11Device* device, HWND hwnd)//, WCHAR* vsFilename, WCHAR* psFileName) //WCHAR* gsFilename
+bool ColorShader::InitializeShader(ID3D11Device*& device, HWND hwnd)//, WCHAR* vsFilename, WCHAR* psFileName) //WCHAR* gsFilename
 {
 	ID3DBlob* pVS = nullptr;
 	ID3DBlob* errorBlob = nullptr;
@@ -173,7 +173,7 @@ bool ColorShader::InitializeShader(ID3D11Device* device, HWND hwnd)//, WCHAR* vs
 		&geometryShader
 	);
 	pGS->Release();
-	return false;
+	return true;
 }
 
 void ColorShader::ShutdownShader()
@@ -241,17 +241,17 @@ void ColorShader::OutputShaderErrorMessage(ID3D10Blob * errorMessage, HWND hwnd,
 	//return;
 }
 
-bool ColorShader::SetShaderParameters(ID3D11DeviceContext * deviceContext, DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix)
+bool ColorShader::SetShaderParameters(ID3D11DeviceContext *& deviceContext, DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix)
 {
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedMemory;
-//	MatrixBufferType* dataPtr;
-	//PerFrameMatrices* matricesPerFrame;
-	//unsigned int bufferNumber;
+	//	MatrixBufferType* dataPtr;
+		//PerFrameMatrices* matricesPerFrame;
+		//unsigned int bufferNumber;
 
-	//Make sure to transpose matrices before sending them into the shader, this is a requirement for DirectX 11.
+		//Make sure to transpose matrices before sending them into the shader, this is a requirement for DirectX 11.
 
-		// Transpose the matrices to prepare them for the shader.
+			// Transpose the matrices to prepare them for the shader.
 	worldMatrix = XMMatrixTranspose(worldMatrix);
 	viewMatrix = XMMatrixTranspose(viewMatrix);
 	projectionMatrix = XMMatrixTranspose(projectionMatrix);
@@ -271,7 +271,7 @@ bool ColorShader::SetShaderParameters(ID3D11DeviceContext * deviceContext, Direc
 	// Get a pointer to the data in the constant buffer.
 	//matricesPerFrame = (PerFrameMatrices*)mappedMemory.pData; //was in tutorial
 	memcpy(mappedMemory.pData, matricesPerFrame, sizeof(PerFrameMatrices));
-	
+
 	// Unlock the constant buffer.
 	deviceContext->Unmap(MatrixPerFrameBuffer, 0);
 
@@ -286,22 +286,21 @@ bool ColorShader::SetShaderParameters(ID3D11DeviceContext * deviceContext, Direc
 	deviceContext->VSSetConstantBuffers(0, 1, &ConstantBuffer); //could have bufferNumber = 0 dno why tho
 	deviceContext->GSSetConstantBuffers(0, 1, &MatrixPerFrameBuffer);
 
-	return false;
+	return true;
 }
 
 void ColorShader::RenderShader(ID3D11DeviceContext * deviceContext, int count)
 {
 
-	deviceContext->IASetInputLayout(this->vertexLayout);
 	deviceContext->VSSetShader(this->vertexShader, nullptr, 0);
 	deviceContext->HSSetShader(nullptr, nullptr, 0);
 	deviceContext->DSSetShader(nullptr, nullptr, 0);
 	deviceContext->GSSetShader(this->geometryShader, nullptr, 0);
 	deviceContext->PSSetShader(this->pixelShader, nullptr, 0);
-
+	deviceContext->IASetInputLayout(this->vertexLayout);
 
 	//deviceContext->DrawIndexed(count, 0, 0);
-	deviceContext->Draw(count,0); 
+	deviceContext->Draw(count, 0);
 	deviceContext->GSSetShader(nullptr, nullptr, 0);
 }
 
@@ -322,7 +321,7 @@ ColorShader::~ColorShader()
 
 bool ColorShader::Initialize(ID3D11Device *device, HWND hwnd)
 {
-	bool result=false;
+	bool result = false;
 	gConstantBufferData = (CBData*)_aligned_malloc(sizeof(CBData), 16);
 	gConstantBufferData->colour[0] = 0.5f;
 	gConstantBufferData->colour[1] = 0.5f;
@@ -330,7 +329,7 @@ bool ColorShader::Initialize(ID3D11Device *device, HWND hwnd)
 	gConstantBufferData->colour[3] = 1.0f;
 	gConstantBufferData->offset = 0.0f;
 
-	
+
 
 	// Initialize the vertex and pixel shaders.
 	result = InitializeShader(device, hwnd);//, L"../Engine/color.vs", L"../Engine/color.ps");
@@ -398,7 +397,7 @@ void ColorShader::Shutdown()
 		MatrixPerFrameBuffer->Release();
 		MatrixPerFrameBuffer = nullptr;
 	}
-	if(gConstantBufferData)
+	if (gConstantBufferData)
 	{
 		_aligned_free(gConstantBufferData); //struct
 	}
@@ -434,7 +433,7 @@ void ColorShader::Shutdown()
 	}
 }
 
-bool ColorShader::Render(ID3D11DeviceContext* deviceContext, int count, DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix)
+bool ColorShader::Render(ID3D11DeviceContext*& deviceContext, int count, DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix)
 {
 	bool result = false;
 
@@ -444,7 +443,7 @@ bool ColorShader::Render(ID3D11DeviceContext* deviceContext, int count, DirectX:
 	{
 		result = false;
 	}
-	else 
+	else
 	{
 		// Now render the prepared buffers with the shader.
 		RenderShader(deviceContext, count);

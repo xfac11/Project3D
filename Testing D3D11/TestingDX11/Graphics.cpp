@@ -34,6 +34,8 @@ bool Graphics::render()
 	//campos mappedmemory
 
 	this->theModel->setVertexBuffer(this->Direct3D->GetDeviceContext());
+	this->theCamera->Render();
+	this->theColorShader->Render(this->Direct3D->GetDeviceContext(), this->theModel->getVertexCount(), this->Direct3D->GetWorldMatrix(), this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix());
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 	Direct3D->EndScene();
@@ -64,10 +66,13 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	//if (this->Direct3D == nullptr)
 	//	throw std::bad_alloc();
 	this->Direct3D = new D3D;
+	if (this->Direct3D==nullptr)
+	{
+			
+	}
 	//this->Direct3D = (D3D*)::operator new (sizeof(D3D));
 	//this->Direct3D = (D3D*)_aligned_malloc(sizeof(D3D), 16);
-
-	result = Direct3D->initialize(screenWidth, screenHeight, VSYNC_ENABLED, hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
+	result=Direct3D->initialize(screenWidth, screenHeight, VSYNC_ENABLED, hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
 	if (!result)
 	{
 		MessageBox(hwnd, "Could not initialize Direct3D", "Error", MB_OK); //L"", L"", ;
@@ -80,10 +85,10 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		MessageBox(hwnd, "My B, Could not initialize Camera", "Error", MB_OK);
 		result = false;
 	}
-	theCamera->SetPosition(0.0f, 0.0f, -5.0f);
+	theCamera->SetPosition(0.0f, 0.0f, -1.0f);
 
 	theModel = new Model;
-	if (theModel)
+	if (!theModel)
 	{
 		MessageBox(hwnd, "My B, Could not initialize Model", "Error", MB_OK);
 		result = false;

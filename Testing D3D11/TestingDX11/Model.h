@@ -15,7 +15,7 @@ public:
 	void setVertexBuffer(ID3D11DeviceContext *& gDeviceContext);
 	int getVertexCount()const;
 	void setTheTexture( ID3D11Device*& gDevice, ID3D11DeviceContext *&gDeviceContext);
-	void setSampler(ID3D11Device* gDevice);
+	void setSampler(ID3D11Device*& gDevice);
 private:
 	ID3D11Buffer *vertexBuffer;
 	//ID3D11Buffer *indexBuffer;
