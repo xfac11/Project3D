@@ -2,8 +2,9 @@
 
 Texture::Texture()
 {
-	this->targaData = nullptr;
+	//this->targaData = nullptr;
 	this->textureView = nullptr;
+	this->DATA = nullptr;
 }
 
 Texture::~Texture()
@@ -11,17 +12,17 @@ Texture::~Texture()
 
 }
 
-void Texture::setTexture(TextureData* obj, ID3D11Device* gDevice)
+void Texture::setTexture(ID3D11Device*& gDevice, ID3D11DeviceContext  *&gDeviceContext)
 {
-	this->targaData->IMAGE_DATA = obj->IMAGE_DATA;
-	this->targaData->IMAGE_HEIGHT = obj->IMAGE_HEIGHT;
-	this->targaData->IMAGE_WIDTH = obj->IMAGE_WIDTH;
+	//this->targaData->setDATA(obj->getDATA(),obj->getSize());
+	//this->targaData->setWIDTH(obj->getWidth());
+	//this->targaData->setHEIGHT(obj->getHeight());
 	ID3D11Texture2D* tex = nullptr;
 	D3D11_SUBRESOURCE_DATA texInitData = { 0 };
 	ZeroMemory(&texInitData, sizeof(texInitData));
-	texInitData.pSysMem = (const void*)obj->IMAGE_DATA;
-	texInitData.SysMemPitch = obj->IMAGE_WIDTH * 4;
-	texInitData.SysMemSlicePitch = obj->IMAGE_HEIGHT * obj->IMAGE_WIDTH * 4;
+	texInitData.pSysMem = (const void*)BTH_IMAGE_DATA;
+	texInitData.SysMemPitch = BTH_IMAGE_WIDTH * 4;
+	texInitData.SysMemSlicePitch = BTH_IMAGE_HEIGHT * BTH_IMAGE_WIDTH * 4;
 
 
 	D3D11_TEXTURE2D_DESC texDesc;
@@ -30,8 +31,8 @@ void Texture::setTexture(TextureData* obj, ID3D11Device* gDevice)
 	texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 	texDesc.CPUAccessFlags = 0;
 	texDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	texDesc.Height = obj->IMAGE_HEIGHT;
-	texDesc.Width = obj->IMAGE_WIDTH;
+	texDesc.Height = BTH_IMAGE_HEIGHT;
+	texDesc.Width = BTH_IMAGE_WIDTH;
 	texDesc.MipLevels = 1;
 	texDesc.MiscFlags = 0;
 	texDesc.SampleDesc.Count = 1;
@@ -40,6 +41,7 @@ void Texture::setTexture(TextureData* obj, ID3D11Device* gDevice)
 
 	gDevice->CreateTexture2D(&texDesc, &texInitData, &tex);
 	gDevice->CreateShaderResourceView(tex, NULL, &this->textureView);
+	gDeviceContext->PSSetShaderResources(0, 1, &this->textureView);
 }
 
 ID3D11ShaderResourceView *& Texture::getTexture()
