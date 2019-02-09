@@ -1,6 +1,8 @@
 # Project3D
 Project Directx 3D 11
 
+Box creation with size and position only
+
 1.2 
 Mandatory techniques or implementation details: 
 - You have to use a “perspective” camera, 
