@@ -51,7 +51,7 @@ public:
 	{
 		_mm_free(p);
 	}
-
+	void setIncrement(float g);
 	bool initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen, float screenDepth, float screenNear);
 	void Shutdown();
 	void BeginScene(float color[4]);

@@ -23,7 +23,12 @@ D3D::~D3D()
 {
 }
 
-bool D3D::initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen, float screenDepth, float screenNear) 
+void D3D::setIncrement(float g)
+{
+	this->gIncrement = g;
+}
+
+bool D3D::initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen, float screenDepth, float screenNear)
 {
 	//bool result = false;
 	HRESULT result;
@@ -170,7 +175,7 @@ bool D3D::initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 	this->projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, 0.1f, 20.f);
 	//this->projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, screenNear, screenDepth);
 	//this->worldMatrix = DirectX::XMMatrixIdentity();
-	this->worldMatrix = DirectX::XMMatrixRotationY(this->gIncrement);
+	//this->worldMatrix = DirectX::XMMatrixRotationY(this->gIncrement);
 	//this->worldMatrix = DirectX::XMMatrixTranspose(worldMatrix); //moved to colorshader
 	//this->orthoMatrix = DirectX::XMMatrixOrthographicLH((float)screenWidth, (float)screenHeight, screenNear, screenDepth);
 
@@ -241,7 +246,7 @@ void D3D::BeginScene(float color[4])
 	// Clear the depth buffer.
 	deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	deviceContext->OMSetDepthStencilState(this->depthStencilState, 0); //1
-
+	this->worldMatrix = DirectX::XMMatrixRotationY(this->gIncrement);//to here
 }
 
 void D3D::EndScene()

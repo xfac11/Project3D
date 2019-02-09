@@ -18,8 +18,8 @@ void Graphics::renderImgui()
 
 	ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
 	ImGui::Text("This is some unuseful text.");
-	//ImGui::SliderFloat("dist", &dist, -10.0f, 10.0f);
-	//ImGui::SliderFloat("rotation", &gIncrement, -10.0f, 20.0f);
+	ImGui::SliderFloat("dist", &dist, -10.0f, 10.0f);
+	ImGui::SliderFloat("rotation", &gIncrement, -10.0f, 20.0f);
 	ImGui::ColorEdit3("bg-color", (float*)&this->color);
 	//ImGui::ColorEdit4("Triangle data", (float*)gConstantBufferData);
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
@@ -34,6 +34,8 @@ bool Graphics::render()
 	//campos mappedmemory
 
 	this->theModel->setVertexBuffer(this->Direct3D->GetDeviceContext());
+	this->theCamera->SetPosition(0.0f, 0.0f, dist);
+	this->Direct3D->setIncrement(this->gIncrement);
 	this->theCamera->Render();
 	this->theColorShader->Render(this->Direct3D->GetDeviceContext(), this->theModel->getVertexCount(), this->Direct3D->GetWorldMatrix(), this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix());
 	ImGui::Render();
@@ -53,6 +55,7 @@ Graphics::Graphics()
 	this->color[1] = 0.9f;
 	this->color[2] = 0.5f;
 	this->color[3] = 0.5f;
+	this->dist = -1.0f;
 }
 
 Graphics::~Graphics()

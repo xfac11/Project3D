@@ -22,7 +22,8 @@ private:
 	ColorShader* theColorShader;
 	float color[4]; //parameter color?
 	void renderImgui();
-
+	float dist;
+	float gIncrement;
 	bool render(); //float [4]color
 public:
 	Graphics();
