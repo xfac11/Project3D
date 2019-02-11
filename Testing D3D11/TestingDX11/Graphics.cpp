@@ -24,7 +24,7 @@ void Graphics::renderImgui()
 	ImGui::SliderFloat("Camera X-Rotation", &camRot.x, -365.0f, 365.0f);//Mouse
 	ImGui::SliderFloat("Camera Y-Rotation", &camRot.y, -365.0f, 365.0f);//Mouse
 	ImGui::SliderFloat("Camera Z-Rotation", &camRot.z, -365.0f, 365.0f);//Mouse
-	ImGui::SliderFloat("Object Rotation", &gIncrement, -10.0f, 20.0f);
+	ImGui::SliderFloat("World Rotation", &gIncrement, -10.0f, 20.0f);
 	ImGui::ColorEdit3("bg-color", (float*)&this->color);
 	ImGui::CaptureKeyboardFromApp(true);
 	//ImGui::ColorEdit4("Triangle data", (float*)gConstantBufferData);
