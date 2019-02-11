@@ -14,9 +14,9 @@ Model::~Model()
 
 }
 
-void Model::addQuads(Vertex3D newQuad[6], ID3D11Device *& gDevice)
+bool Model::addQuads(Vertex3D newQuad[6], ID3D11Device *& gDevice)
 {//Will change vertexbuffer and vertexcount
-	quads.addQuad(newQuad, gDevice, this->vertexBuffer, this->vertexCount);
+	return quads.addQuad(newQuad, gDevice, this->vertexBuffer, this->vertexCount);
 }
 
 void Model::shutdown()
@@ -29,6 +29,11 @@ void Model::shutdown()
 		this->constantBuffer->Release();
 	if (this->SamplerState != nullptr)
 		this->SamplerState->Release();
+}
+
+bool Model::createTheVertexBuffer(ID3D11Device *& gDevice)
+{
+	return this->quads.createVertexBuffer(gDevice, this->vertexBuffer, this->vertexCount);
 }
 
 void Model::setVertexBuffer(ID3D11DeviceContext *& gDeviceContext)

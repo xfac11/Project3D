@@ -10,8 +10,9 @@ public:
 	Model();
 	~Model();
 	//This before setVertexBuffer
-	void addQuads(Vertex3D newQuad[6], ID3D11Device *& gDevice);
+	bool addQuads(Vertex3D newQuad[6], ID3D11Device *& gDevice);
 	void shutdown();
+	bool createTheVertexBuffer(ID3D11Device *& gDevice);
 	void setVertexBuffer(ID3D11DeviceContext *& gDeviceContext);
 	int getVertexCount()const;
 	void setTheTexture( ID3D11Device*& gDevice, ID3D11DeviceContext *&gDeviceContext);

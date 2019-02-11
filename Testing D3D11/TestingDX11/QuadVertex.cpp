@@ -2,7 +2,8 @@
 
 void QuadVertex::update(ID3D11Device *& gDevice, ID3D11Buffer *& gVertexBuffer)
 {
-	gDevice->CreateBuffer(&this->bufferDesc, &this->data, &gVertexBuffer);
+	
+	
 }
 
 QuadVertex::QuadVertex(Vertex3D newQuad[6], ID3D11Device *& gDevice, ID3D11Buffer *& gVertexBuffer, int & vertexCount)
@@ -21,13 +22,7 @@ QuadVertex::QuadVertex(Vertex3D newQuad[6], ID3D11Device *& gDevice, ID3D11Buffe
 	vertexCount++;
 
 
-	memset(&this->bufferDesc, 0, sizeof(this->bufferDesc));
-	this->bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	this->bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	this->bufferDesc.ByteWidth = sizeof(Quad);
-	this->data.pSysMem = Quad;
-
-	update(gDevice, gVertexBuffer);
+	
 }
 
 QuadVertex::~QuadVertex()
@@ -37,6 +32,11 @@ QuadVertex::~QuadVertex()
 UINT32 QuadVertex::getSize()const
 {
 	return sizeof(Quad);
+}
+
+Vertex3D QuadVertex::getQuads(int id)
+{
+	return this->Quad[id];
 }
 
 void QuadVertex::setColor(int id, float rgb[3], ID3D11Device *& gDevice, ID3D11Buffer *& gVertexBuffer)

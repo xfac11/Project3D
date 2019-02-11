@@ -23,6 +23,9 @@ private:
 	float color[4]; //parameter color?
 	void renderImgui();
 	float dist;
+	float xPos;
+	float xRot;
+	float yRot;
 	float gIncrement;
 	bool render(); //float [4]color
 public:

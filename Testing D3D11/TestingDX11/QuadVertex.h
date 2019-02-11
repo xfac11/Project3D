@@ -13,6 +13,7 @@ public:
 	QuadVertex(Vertex3D newQuad[6], ID3D11Device *& gDevice, ID3D11Buffer *& gVertexBuffer,int & vertexCount);
 	~QuadVertex();
 	UINT32 getSize()const;
+	Vertex3D getQuads(int id);
 	void setColor(int id, float rgb[3], ID3D11Device *& gDevice, ID3D11Buffer *& gVertexBuffer);
 };
 #endif
