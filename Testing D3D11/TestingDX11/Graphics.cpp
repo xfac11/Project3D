@@ -17,30 +17,16 @@ void Graphics::renderImgui()
 	ImGui::NewFrame();
 
 	ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-	ImGui::Text("This is some unuseful text.");
-	ImGui::SliderFloat("dist", &dist, -10.0f, 10.0f);//W and S Keyboard
-	ImGui::SliderFloat("xPos", &xPos, -10.0f, 10.0f);//A and D Keyboard
-	ImGui::SliderFloat("xRotation", &xRot, -100.0f, 100.0f);//Mouse
-	ImGui::SliderFloat("yRotation", &yRot, -365.0f, 365.0f);//Mouse
-	ImGui::SliderFloat("rotation", &gIncrement, -10.0f, 20.0f);
+	ImGui::Text("This is some unuseful text."); //W and S Keyboard
+	ImGui::SliderFloat("Camera X-Position", &camPos.x, -10.0f, 10.0f);//A and D Keyboard
+	ImGui::SliderFloat("Camera Y-Position", &camPos.y, -10.0f, 10.0f);//A and D Keyboard
+	ImGui::SliderFloat("Camera Z-Position", &camPos.z, -10.0f, 10.0f); //W & S
+	ImGui::SliderFloat("Camera X-Rotation", &camRot.x, -365.0f, 365.0f);//Mouse
+	ImGui::SliderFloat("Camera Y-Rotation", &camRot.y, -365.0f, 365.0f);//Mouse
+	ImGui::SliderFloat("Camera Z-Rotation", &camRot.z, -365.0f, 365.0f);//Mouse
+	ImGui::SliderFloat("Object Rotation", &gIncrement, -10.0f, 20.0f);
 	ImGui::ColorEdit3("bg-color", (float*)&this->color);
 	ImGui::CaptureKeyboardFromApp(true);
-	/*if (ImGui::IsKeyPressed('a'))
-	{
-		xPos -= 0.1f;
-	}
-	else if (ImGui::IsKeyPressed('d'))
-	{
-		xPos += 0.1f;
-	}
-	if (ImGui::IsKeyPressed('w'))
-	{
-		dist += 0.1f;
-	}
-	else if (ImGui::IsKeyPressed('s'))
-	{
-		dist -= 0.1f;
-	}*/
 	//ImGui::ColorEdit4("Triangle data", (float*)gConstantBufferData);
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	ImGui::End();
@@ -49,16 +35,17 @@ void Graphics::renderImgui()
 bool Graphics::render()
 {
 	this->renderImgui();
-	Direct3D->BeginScene(this->color);
+	this->Direct3D->BeginScene(this->color);
 	//Direct3D->initialize();
 	//campos mappedmemory
 
 	this->theModel->setVertexBuffer(this->Direct3D->GetDeviceContext());
-	this->theCamera->SetPosition(xPos, 0.0f, dist);
-	this->theCamera->SetRotation(xRot, yRot, 0.0f);
+	this->theCamera->SetPosition(this->camPos.x, this->camPos.y, this->camPos.z);
+	this->theCamera->SetRotation(this->camRot.x, this->camRot.y, this->camRot.z);
 	this->Direct3D->setIncrement(this->gIncrement);
 	this->theCamera->Render();
 	this->theColorShader->Render(this->Direct3D->GetDeviceContext(), this->theModel->getVertexCount(), this->Direct3D->GetWorldMatrix(), this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix());
+
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 	Direct3D->EndScene();
@@ -76,10 +63,12 @@ Graphics::Graphics()
 	this->color[1] = 0.9f;
 	this->color[2] = 0.5f;
 	this->color[3] = 0.5f;
-	this->dist = -1.0f;
-	this->xPos = 0.0f;
-	this->xRot = 0.0f;
-	this->yRot = 0.0f;
+	this->camPos = DirectX::XMFLOAT3(0.f, 0.f, -1.f);
+	this->camRot = DirectX::XMFLOAT3(0.f, 0.f, 0.f);
+	this->gIncrement = 0;
+	
+	
+
 }
 
 Graphics::~Graphics()
@@ -89,25 +78,24 @@ Graphics::~Graphics()
 
 bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 {
-	bool result = false;
+	bool result;
 	//if (this->Direct3D == nullptr)
 	//	throw std::bad_alloc();
 	this->Direct3D = new D3D;
-	if (this->Direct3D==nullptr)
+	if (Direct3D == nullptr)
 	{
 		MessageBox(hwnd, "Could not create Direct3D", "Error", MB_OK);
+		return false;
 	}
-	//this->Direct3D = (D3D*)::operator new (sizeof(D3D));
-	//this->Direct3D = (D3D*)_aligned_malloc(sizeof(D3D), 16);
-	result=Direct3D->initialize(screenWidth, screenHeight, VSYNC_ENABLED, hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
-	if (!result)
+	result = Direct3D->initialize(screenWidth, screenHeight, VSYNC_ENABLED, hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
+	if (result==false)
 	{
 		MessageBox(hwnd, "Could not initialize Direct3D", "Error", MB_OK); //L"", L"", ;
 		result = false;
 	}
 	theCamera = new Camera;
 	//theCamera = (Camera*)_aligned_malloc(sizeof(Camera), 16);
-	if (!theCamera)
+	if (theCamera==nullptr)
 	{
 		MessageBox(hwnd, "My B, Could not initialize Camera", "Error", MB_OK);
 		result = false;
@@ -115,7 +103,7 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	theCamera->SetPosition(0.0f, 0.0f, -1.0f);
 
 	theModel = new Model;
-	if (!theModel)
+	if (theModel==nullptr)
 	{
 		MessageBox(hwnd, "My B, Could not initialize Model", "Error", MB_OK);
 		result = false;
@@ -128,14 +116,15 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	//}
 
 	theColorShader = new ColorShader;
-	if (!theColorShader)
+	if (theColorShader==nullptr)
 	{
+		MessageBox(hwnd, "Could not create the color shader object.", "Error", MB_OK);
 		return false;
 	}
 
 	// Initialize the color shader object.
 	result = theColorShader->Initialize(Direct3D->GetDevice(), hwnd);
-	if (!result)
+	if (result==false)
 	{
 		MessageBox(hwnd, "Could not initialize the color shader object.", "Error", MB_OK);
 		return false;
@@ -173,8 +162,6 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 						1.f, 1.f, 1.f,
 						0.5f, -0.5f, 0.f,
 	};
-
-
 	Vertex3D triangleVertices[6] =
 	{
 		0.7f, -0.7f, 3.0f,	//v0 pos
@@ -213,26 +200,9 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		1.0f,1.0f,1.0f,
 		-0.5f, -0.5f, 0.0f,
 	};
-
-
-
 	this->theModel->addQuads(TwoTris, this->Direct3D->GetDevice());
-	if (this->theModel->addQuads(triangleVertices, this->Direct3D->GetDevice()))
-	{
-
-	}
-	else
-	{
-		MessageBox(hwnd, "Could not create another quads", "Error", MB_OK);
-	}
-	if (this->theModel->createTheVertexBuffer(this->Direct3D->GetDevice()))
-	{
-
-	}
-	else
-	{
-		MessageBox(hwnd, "Could not create vertex quads", "Error", MB_OK);
-	}
+	this->theModel->addQuads(triangleVertices, this->Direct3D->GetDevice());
+	this->theModel->createTheVertexBuffer(this->Direct3D->GetDevice());
 	//TextureData* txt = nullptr;
 	//txt = new TextureData(BTH_IMAGE_WIDTH, BTH_IMAGE_HEIGHT, BTH_IMAGE_DATA, sizeof(BTH_IMAGE_DATA));
 	//unsigned char* image_data = BTH_IMAGE_DATA;

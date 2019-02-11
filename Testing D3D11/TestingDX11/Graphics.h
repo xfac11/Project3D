@@ -21,12 +21,11 @@ private:
 	Model* theModel;
 	ColorShader* theColorShader;
 	float color[4]; //parameter color?
-	void renderImgui();
-	float dist;
-	float xPos;
-	float xRot;
-	float yRot;
+	DirectX::XMFLOAT3 camPos;
+	DirectX::XMFLOAT3 camRot;
 	float gIncrement;
+
+	void renderImgui();
 	bool render(); //float [4]color
 public:
 	Graphics();
