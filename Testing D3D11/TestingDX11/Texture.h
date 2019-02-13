@@ -4,12 +4,14 @@
 #include <directxmath.h>
 //#include"Structs.h"
 #include "bth_image.h"
+#include "textureload.h"
 //#include "TextureData.h"
 class Texture
 {
 public:
 	Texture();
 	~Texture();
+	void setTexture2(ID3D11Device*& gDevice, ID3D11DeviceContext *& gDeviceContext);
 	void setTexture(ID3D11Device*& gDevice, ID3D11DeviceContext *& gDeviceContext);
 	//void changeTextureData(TextureData* obj);
 	ID3D11ShaderResourceView*& getTexture();
@@ -19,6 +21,7 @@ private:
 	ID3D11ShaderResourceView* textureView;
 	//TextureData* targaData;
 	unsigned char* DATA;
+	TextureLoad testTexture;
 
 };
 #endif // !TEXTURE_H
