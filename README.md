@@ -21,22 +21,4 @@ Geometry (2):
 Texturing and Lighting (1): 
     _Daniel_
   o Normal mapping
-  
-Projection Techniques (1):
-    _      _
-  o Shadow mapping 
-  
-Acceleration Techniques (2):
-  o View frustum culling against a quadtree 
-  o Portal Culling 
-  o Front to Back rendering 
-  o Back face culling using Geometry Shader
-  
-Other techniques (2):
-  o Particle systems with Billboarded particles 
-    ▪ If Particles are updated on the GPU, counts as 2 o Gaussian filter in Compute Shader  
-  o Bilateral filter in CS (any filter that can be applied in two passes) 
-  o Mouse Picking 
-  o Screen-Space Antialiasing o Water-effect (based on vertex or texture animations) 
-  o Glow-effect 
-  o Make a small game in your application
+
