@@ -8,12 +8,15 @@ private:
 	int CAPVertex;
 	int nrOfQuads;
 	QuadVertex* *Quads;
-	Vertex3D quadVertex[12];
+	Vertex3D* quadVertex;
+	void expandQuads();
+	void expandVertex();
 	int nrOfVertex;
 public:
 	QuadHandler();
 	~QuadHandler();
-	bool addQuad(Vertex3D newQuad[6], ID3D11Device *& gDevice, ID3D11Buffer *& gVertexBuffer, int & vertexCount);
+	bool addQuad(DirectX::XMFLOAT3 pos, float width, float height, float depth,int face, int & vertexCount);
+	bool addTri(DirectX::XMFLOAT3 p1, DirectX::XMFLOAT3 p2, DirectX::XMFLOAT3 p3, int & vertexCount);
 	bool createVertexBuffer(ID3D11Device *& gDevice, ID3D11Buffer *& gVertexBuffer, int & vertexCount);
 	//void update(ID3D11DeviceContext* gDeviceContext, ID3D11Buffer *& gVertexBuffer, UINT32 & vertexSize, UINT32 & offset, ID3D11InputLayout* gVertexLayout);
 	UINT32 getSize(int id);

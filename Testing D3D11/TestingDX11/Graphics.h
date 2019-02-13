@@ -4,6 +4,7 @@
 #include "Camera.h"
 #include "ColorShader.h"
 #include "Model.h"
+#include"Triangle.h"
 //#include "TextureData.h"
 //#include "bth_image.h"
 #include "imgui/imgui.h"
@@ -21,11 +22,13 @@ private:
 	Model* theModel;
 	ColorShader* theColorShader;
 	float color[4]; //parameter color?
-	DirectX::XMFLOAT3 camPos;
-	DirectX::XMFLOAT3 camRot;
-	float gIncrement;
-
 	void renderImgui();
+	float dist;
+	float xPos;
+	float yPos;
+	float xRot;
+	float yRot;
+	float gIncrement;
 	bool render(); //float [4]color
 public:
 	Graphics();

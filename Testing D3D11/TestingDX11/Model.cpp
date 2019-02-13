@@ -14,9 +14,21 @@ Model::~Model()
 
 }
 
-bool Model::addQuads(Vertex3D newQuad[6], ID3D11Device *& gDevice)
+bool Model::addQuads(DirectX::XMFLOAT3 pos, float width,float height,float depth,int face)
 {//Will change vertexbuffer and vertexcount
-	return quads.addQuad(newQuad, gDevice, this->vertexBuffer, this->vertexCount);
+	return quads.addQuad(pos, width, height,depth,face,this->vertexCount);
+	this->vertexCount += 6;
+}
+
+bool Model::addCube(DirectX::XMFLOAT3 pos, float width, float height, float depth)
+{
+	this->cubes.addCube(pos, width, height, depth);
+	return true;
+}
+
+bool Model::addTri(DirectX::XMFLOAT3 p1, DirectX::XMFLOAT3 p2, DirectX::XMFLOAT3 p3)
+{
+	return quads.addTri(p1, p2, p3,this->vertexCount);
 }
 
 void Model::shutdown()
@@ -33,7 +45,7 @@ void Model::shutdown()
 
 bool Model::createTheVertexBuffer(ID3D11Device *& gDevice)
 {
-	return this->quads.createVertexBuffer(gDevice, this->vertexBuffer, this->vertexCount);
+	return this->cubes.insertVertexBuffer(gDevice, this->vertexBuffer, this->vertexCount);
 }
 
 void Model::setVertexBuffer(ID3D11DeviceContext *& gDeviceContext)

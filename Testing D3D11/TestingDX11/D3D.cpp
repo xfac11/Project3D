@@ -172,7 +172,7 @@ bool D3D::initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 
 
 	//move to ColorShader
-	this->projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, 0.1f, 20.f);
+	this->projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, 0.1f, 100.f);
 	//this->projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, screenNear, screenDepth);
 	//this->worldMatrix = DirectX::XMMatrixIdentity();
 	//this->worldMatrix = DirectX::XMMatrixRotationY(this->gIncrement);

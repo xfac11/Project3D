@@ -15,7 +15,7 @@ private:
 		unsigned char bpp;
 		unsigned char data2;
 	};
-	
+
 	bool LoadTarga(char*, int&, int&);
 
 	unsigned char* m_targaData;
@@ -34,7 +34,7 @@ public:
 	void Shutdown();
 
 	ID3D11ShaderResourceView* GetTexture();
-	
+
 	unsigned char* getTextureCharArray();
 	unsigned short getWidth();
 	unsigned short getHeight();

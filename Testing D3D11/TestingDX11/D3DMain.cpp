@@ -5,7 +5,7 @@
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
 
-	System sys = System(hInstance, "coolagubben", nCmdShow);
+	System sys = System(hInstance, "coolagubben", 1);
 	//sys.initialize();
 	sys.run();//loop
 	return (int)sys.getMsgWParam();

@@ -283,6 +283,7 @@ bool ColorShader::SetShaderParameters(ID3D11DeviceContext *& deviceContext, Dire
 	// Finanly set the constant buffer in the vertex shader with the updated values.
 	//deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
 	deviceContext->PSSetConstantBuffers(0, 1, &ConstantBuffer);
+	deviceContext->PSSetConstantBuffers(1, 1, &MatrixPerFrameBuffer);
 	deviceContext->VSSetConstantBuffers(0, 1, &ConstantBuffer); //could have bufferNumber = 0 dno why tho
 	deviceContext->GSSetConstantBuffers(0, 1, &MatrixPerFrameBuffer);
 

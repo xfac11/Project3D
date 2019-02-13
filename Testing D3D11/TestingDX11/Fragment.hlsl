@@ -6,6 +6,10 @@ struct VS_OUT
 	float3 Normal : NORMAL;
 	float3 ThePoint : MYVALUE;
 };
+cbuffer CB_PER_FRAME : register(b1)
+{
+	float4x4 worldMat;
+}
 Texture2D Tex:register(t0);
 SamplerState SampSt :register(s0);
 float4 PS_main(VS_OUT input) : SV_Target
@@ -15,7 +19,8 @@ float4 PS_main(VS_OUT input) : SV_Target
 	// diffuse, no attenuation.
 
 	float3 ambient = color * final_colour;
-	float3 light_pos = { 0.f,0.f,-3.f };
+	float3 light_pos = { 0.f,0.f,3.f };
+	light_pos=mul((float3x3)worldMat, light_pos);//sending the worldmat to the fragment shader 
 	float3 light_colour = { 1.f,1.f,1.f };
 	// IMPLEMENT HERE DIFFUSE SHADING
 	float3 normal = normalize(input.Normal);

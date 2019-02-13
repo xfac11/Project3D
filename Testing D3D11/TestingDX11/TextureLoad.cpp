@@ -208,9 +208,9 @@ bool TextureLoad::LoadTarga(char* filename, int& height, int& width)
 	k = (width * height * 4) - (width * 4);
 
 	// Now copy the targa image data into the targa destination array in the correct order since the targa format is stored upside down.
-	for (j = 0; j<height; j++)
+	for (j = 0; j < height; j++)
 	{
-		for (i = 0; i<width; i++)
+		for (i = 0; i < width; i++)
 		{
 			m_targaData[index + 0] = targaImage[k + 2];  // Red.
 			m_targaData[index + 1] = targaImage[k + 1];  // Green.

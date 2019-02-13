@@ -75,7 +75,7 @@ void Texture::setTexture(ID3D11Device*& gDevice, ID3D11DeviceContext *& gDeviceC
 	texDesc.SampleDesc.Count = 1;
 	texDesc.SampleDesc.Quality = 0;
 	texDesc.Usage = D3D11_USAGE_DEFAULT;
-	
+
 	gDevice->CreateTexture2D(&texDesc, &texInitData, &tex);
 	gDevice->CreateShaderResourceView(tex, NULL, &this->textureView);
 }

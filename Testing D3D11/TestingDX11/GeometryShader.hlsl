@@ -24,6 +24,7 @@ cbuffer CB_PER_FRAME : register(b0)
 [maxvertexcount(6)]
 void GS_main(triangle GSInput input[3], inout TriangleStream<GSOutput> theOutput)
 {
+
 	GSOutput output;
 	float3 u = input[1].pos.xyz - input[0].pos.xyz;
 	float3 v = input[2].pos.xyz - input[0].pos.xyz; //pos of 3 == 0

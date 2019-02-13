@@ -137,6 +137,8 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ColorShader.cpp" />
+    <ClCompile Include="Cube.cpp" />
+    <ClCompile Include="CubeHandler.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="myCamera.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -173,6 +175,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="TextureLoad.cpp" />
+    <ClCompile Include="Triangle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Fragment.hlsl">
@@ -218,6 +222,8 @@
     </ClInclude>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ColorShader.h" />
+    <ClInclude Include="Cube.h" />
+    <ClInclude Include="CubeHandler.h" />
     <ClInclude Include="myCamera.h" />
     <ClInclude Include="D3D.h" />
     <ClInclude Include="Graphics.h" />
@@ -237,7 +243,9 @@
     <ClInclude Include="Structs.h" />
     <ClInclude Include="System.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="TextureLoad.h" />
     <ClInclude Include="TextureShader.h" />
+    <ClInclude Include="Triangle.h" />
     <ClInclude Include="Vertex3D.h" />
   </ItemGroup>
   <ItemGroup>
