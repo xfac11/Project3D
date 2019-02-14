@@ -29,4 +29,5 @@ Keyboard, inputs, Camera, FPS
   _Karlos_
   o FPS, but with wierd controlls
   o Keyboard done!
+  o added klasses for keyboard but need to update before i can upload move()
   
