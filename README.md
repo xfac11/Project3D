@@ -25,3 +25,8 @@ Texturing and Lighting (1):
     _Daniel_
   o Normal mapping
 
+Keyboard, inputs, Camera, FPS
+  _Karlos_
+  o FPS, but with wierd controlls
+  o Keyboard done!
+  
