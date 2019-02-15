@@ -85,8 +85,10 @@ bool Graphics::render()
 	//campos mappedmemory
 
 	this->theModel->setVertexBuffer(this->Direct3D->GetDeviceContext());
-	this->theCamera->SetPosition(xPos, yPos, dist);
-	this->theCamera->SetRotation(xRot, yRot, 0.0f);
+	//this->theCamera->SetPosition(xPos, yPos, dist);
+	//this->theCamera->SetRotation(xRot, yRot, 0.0f);
+	this->theCamera->SetPosition(this->camPos);
+	this->theCamera->SetRotation(this->camRot);
 	this->Direct3D->setIncrement(this->gIncrement);
 	this->theCamera->Render();
 	this->theColorShader->Render(this->Direct3D->GetDeviceContext(), this->theModel->getVertexCount(), this->Direct3D->GetWorldMatrix(), this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix());
