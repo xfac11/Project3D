@@ -23,18 +23,20 @@ private:
 	ColorShader* theColorShader;
 	float color[4]; //parameter color?
 	void renderImgui();
-	float dist;
-	float xPos;
-	float yPos;
-	float xRot;
-	float yRot;
+	//float dist;
+	//float xPos;
+	//float yPos;
+	//float xRot;
+	//float yRot;
+	DirectX::XMFLOAT3 camPos; //scene class
+	DirectX::XMFLOAT3 camRot; //scene class
 	float gIncrement;
 	bool render(); //float [4]color
 public:
 	Graphics();
 	~Graphics();
 	void initImgui(HWND hWnd);
-
+	void move(Direction forward, Direction left_right);// Direction
 	bool Initialize(int screenWidth, int screenHeight, HWND hwnd);
 
 	void Shutdown();
