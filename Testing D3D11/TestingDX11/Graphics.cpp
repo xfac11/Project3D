@@ -9,7 +9,51 @@ void Graphics::initImgui(HWND hWnd)
 	ImGui_ImplDX11_Init(this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext());
 	ImGui::StyleColorsDark();
 }
+void Graphics::move(Direction forward, Direction left_right)
+{
+	//rotation mouse input
+		//example 
 
+		//make bool? variable from Keyboard and multiply
+	float speed = 0.02f*ImGui::GetIO().DeltaTime;
+
+	//[ ] 
+
+	//jump physics?
+
+
+	if (forward != Neutral)
+	{
+		this->camPos.y += (-this->camRot.x) * speed*forward; //up
+		if (abs(this->camRot.y) <= 90)
+		{
+			this->camPos.z += (90 - abs(this->camRot.y)) * speed*forward; //forward 
+			this->camPos.x += (this->camRot.y) * speed*forward;  //leftright
+		}
+		else
+		{
+			this->camPos.z += (abs(this->camRot.y)-90) * speed*-forward; //forward
+			this->camPos.x += (180 - abs(this->camRot.y))*(abs(this->camRot.y) / this->camRot.y) * speed*forward;  //leftright
+		}
+	}
+	if (left_right != Neutral)
+	{
+		this->camPos.y += (-this->camRot.x) * speed*forward; //up
+		if (abs(this->camRot.y) <= 90)
+		{
+			this->camPos.z += (-this->camRot.y) * speed*left_right;  //forward
+			this->camPos.x += ( (90-this->camRot.y)) * speed*left_right; //leftright
+			
+		}
+		else
+		{
+			this->camPos.z += (180 - abs(this->camRot.y))*(abs(this->camRot.y) / this->camRot.y) * speed*left_right*-1;  //forward
+			this->camPos.x += (abs(this->camRot.y) - 90) * speed*left_right*-1; //leftright
+			
+		}
+	}
+
+}
 void Graphics::renderImgui()
 {
 	ImGui_ImplDX11_NewFrame();
@@ -18,30 +62,16 @@ void Graphics::renderImgui()
 
 	ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
 	ImGui::Text("This is some unuseful text.");
-	ImGui::SliderFloat("dist", &dist, -10.0f, 10.0f);//W and S Keyboard
-	ImGui::SliderFloat("xPos", &xPos, -10.0f, 10.0f);//A and D Keyboard
-	ImGui::SliderFloat("yPos", &yPos, -10.0f, 10.0f);//A and D Keyboard
-	ImGui::SliderFloat("xRotation", &xRot, -100.0f, 100.0f);//Mouse
-	ImGui::SliderFloat("yRotation", &yRot, -365.0f, 365.0f);//Mouse
-	ImGui::SliderFloat("rotation", &gIncrement, -10.0f, 20.0f);
+	ImGui::SliderFloat("Camera X-Position", &camPos.x, -10.0f, 10.0f);//A and D Keyboard
+	ImGui::SliderFloat("Camera Y-Position", &camPos.y, -10.0f, 10.0f);//A and D Keyboard
+	ImGui::SliderFloat("Camera Z-Position", &camPos.z, -10.0f, 10.0f); //W & S
+	ImGui::SliderFloat("Camera X-Rotation", &camRot.x, -90.0f, 90.0f); //Mouse
+	ImGui::SliderFloat("Camera Y-Rotation", &camRot.y, -180.0f, 180.0f);//Mouse
+	ImGui::SliderFloat("[unused]Camera Z-Rotation", &camRot.z, -360.0f, 360.0f);//Mouse
+	ImGui::SliderFloat("World Rotation", &gIncrement, -6.0f, 6.0f);
 	ImGui::ColorEdit3("bg-color", (float*)&this->color);
 	ImGui::CaptureKeyboardFromApp(true);
-	/*if (ImGui::IsKeyPressed('a'))
-	{
-		xPos -= 0.1f;
-	}
-	else if (ImGui::IsKeyPressed('d'))
-	{
-		xPos += 0.1f;
-	}
-	if (ImGui::IsKeyPressed('w'))
-	{
-		dist += 0.1f;
-	}
-	else if (ImGui::IsKeyPressed('s'))
-	{
-		dist -= 0.1f;
-	}*/
+
 	//ImGui::ColorEdit4("Triangle data", (float*)gConstantBufferData);
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	ImGui::End();
@@ -77,11 +107,14 @@ Graphics::Graphics()
 	this->color[1] = 0.9f;
 	this->color[2] = 0.5f;
 	this->color[3] = 0.5f;
-	this->dist = -1.0f;
-	this->xPos = 0.0f;
-	this->xRot = 0.0f;
-	this->yRot = 0.0f;
-	this->yPos = 0.0f;
+	//this->dist = -1.0f;
+	//this->xPos = 0.0f;
+	//this->xRot = 0.0f;
+	//this->yRot = 0.0f;
+	//this->yPos = 0.0f;
+	this->camPos = DirectX::XMFLOAT3(0.f, 0.f, -1.f);
+	this->camRot = DirectX::XMFLOAT3(0.f, 0.f, 0.f);
+	this->gIncrement = 0;
 }
 
 Graphics::~Graphics()
