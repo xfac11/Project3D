@@ -5,8 +5,9 @@
 #include <d3d11.h>
 #include"Graphics.h"
 #include <DirectXMath.h>
-//#include"headerFiles.h"
-#include<string>
+//#include <WICTextureLoader>
+#include "Keyboard.h"
+#include <string>
 using namespace DirectX;
 //using namespace DirectX::SimpleMath;
 
@@ -16,27 +17,37 @@ using namespace DirectX;
 class System
 {
 public:
-	//System();
+	
 	System(HINSTANCE hInstance, LPCSTR name, int nCmdShow);
 	~System();
-	System(const System& obj);
+	//System(const System& obj);
 	bool initialize();
 	void run();
 	void shutDown();
 	WPARAM getMsgWParam();
-	//LRESULT MessageHandler(HWND,UINT;WPARAM,LPARAM);
+
+	//LRESULT CALLBACK MessageHandler(HWND hwnd,UINT usmg, WPARAM wparam, LPARAM lparam);
+
 private:
-	bool frame();
+	//bool frame();
 	void initializeWindows(float height, float width);
 	HWND InitWindow(HINSTANCE hInstance, float height, float width);
-	static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+	static LRESULT CALLBACK  WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 	LPCSTR applicationName;
 	HINSTANCE hinstance;
 	HWND hwnd;
 	MSG msg;
 	int nCMDShow;
-	//Input* input;
+	//unsigned char input;
 	Graphics* graphics;
+	Keyboard* theKeyboard;
+	//Input* theInput;
+	void inputHandle(const unsigned char key);
+
+
+
+	Direction forward; //have these in a own class?
+	Direction left_right;
 
 };
 #endif
