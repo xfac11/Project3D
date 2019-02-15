@@ -12,6 +12,12 @@ struct CBData //ConstantBufferData
 	float offset;
 	float padding1, padding2, padding3;
 };
+enum Direction
+{
+	Neutral = 0,
+	Positive = 1,
+	Negative = -1
+};
 //struct TextureData
 //{
 //	unsigned int IMAGE_WIDTH;
