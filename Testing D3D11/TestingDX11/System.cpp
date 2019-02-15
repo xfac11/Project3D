@@ -31,7 +31,7 @@ HWND System::InitWindow(HINSTANCE hInstance, float height, float width)
 		nullptr,
 		nullptr,
 		hInstance,
-		nullptr);
+		this);
 	return hwnd;
 }
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lParam);
