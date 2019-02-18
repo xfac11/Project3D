@@ -64,9 +64,9 @@ int Model::getVertexCount() const
 	return this->vertexCount;
 }
 
-void Model::setTheTexture( ID3D11Device *& gDevice, ID3D11DeviceContext *&gDeviceContext)
+void Model::setTheTexture( ID3D11Device *& gDevice, ID3D11DeviceContext *&gDeviceContext, char* filename)
 {
-	this->texture.setTexture(gDevice, gDeviceContext);
+	this->texture.setTexture(gDevice, gDeviceContext, filename);
 }
 
 void Model::setSampler(ID3D11Device*& gDevice)

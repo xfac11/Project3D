@@ -12,7 +12,7 @@ public:
 	Texture();
 	~Texture();
 	void setTexture2(ID3D11Device*& gDevice, ID3D11DeviceContext *& gDeviceContext);
-	void setTexture(ID3D11Device*& gDevice, ID3D11DeviceContext *& gDeviceContext);
+	void setTexture(ID3D11Device*& gDevice, ID3D11DeviceContext *& gDeviceContext, char* filename);
 	//void changeTextureData(TextureData* obj);
 	ID3D11ShaderResourceView*& getTexture();
 	void cleanUp();

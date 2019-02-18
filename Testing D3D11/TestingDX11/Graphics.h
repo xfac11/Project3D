@@ -19,7 +19,8 @@ class Graphics
 private:
 	D3D* Direct3D;
 	Camera* theCamera;
-	Model* theModel;
+	Model* *theModel;
+	int cap = 2;
 	ColorShader* theColorShader;
 	float color[4]; //parameter color?
 	void renderImgui();

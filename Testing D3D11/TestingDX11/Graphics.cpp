@@ -30,7 +30,7 @@ void Graphics::move(Direction forward, Direction left_right)
 			this->camPos.z += (90 - abs(this->camRot.y)) * speed*forward; //forward 
 			this->camPos.x += (this->camRot.y) * speed*forward;  //leftright
 		}
-		else
+		if(abs(this->camRot.y) > 90)
 		{
 			this->camPos.z += (abs(this->camRot.y)-90) * speed*-forward; //forward
 			this->camPos.x += (180 - abs(this->camRot.y))*(abs(this->camRot.y) / this->camRot.y) * speed*forward;  //leftright
@@ -45,7 +45,7 @@ void Graphics::move(Direction forward, Direction left_right)
 			this->camPos.x += ( (90-this->camRot.y)) * speed*left_right; //leftright
 			
 		}
-		else
+		if(abs(this->camRot.y) > 90)
 		{
 			this->camPos.z += (180 - abs(this->camRot.y))*(abs(this->camRot.y) / this->camRot.y) * speed*left_right*-1;  //forward
 			this->camPos.x += (abs(this->camRot.y) - 90) * speed*left_right*-1; //leftright
@@ -84,14 +84,21 @@ bool Graphics::render()
 	//Direct3D->initialize();
 	//campos mappedmemory
 
-	this->theModel->setVertexBuffer(this->Direct3D->GetDeviceContext());
+
 	//this->theCamera->SetPosition(xPos, yPos, dist);
 	//this->theCamera->SetRotation(xRot, yRot, 0.0f);
+	
 	this->theCamera->SetPosition(this->camPos);
 	this->theCamera->SetRotation(this->camRot);
 	this->Direct3D->setIncrement(this->gIncrement);
 	this->theCamera->Render();
-	this->theColorShader->Render(this->Direct3D->GetDeviceContext(), this->theModel->getVertexCount(), this->Direct3D->GetWorldMatrix(), this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix());
+	for (int i = 0; i < cap; i++) {
+		this->theModel[i]->setVertexBuffer(this->Direct3D->GetDeviceContext());
+		this->theColorShader->Render(this->Direct3D->GetDeviceContext(), this->theModel[i]->getVertexCount(), this->Direct3D->GetWorldMatrix(), this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix());
+		this->Direct3D->setIncrement(3.14);
+
+	}
+
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 	Direct3D->EndScene();
@@ -103,7 +110,11 @@ Graphics::Graphics()
 {
 	this->Direct3D = nullptr;
 	this->theCamera = nullptr;
-	this->theModel = nullptr;
+	this->theModel = new Model*[cap];
+	for (int i = 0; i < cap; i++)
+	{
+		this->theModel[i] = nullptr;
+	}
 	this->theColorShader = nullptr;
 	this->color[0] = 0.1f;
 	this->color[1] = 0.9f;
@@ -114,7 +125,7 @@ Graphics::Graphics()
 	//this->xRot = 0.0f;
 	//this->yRot = 0.0f;
 	//this->yPos = 0.0f;
-	this->camPos = DirectX::XMFLOAT3(0.f, 0.f, -1.f);
+	this->camPos = DirectX::XMFLOAT3(0.f, 0.f, -10.f);
 	this->camRot = DirectX::XMFLOAT3(0.f, 0.f, 0.f);
 	this->gIncrement = 0;
 }
@@ -151,7 +162,10 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 	theCamera->SetPosition(0.0f, 0.0f, -1.0f);
 
-	theModel = new Model;
+	for (int i = 0; i < cap; i++) {
+		theModel[i] = new Model;
+	}
+
 	if (!theModel)
 	{
 		MessageBox(hwnd, "My B, Could not initialize Model", "Error", MB_OK);
@@ -177,10 +191,10 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		MessageBox(hwnd, "Could not initialize the color shader object.", "Error", MB_OK);
 		return false;
 	}
-	this->theModel->addCube(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), 1, 0, 1);
-	this->theModel->addCube(DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f), 1, 0, 1);
-	this->theModel->addCube(DirectX::XMFLOAT3(0.0f, 0.0f, 2.0f), 1, 0, 1);
-	this->theModel->addCube(DirectX::XMFLOAT3(0.0f, 0.0f, 3.0f), 1, 0, 1);
+	this->theModel[0]->addCube(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), 1, 1, 1);
+	this->theModel[1]->addCube(DirectX::XMFLOAT3(0.0f, 2.0f, 3.0f), 1, 1, 1);
+	//this->theModel->addCube(DirectX::XMFLOAT3(0.0f, 0.0f, 2.0f), 2, 2, 2);
+	//this->theModel->addCube(DirectX::XMFLOAT3(0.0f, 0.0f, 3.0f), 2, 2, 2);
 	/*this->theModel->addQuads(DirectX::XMFLOAT3(2.0f, -0.5f, 4.0f), 1, 0, 1, 0);
 	this->theModel->addQuads(DirectX::XMFLOAT3(2.0f, -0.5f, 4.0f), 0, 1, 1, 0);
 	this->theModel->addQuads(DirectX::XMFLOAT3(2.0f, -0.5f, 4.0f), 1, 1, 0, 0);
@@ -277,14 +291,15 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	//this->theModel->addQuads(triangleVertices4, this->Direct3D->GetDevice());
 	//this->theModel->addQuads(triangleVertices5, this->Direct3D->GetDevice());
 	//this->theModel->addQuads(triangleVertices6, this->Direct3D->GetDevice());
+	for (int i = 0; i < cap; i++) {
+		if (theModel[i]->createTheVertexBuffer(this->Direct3D->GetDevice()))
+		{
 
-	if (this->theModel->createTheVertexBuffer(this->Direct3D->GetDevice()))
-	{
-
-	}
-	else
-	{
-		MessageBox(hwnd, "Could not create vertex quads", "Error", MB_OK);
+		}
+		else
+		{
+			MessageBox(hwnd, "Could not create vertex quads", "Error", MB_OK);
+		}
 	}
 	//TextureData* txt = nullptr;
 	//txt = new TextureData(BTH_IMAGE_WIDTH, BTH_IMAGE_HEIGHT, BTH_IMAGE_DATA, sizeof(BTH_IMAGE_DATA));
@@ -292,8 +307,10 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	//txt->IMAGE_DATA= BTH_IMAGE_DATA;
 	//txt->IMAGE_HEIGHT = BTH_IMAGE_HEIGHT;
 	//txt->IMAGE_WIDTH = BTH_IMAGE_WIDTH;
-	this->theModel->setSampler(this->Direct3D->GetDevice());
-	this->theModel->setTheTexture(this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext());
+
+	theModel[0]->setSampler(this->Direct3D->GetDevice());
+	theModel[0]->setTheTexture(this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext(), "rock_01_dif_32bit.tga");
+	theModel[1]->setTheTexture(this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext(), "lovelive.tga");
 	
 	return result;
 }
@@ -310,7 +327,9 @@ void Graphics::Shutdown()
 	{
 		_aligned_free(Direct3D);
 	}
-	this->theModel->shutdown();
+	for (int i = 0; i < cap; i++) {
+		theModel[i]->shutdown();
+	}
 	Direct3D->Shutdown();
 	ImGui_ImplDX11_Shutdown();
 	ImGui_ImplWin32_Shutdown();

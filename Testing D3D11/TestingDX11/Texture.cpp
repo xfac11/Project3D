@@ -43,9 +43,9 @@ void Texture::setTexture2(ID3D11Device*& gDevice, ID3D11DeviceContext  *&gDevice
 	gDevice->CreateShaderResourceView(tex, NULL, &this->textureView);
 }
 
-void Texture::setTexture(ID3D11Device*& gDevice, ID3D11DeviceContext *& gDeviceContext)
+void Texture::setTexture(ID3D11Device*& gDevice, ID3D11DeviceContext *& gDeviceContext, char* filename)
 {
-	testTexture.Initialize(gDevice, gDeviceContext, "rock_01_dif_32bit.tga");
+	testTexture.Initialize(gDevice, gDeviceContext, filename);
 	/*this->textureView = testTexture.GetTexture();
 
 	ID3D11Texture2D* tex = nullptr;
