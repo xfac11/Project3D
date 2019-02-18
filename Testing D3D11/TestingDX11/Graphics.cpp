@@ -193,6 +193,7 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 	this->theModel[0]->addCube(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), 1, 1, 1);
 	this->theModel[1]->addCube(DirectX::XMFLOAT3(0.0f, 2.0f, 3.0f), 1, 1, 1);
+	//this->theModel[2]->addCube(DirectX::XMFLOAT3(0.0f, 3.0f, 3.0f), 1, 1, 1);
 	//this->theModel->addCube(DirectX::XMFLOAT3(0.0f, 0.0f, 2.0f), 2, 2, 2);
 	//this->theModel->addCube(DirectX::XMFLOAT3(0.0f, 0.0f, 3.0f), 2, 2, 2);
 	/*this->theModel->addQuads(DirectX::XMFLOAT3(2.0f, -0.5f, 4.0f), 1, 0, 1, 0);
@@ -309,8 +310,9 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	//txt->IMAGE_WIDTH = BTH_IMAGE_WIDTH;
 
 	theModel[0]->setSampler(this->Direct3D->GetDevice());
-	theModel[0]->setTheTexture(this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext(), "rock_01_dif_32bit.tga");
-	theModel[1]->setTheTexture(this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext(), "lovelive.tga");
+	theModel[0]->setTheTexture(this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext(), "textures/rock_01_dif_32bit.tga");
+	theModel[1]->setTheTexture(this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext(), "textures/lovelive.tga");
+	//theModel[2]->setTheTexture(this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext(), "textures/bricks_red_32.tga");
 	
 	return result;
 }
