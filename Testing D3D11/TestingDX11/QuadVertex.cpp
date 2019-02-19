@@ -1,10 +1,5 @@
 #include "QuadVertex.h"
 
-void QuadVertex::update(ID3D11Device *& gDevice, ID3D11Buffer *& gVertexBuffer)
-{
-	
-	
-}
 
 QuadVertex::QuadVertex()
 {
@@ -118,14 +113,4 @@ void QuadVertex::setRotationZ(float angle)
 {
 	this->quad[0].rotateZ(angle);
 	this->quad[1].rotateZ(angle);
-}
-
-void QuadVertex::setColor(int id, float rgb[3], ID3D11Device *& gDevice, ID3D11Buffer *& gVertexBuffer)
-{
-	//Quad[id].r = rgb[0];
-	//Quad[id].b = rgb[1];
-	//Quad[id].g = rgb[2];
-	//Quad[id].t = rgb[3];
-
-	update(gDevice, gVertexBuffer);
 }
