@@ -45,7 +45,7 @@ bool D3D::initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 	//ID3D11Texture2D* backBufferPtr = nullptr;
 	//D3D11_TEXTURE2D_DESC depthBufferDesc;
 	//D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
-	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
+	//D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc; 
 	//D3D11_RASTERIZER_DESC rasterDesc;
 	//D3D11_VIEWPORT viewport;
 	float fieldOfView, screenAspect;
@@ -162,22 +162,12 @@ bool D3D::initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 	vp.TopLeftY = 0;
 	deviceContext->RSSetViewports(1, &vp);
 
-	//do this later
-	//this->gIncrement += 0.8f * ImGui::GetIO().DeltaTime; 
-	//gConstantBufferData->offset = sin(this->gIncrement);
 
 	//fieldOfView = 3.141592654f / 4.0f; //0.785
 	fieldOfView = 0.45f*DirectX::XM_PI;
 	screenAspect = (float)screenWidth / (float)screenHeight;
 
-
-	//move to ColorShader
 	this->projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, 0.1f, 100.f);
-	//this->projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, screenNear, screenDepth);
-	//this->worldMatrix = DirectX::XMMatrixIdentity();
-	//this->worldMatrix = DirectX::XMMatrixRotationY(this->gIncrement);
-	//this->worldMatrix = DirectX::XMMatrixTranspose(worldMatrix); //moved to colorshader
-	//this->orthoMatrix = DirectX::XMMatrixOrthographicLH((float)screenWidth, (float)screenHeight, screenNear, screenDepth);
 
 	return true;
 }
