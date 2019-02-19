@@ -44,7 +44,7 @@ DirectX::XMFLOAT3 Camera::GetRotation()
 void Camera::Render()
 {
 	float radians = 0.0174532925f;
-	DirectX::XMVECTOR pos = DirectX::XMVectorSet(this->position.x, this->position.y, this->position.z, 0.0f);
+	//DirectX::XMVECTOR pos = DirectX::XMVectorSet(this->position.x, this->position.y, this->position.z, 0.0f);
 	DirectX::XMVECTOR Forward = DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 	DirectX::XMVECTOR Up = DirectX::XMVectorSet(0, 1.f, 0, 0.0);
 	DirectX::XMVECTOR CamPos = DirectX::XMVectorSet(this->position.x, this->position.y, this->position.z, 1.0);
@@ -54,9 +54,9 @@ void Camera::Render()
 
 	//LookAt = DirectX::XMVector3TransformCoord(LookAt, rotationMatrix);s
 	DirectX::XMVECTOR lookOffset = DirectX::XMVector3TransformCoord(Forward, rotationMatrix);
-	DirectX::XMVECTOR lookatK=DirectX::XMVectorAdd(lookOffset,pos);
+	//DirectX::XMVECTOR lookatK=DirectX::XMVectorAdd(lookOffset,pos);
 	DirectX::XMVECTOR LookAt = DirectX::XMVectorAdd(CamPos, lookOffset);
-	DirectX::XMVECTOR right = DirectX::XMVector3Cross(lookOffset, Up);
+	//DirectX::XMVECTOR right = DirectX::XMVector3Cross(lookOffset, Up);
 	Up = DirectX::XMVector3TransformCoord(Up, rotationMatrix);
 	//Up = XMVector3TransformCoord(Up, rotationMatrix);
 	//LookAt = DirectX::XMVectorAdd(CamPos, LookAt);
