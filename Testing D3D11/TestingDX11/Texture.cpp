@@ -4,7 +4,7 @@ Texture::Texture()
 {
 	//this->targaData = nullptr;
 	this->textureView = nullptr;
-	this->DATA = nullptr;
+	//this->DATA = nullptr;
 }
 
 Texture::~Texture()
@@ -14,9 +14,7 @@ Texture::~Texture()
 
 void Texture::setTexture2(ID3D11Device*& gDevice, ID3D11DeviceContext  *&gDeviceContext)
 {
-	//this->targaData->setDATA(obj->getDATA(),obj->getSize());
-	//this->targaData->setWIDTH(obj->getWidth());
-	//this->targaData->setHEIGHT(obj->getHeight());
+
 	ID3D11Texture2D* tex = nullptr;
 	D3D11_SUBRESOURCE_DATA texInitData = { 0 };
 	ZeroMemory(&texInitData, sizeof(texInitData));
@@ -88,4 +86,6 @@ ID3D11ShaderResourceView *& Texture::getTexture()
 void Texture::cleanUp()
 {
 	this->textureView->Release();
+	//this->texture->Release();
+	this->testTexture.Shutdown();
 }
