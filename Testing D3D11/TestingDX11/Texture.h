@@ -20,7 +20,7 @@ private:
 	//ID3D11Texture2D* texture;
 	ID3D11ShaderResourceView* textureView;
 	//TextureData* targaData;
-	unsigned char* DATA;
+	//unsigned char* DATA;
 	TextureLoad testTexture;
 
 };
