@@ -5,6 +5,7 @@ Model::Model()
 	this->vertexBuffer = nullptr;
 	//this->indexBuffer = nullptr;
 	this->constantBuffer = nullptr;
+	this->SamplerState = nullptr;
 	//this->indexCount = 0;
 	this->vertexCount = 0;
 }
@@ -41,6 +42,7 @@ void Model::shutdown()
 		this->constantBuffer->Release();
 	if (this->SamplerState != nullptr)
 		this->SamplerState->Release();
+	this->texture.cleanUp();
 }
 
 bool Model::createTheVertexBuffer(ID3D11Device *& gDevice)
