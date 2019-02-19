@@ -8,5 +8,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	System sys = System(hInstance, "coolagubben", 1);
 	//sys.initialize();
 	sys.run();//loop
+	sys.shutDown();
 	return (int)sys.getMsgWParam();
 }
