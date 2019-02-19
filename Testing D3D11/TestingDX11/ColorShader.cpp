@@ -176,7 +176,7 @@ bool ColorShader::InitializeShader(ID3D11Device*& device, HWND hwnd)//, WCHAR* v
 	return true;
 }
 
-void ColorShader::ShutdownShader()
+/*void ColorShader::ShutdownShader()
 {
 	// Release the matrix constant buffer.
 	//if (m_matrixBuffer)
@@ -205,7 +205,7 @@ void ColorShader::ShutdownShader()
 		vertexShader->Release();
 		vertexShader = 0;
 	}
-}
+}*/
 
 void ColorShader::OutputShaderErrorMessage(ID3D10Blob * errorMessage, HWND hwnd, WCHAR * shaderFilename)
 {
