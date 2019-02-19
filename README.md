@@ -27,7 +27,7 @@ Texturing and Lighting (1):
 
 Keyboard, inputs, Camera, FPS
   _Karlos_
-  o FPS, but with wierd controlls
+  o FPS done! 
   o Keyboard done!
-  o added klasses for keyboard but need to update before i can upload move()
+  o simple physics (jump and fall)
   
