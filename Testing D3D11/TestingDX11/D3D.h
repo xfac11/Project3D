@@ -23,7 +23,7 @@ private:
 	//ID3D11RasterizerState* rasterState;
 	DirectX::XMMATRIX projectionMatrix;
 	DirectX::XMMATRIX worldMatrix;
-	DirectX::XMMATRIX orthoMatrix;  //switch to 
+	//DirectX::XMMATRIX orthoMatrix;   
 
 	//maybe D3D should have CBData instead of ColorShader
 
