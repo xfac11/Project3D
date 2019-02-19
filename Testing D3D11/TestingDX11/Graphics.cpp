@@ -9,57 +9,90 @@ void Graphics::initImgui(HWND hWnd)
 	ImGui_ImplDX11_Init(this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext());
 	ImGui::StyleColorsDark();
 }
-void Graphics::move(Direction forward, Direction left_right)
+void Graphics::move(Direction forward, Direction left_right, Direction up_down, bool flyMode, int mouseX, int mouseY)
 {
-	//rotation mouse input
-		//example 
+	float ground_level = 0;
+	float gravity = -9.82f;
+	this->height = this->camPos.y - ground_level;
+	
+	float timePassed = sqrt(2 * height / abs(gravity));
+	float velocity = gravity * timePassed;
 
-		//make bool? variable from Keyboard and multiply
 	float speed = 0.02f*ImGui::GetIO().DeltaTime;
-
-	//[ ] 
-
-	//jump physics?
-
-
-	if (forward != Neutral)
+	int sensitivity = 30;
+	this->camRot.x += mouseY * sensitivity* ImGui::GetIO().DeltaTime;
+	this->camRot.y += mouseX * sensitivity* ImGui::GetIO().DeltaTime;
+	
+	
+	if (this->camPos.y <= ground_level && up_down==Positive) //change this to collision checks with platforms
 	{
-		this->camPos.y += (-this->camRot.x) * speed*forward; //up
-		if (abs(this->camRot.y) <= 90)
-		{
-			this->camPos.z += (90 - abs(this->camRot.y)) * speed*forward; //forward 
-			this->camPos.x += (this->camRot.y) * speed*forward;  //leftright
-		}
-		if(abs(this->camRot.y) > 90)
-		{
-			this->camPos.z += (abs(this->camRot.y)-90) * speed*-forward; //forward
-			this->camPos.x += (180 - abs(this->camRot.y))*(abs(this->camRot.y) / this->camRot.y) * speed*forward;  //leftright
-		}
-	}
-	if (left_right != Neutral)
-	{
-		this->camPos.y += (-this->camRot.x) * speed*forward; //up
-		if (abs(this->camRot.y) <= 90)
-		{
-			this->camPos.z += (-this->camRot.y) * speed*left_right;  //forward
-			this->camPos.x += ( (90-this->camRot.y)) * speed*left_right; //leftright
-			
-		}
-		if(abs(this->camRot.y) > 90)
-		{
-			this->camPos.z += (180 - abs(this->camRot.y))*(abs(this->camRot.y) / this->camRot.y) * speed*left_right*-1;  //forward
-			this->camPos.x += (abs(this->camRot.y) - 90) * speed*left_right*-1; //leftright
-			
-		}
+		this->isJumping = true;
 	}
 
+	//flymode
+	if (flyMode == true)
+	{
+		this->camPos.y += (-this->camRot.x) * speed*forward; //up
+		this->camPos.y += speed * up_down*50;
+	}
+	else //no flying
+	{
+		if (this->camPos.y > ground_level)
+		{
+			this->camPos.y += velocity*ImGui::GetIO().DeltaTime; //fall
+		}
+
+		if (this->isJumping == true)
+		{
+			this->jumpTimer += ImGui::GetIO().DeltaTime;
+			if (this->jumpTimer < 1.f)
+			{
+				this->camPos.y += (-9.82f * jumpTimer + 11.f)*ImGui::GetIO().DeltaTime; //wierd jump
+			}
+			else
+			{
+				this->jumpTimer = 0;
+				isJumping = false;
+			}
+		}
+	}
+	
+
+	//standard movement
+	//forward backward
+	if (abs(this->camRot.y) <= 90)
+	{
+		this->camPos.z += (90 - abs(this->camRot.y)) * speed*forward; //forward 
+		this->camPos.x += (this->camRot.y) * speed*forward;  //leftright
+	}
+	else if (abs(this->camRot.y) >= 90)
+	{
+		this->camPos.z += (abs(this->camRot.y) - 90) * speed*-forward; //forward
+		this->camPos.x += (180 - abs(this->camRot.y))*(abs(this->camRot.y) / this->camRot.y) * speed*forward;  //leftright
+	}
+	
+	//left_right
+	if (abs(this->camRot.y) <= 90)
+	{
+		this->camPos.z += (-this->camRot.y) * speed*left_right;  //forward
+		this->camPos.x += (90 - abs(this->camRot.y)) * speed*left_right; //leftright
+
+	}
+	else if (abs(this->camRot.y) >= 90)
+	{
+		this->camPos.z += (180 - abs(this->camRot.y))*(abs(this->camRot.y) / this->camRot.y) * speed*left_right*-1;  //forward
+		this->camPos.x += (abs(this->camRot.y) - 90) * speed*left_right*-1; //leftright
+
+	}
+	
 }
 void Graphics::renderImgui()
 {
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
-
+	std::string textUse;
+	
 	ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
 	ImGui::Text("This is some unuseful text.");
 	ImGui::SliderFloat("Camera X-Position", &camPos.x, -10.0f, 10.0f);//A and D Keyboard
@@ -70,6 +103,8 @@ void Graphics::renderImgui()
 	ImGui::SliderFloat("[unused]Camera Z-Rotation", &camRot.z, -360.0f, 360.0f);//Mouse
 	ImGui::SliderFloat("World Rotation", &gIncrement, -6.0f, 6.0f);
 	ImGui::ColorEdit3("bg-color", (float*)&this->color);
+	textUse = "Height from 'Ground': " + std::to_string(this->height)+ "m";
+	ImGui::Text(textUse.c_str());
 	ImGui::CaptureKeyboardFromApp(true);
 
 	//ImGui::ColorEdit4("Triangle data", (float*)gConstantBufferData);
@@ -85,8 +120,7 @@ bool Graphics::render()
 	//campos mappedmemory
 
 
-	//this->theCamera->SetPosition(xPos, yPos, dist);
-	//this->theCamera->SetRotation(xRot, yRot, 0.0f);
+
 	
 	this->theCamera->SetPosition(this->camPos);
 	this->theCamera->SetRotation(this->camRot);
@@ -120,19 +154,18 @@ Graphics::Graphics()
 	this->color[1] = 0.9f;
 	this->color[2] = 0.5f;
 	this->color[3] = 0.5f;
-	//this->dist = -1.0f;
-	//this->xPos = 0.0f;
-	//this->xRot = 0.0f;
-	//this->yRot = 0.0f;
-	//this->yPos = 0.0f;
 	this->camPos = DirectX::XMFLOAT3(0.f, 0.f, -10.f);
 	this->camRot = DirectX::XMFLOAT3(0.f, 0.f, 0.f);
 	this->gIncrement = 0;
+	
+	this->jumpTimer = 0.f;
+	this->isJumping = false;
+	this->height = 0.f;
 }
 
 Graphics::~Graphics()
 {
-	this->Shutdown(); //????
+	//this->Shutdown(); //????
 }
 
 bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
@@ -318,24 +351,19 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 }
 
 void Graphics::Shutdown()
-{/*
-	if (Direct3D)
-	{
-		Direct3D.Shutdown();
-		delete Direct3D;
-		Direct3D = NULL;
-	}*/
-	if (Direct3D)
-	{
-		_aligned_free(Direct3D);
-	}
-	for (int i = 0; i < cap; i++) {
-		theModel[i]->shutdown();
-	}
-	Direct3D->Shutdown();
+{
 	ImGui_ImplDX11_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
+
+	this->Direct3D->Shutdown();
+	this->theModel->shutdown();
+	this->theColorShader->Shutdown();
+
+	delete Direct3D;
+	delete theCamera;
+	//delete theModel; fix deletion of model
+	delete theColorShader;
 }
 
 bool Graphics::Frame()
