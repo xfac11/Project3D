@@ -16,6 +16,27 @@ using namespace DirectX;
 //using Microsoft::WRL::ComPtr;
 class System
 {
+private:
+	LPCSTR applicationName;
+	HINSTANCE hinstance;
+	HWND hwnd;
+	MSG msg;
+	int nCMDShow;
+
+	Graphics* graphics;
+	Keyboard* theKeyboard;
+	Mouse* theMouse;
+
+	bool mouseSwitch;
+	bool flySwitch;
+
+	Direction forward; //have these in a own class?
+	Direction left_right;
+	Direction up_down;
+
+	static LRESULT CALLBACK  WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+	HWND InitWindow(HINSTANCE hInstance, float height, float width);
+	void change(bool & theSwitch);
 public:
 	
 	System(HINSTANCE hInstance, LPCSTR name, int nCmdShow);
@@ -25,29 +46,6 @@ public:
 	void run();
 	void shutDown();
 	WPARAM getMsgWParam();
-
-	//LRESULT CALLBACK MessageHandler(HWND hwnd,UINT usmg, WPARAM wparam, LPARAM lparam);
-
-private:
-	//bool frame();
-	void initializeWindows(float height, float width);
-	HWND InitWindow(HINSTANCE hInstance, float height, float width);
-	static LRESULT CALLBACK  WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-	LPCSTR applicationName;
-	HINSTANCE hinstance;
-	HWND hwnd;
-	MSG msg;
-	int nCMDShow;
-	//unsigned char input;
-	Graphics* graphics;
-	Keyboard* theKeyboard;
-	//Input* theInput;
-	void inputHandle(const unsigned char key);
-
-
-
-	Direction forward; //have these in a own class?
-	Direction left_right;
 
 };
 #endif
