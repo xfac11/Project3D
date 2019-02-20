@@ -357,12 +357,15 @@ void Graphics::Shutdown()
 	ImGui::DestroyContext();
 
 	this->Direct3D->Shutdown();
-	this->theModel->shutdown();
+	this->theModel[0]->shutdown();
+	this->theModel[1]->shutdown();
 	this->theColorShader->Shutdown();
 
 	delete Direct3D;
 	delete theCamera;
-	//delete theModel; fix deletion of model
+	delete theModel[0];
+	delete theModel[1];
+	delete[] theModel;
 	delete theColorShader;
 }
 
