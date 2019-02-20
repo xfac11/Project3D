@@ -4,7 +4,7 @@
 #include "Camera.h"
 #include "ColorShader.h"
 #include "Model.h"
-#include"Triangle.h"
+#include "Triangle.h"
 #include <string>
 //#include "TextureData.h"
 //#include "bth_image.h"
@@ -22,25 +22,26 @@ private:
 	Camera* theCamera;
 	Model* *theModel;
 	ColorShader* theColorShader;
-	
+	int cap = 2;
+
 	float jumpTimer;
 	bool isJumping;
 	float height;
-	
-	
-	int cap = 2;
-	float color[4]; //parameter color?
+
+	float color[4]; //scene class
 	DirectX::XMFLOAT3 camPos; //scene class
 	DirectX::XMFLOAT3 camRot; //scene class
-	float gIncrement;
-	
+	float gIncrement; //scene class
+
 	void renderImgui();
 	bool render(); //float [4]color
 public:
+	
+	
 	Graphics();
 	~Graphics();
-	void initImgui(HWND hWnd);
-	void move(Direction forward, Direction left_right, Direction up_down, bool flyMode, int mouseX, int mouseY);// Direction
+	void initImgui(HWND & hWnd);
+	void move(Direction forward, Direction left_right, Direction up_down, bool flyMode, int mouseX, int mouseY);// Direction forward, Direction left_Right, Direction, Direction upDown);
 	bool Initialize(int screenWidth, int screenHeight, HWND hwnd);
 
 	void Shutdown();

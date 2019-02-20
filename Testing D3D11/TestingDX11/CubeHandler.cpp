@@ -8,6 +8,7 @@ CubeHandler::CubeHandler()
 
 CubeHandler::~CubeHandler()
 {
+	delete[] cubes;
 }
 
 void CubeHandler::addCube(DirectX::XMFLOAT3 pos, float width, float height, float depth)
@@ -53,6 +54,8 @@ bool CubeHandler::insertVertexBuffer(ID3D11Device *& gDevice, ID3D11Buffer *& gV
 	{
 		return false;
 	}
+
+	delete[] temp; //this tho
 	return true;
 }
 

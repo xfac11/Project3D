@@ -1,6 +1,6 @@
 #include "Graphics.h"
 
-void Graphics::initImgui(HWND hWnd)
+void Graphics::initImgui(HWND & hWnd)
 {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -9,6 +9,7 @@ void Graphics::initImgui(HWND hWnd)
 	ImGui_ImplDX11_Init(this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext());
 	ImGui::StyleColorsDark();
 }
+
 void Graphics::move(Direction forward, Direction left_right, Direction up_down, bool flyMode, int mouseX, int mouseY)
 {
 	float ground_level = 0;
@@ -86,15 +87,15 @@ void Graphics::move(Direction forward, Direction left_right, Direction up_down, 
 	}
 	
 }
+
 void Graphics::renderImgui()
 {
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 	std::string textUse;
-	
 	ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-	ImGui::Text("This is some unuseful text.");
+	ImGui::Text("This is some unuseful text."); //W and S Keyboard
 	ImGui::SliderFloat("Camera X-Position", &camPos.x, -10.0f, 10.0f);//A and D Keyboard
 	ImGui::SliderFloat("Camera Y-Position", &camPos.y, -10.0f, 10.0f);//A and D Keyboard
 	ImGui::SliderFloat("Camera Z-Position", &camPos.z, -10.0f, 10.0f); //W & S
@@ -103,39 +104,43 @@ void Graphics::renderImgui()
 	ImGui::SliderFloat("[unused]Camera Z-Rotation", &camRot.z, -360.0f, 360.0f);//Mouse
 	ImGui::SliderFloat("World Rotation", &gIncrement, -6.0f, 6.0f);
 	ImGui::ColorEdit3("bg-color", (float*)&this->color);
+
+	//textUse = "Fly - Mode[true / false]: [" + std::to_string();
+	//ImGui::Text(textUse);
 	textUse = "Height from 'Ground': " + std::to_string(this->height)+ "m";
 	ImGui::Text(textUse.c_str());
 	ImGui::CaptureKeyboardFromApp(true);
-
 	//ImGui::ColorEdit4("Triangle data", (float*)gConstantBufferData);
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	ImGui::End();
 }
 
+
+
 bool Graphics::render()
 {
 	this->renderImgui();
-	Direct3D->BeginScene(this->color);
+	this->Direct3D->BeginScene(this->color);
 	//Direct3D->initialize();
 	//campos mappedmemory
-
-
-
 	
+	//this->theModel->setVertexBuffer(this->Direct3D->GetDeviceContext());
 	this->theCamera->SetPosition(this->camPos);
 	this->theCamera->SetRotation(this->camRot);
 	this->Direct3D->setIncrement(this->gIncrement);
 	this->theCamera->Render();
+	//this->theColorShader->Render(this->Direct3D->GetDeviceContext(), this->theModel->getVertexCount(), this->Direct3D->GetWorldMatrix(), this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix());
 	for (int i = 0; i < cap; i++) {
 		this->theModel[i]->setVertexBuffer(this->Direct3D->GetDeviceContext());
 		this->theColorShader->Render(this->Direct3D->GetDeviceContext(), this->theModel[i]->getVertexCount(), this->Direct3D->GetWorldMatrix(), this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix());
-		this->Direct3D->setIncrement(3.14);
+		this->Direct3D->setIncrement(3.14f);
 
 	}
-
+	
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 	Direct3D->EndScene();
+
 
 	return true;
 }
@@ -154,7 +159,7 @@ Graphics::Graphics()
 	this->color[1] = 0.9f;
 	this->color[2] = 0.5f;
 	this->color[3] = 0.5f;
-	this->camPos = DirectX::XMFLOAT3(0.f, 0.f, -10.f);
+	this->camPos = DirectX::XMFLOAT3(0.f, 0.f, -1.f);
 	this->camRot = DirectX::XMFLOAT3(0.f, 0.f, 0.f);
 	this->gIncrement = 0;
 	
@@ -170,25 +175,24 @@ Graphics::~Graphics()
 
 bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 {
-	bool result = false;
+	bool result;
 	//if (this->Direct3D == nullptr)
 	//	throw std::bad_alloc();
 	this->Direct3D = new D3D;
-	if (this->Direct3D==nullptr)
+	if (Direct3D == nullptr)
 	{
 		MessageBox(hwnd, "Could not create Direct3D", "Error", MB_OK);
+		return false;
 	}
-	//this->Direct3D = (D3D*)::operator new (sizeof(D3D));
-	//this->Direct3D = (D3D*)_aligned_malloc(sizeof(D3D), 16);
-	result=Direct3D->initialize(screenWidth, screenHeight, VSYNC_ENABLED, hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
-	if (!result)
+	result = Direct3D->initialize(screenWidth, screenHeight, VSYNC_ENABLED, hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
+	if (result==false)
 	{
 		MessageBox(hwnd, "Could not initialize Direct3D", "Error", MB_OK); //L"", L"", ;
 		result = false;
 	}
 	theCamera = new Camera;
 	//theCamera = (Camera*)_aligned_malloc(sizeof(Camera), 16);
-	if (!theCamera)
+	if (theCamera==nullptr)
 	{
 		MessageBox(hwnd, "My B, Could not initialize Camera", "Error", MB_OK);
 		result = false;
@@ -198,8 +202,7 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	for (int i = 0; i < cap; i++) {
 		theModel[i] = new Model;
 	}
-
-	if (!theModel)
+	if (theModel==nullptr)
 	{
 		MessageBox(hwnd, "My B, Could not initialize Model", "Error", MB_OK);
 		result = false;
@@ -212,119 +215,169 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	//}
 
 	theColorShader = new ColorShader;
-	if (!theColorShader)
+	if (theColorShader==nullptr)
 	{
+		MessageBox(hwnd, "Could not create the color shader object.", "Error", MB_OK);
 		return false;
 	}
 
 	// Initialize the color shader object.
 	result = theColorShader->Initialize(Direct3D->GetDevice(), hwnd);
-	if (!result)
+	if (result==false)
 	{
 		MessageBox(hwnd, "Could not initialize the color shader object.", "Error", MB_OK);
 		return false;
 	}
+
+	//Vertex3D TwoTris[] = {
+	//	0.f, 0.f, 0.f,		//pos
+	//	0.0f, 1.0f,			//tex u & v
+	//	1.f, 1.f, 1.f,		//normal
+	//	-0.5f, -0.5f, 0.f,  //point
+
+
+	//	0.f, 1.08f, 0.f,
+	//	0.f, 0.f,
+	//	1.f, 1.f, 1.f,
+	//	-0.5f, -0.5f, 0.f,
+
+	//	0.2133f, 1.08f, 0.f,
+	//	0.111f, 0.f,
+	//	1.f, 1.f, 1.f,
+	//	-0.5f, -0.5f, 0.f,
+
+	//
+
+	//	0.f, 0.f,0.f,
+	//	0.f, 1.f,
+	//	1.f, 1.f, 1.f,
+	//	-0.5f, -0.5f, 0.f,
+
+	//	0.2133f, 1.08f, 0.f,
+	//	0.111f, 0.f,
+	//	1.f, 1.f, 1.f,
+	//	-0.5f, -0.5f, 0.f,
+
+	//	0.2133f, 0.f, 0.0f,
+	//	0.111f, 1.f,
+	//	1.f, 1.f, 1.f,
+	//	-0.5f, -0.5f, 0.f,
+
+
+
+	//	0.2133f, 0.f, 0.f,
+	//	0.1111f, 1.f,
+	//	1.f, 1.f, 1.f,
+	//	-0.5f, -0.5f, 0.f,
+
+	//	0.2133f, 0.12f, 0.f,
+	//	0.111f, 0.8889f,
+	//	1.f, 1.f, 1.f,
+	//	-0.5f, -0.5f, 0.f,
+
+	//	1.7064f, 0.12f,0.f,
+	//	0.8889f, 0.8889f,
+	//	1.f, 1.f, 1.f,
+	//	-0.5f, -0.5f, 0.f,
+
+
+	//	0.2133f, 0.f, 0.f,
+	//	0.111f, 1.f,
+	//	1.f, 1.f, 1.f,
+	//	-0.5f, -0.5f, 0.f,
+
+	//	1.7067f, 0.12f, 0.f,
+	//	0.8889f, 0.8889f,
+	//	1.f, 1.f, 1.f,
+	//	-0.5f, -0.5f, 0.f,
+
+	//	1.7067f, 0.f, 0.f,
+	//	0.8889f, 1.f,
+	//	1.f, 1.f, 1.f,
+	//	-0.5f, -0.5f, 0.f,
+
+
+
+
+	//					//-0.5f, -0.5f, 0.f,	//pos
+	//					////0.f, 0.f, 0.f,	//color
+	//					//0.0f, 1.0f,			//tex u & v
+	//					//1.f, 1.f, 1.f,		//normal
+	//					//-0.5f, -0.5f, 0.f,  //point
+
+	//					//-0.5f, 0.5f, 0.f,
+	//					//0.f, 0.f,
+	//					//1.f, 1.f, 1.f,
+	//					//-0.5f, 0.5f, 0.f,
+
+	//					//0.5, 0.5, 0.0,
+	//					//1.0, 0.0,
+	//					//1.f, 1.f, 1.f,
+	//					//0.5, 0.5, 0.0,
+
+	//					//-0.5, -0.5, 0.0,
+	//					//0.0, 1.0,
+	//					//1.f, 1.f, 1.f,
+	//					//-0.5, -0.5, 0.0,
+
+	//					//0.5f, 0.5f, 0.f,
+	//					//1.0, 0.0,
+	//					//1.f, 1.f, 1.f,
+	//					//-0.5f, -0.5f, 0.0,
+
+	//					//0.5f, -0.5f, 0.f,
+	//					//1.f, 1.f,
+	//					//1.f, 1.f, 1.f,
+	//					//0.5f, -0.5f, 0.f,
+	//};
+	//Vertex3D triangleVertices[6] =
+	//{
+	//	1.92f, 0.f, 3.0f,	//v0 pos
+	//	//1.0f, 0.0f, 0.0f,   //v0 color
+	//	1.0f, 1.0f,//v0 textureCoord
+	//	1.0f,1.0f,1.0f,
+	//	0.5f, -0.5f, 0.0f,
+
+	//	0.f, 1.08f, 3.0f,	//v1
+	//	//1.0f 0.0f, 0.0f,	//v1 color
+	//	0.0f, 0.0f,         //v0 textureCoord 
+	//	1.0f,1.0f,1.0f,
+	//	-0.5f, 0.5f, 0.0f,
+
+	//	1.92f, 1.08f, 3.0f, //v2
+	//	//1.0f, 0.0f, 0.0f,	//v2 color
+	//	1.0f, 0.0f,
+	//	1.0f,1.0f,1.0f,
+	//	0.5f, 0.5f, 0.0f,
+
+	//	0.f, 1.08f, 3.0f,	//v3 pos
+	//	//0.0f, 0.0f, 1.0f,	//v0 color
+	//	0.0f, 0.0f,
+	//	1.0f,1.0f,1.0f,
+	//	-0.5f, +0.5f, 0.0f,
+
+	//	1.92f, 0.f, 3.0f,	//v4
+	//	//0.0f, 0.0f, 1.0f,	//v1 color
+	//	1.0f, 1.0f,
+	//	1.0f,1.0f,1.0f,
+	//	0.5f, -0.5f, 0.0f,
+
+	//	0.f, 0.f, 3.0f, //v5
+	//	//0.0f, 0.0f, 1.0f,	//v2 color
+	//	0.0f, 1.0f,
+	//	1.0f,1.0f,1.0f,
+	//	-0.5f, -0.5f, 0.0f,
+	//};
+	//size_t nrOfTwoTris = sizeof(TwoTris) / sizeof(TwoTris[0]);
+	//this->theModel->addQuads(TwoTris, nrOfTwoTris, this->Direct3D->GetDevice());
+	//size_t nrTriVer = sizeof(triangleVertices) / sizeof(triangleVertices[0]);
+	//this->theModel->addQuads(triangleVertices, nrTriVer, this->Direct3D->GetDevice());
+	//this->theModel->createTheVertexBuffer(this->Direct3D->GetDevice());
+
+	
 	this->theModel[0]->addCube(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), 1, 1, 1);
 	this->theModel[1]->addCube(DirectX::XMFLOAT3(0.0f, 2.0f, 3.0f), 1, 1, 1);
-	//this->theModel[2]->addCube(DirectX::XMFLOAT3(0.0f, 3.0f, 3.0f), 1, 1, 1);
-	//this->theModel->addCube(DirectX::XMFLOAT3(0.0f, 0.0f, 2.0f), 2, 2, 2);
-	//this->theModel->addCube(DirectX::XMFLOAT3(0.0f, 0.0f, 3.0f), 2, 2, 2);
-	/*this->theModel->addQuads(DirectX::XMFLOAT3(2.0f, -0.5f, 4.0f), 1, 0, 1, 0);
-	this->theModel->addQuads(DirectX::XMFLOAT3(2.0f, -0.5f, 4.0f), 0, 1, 1, 0);
-	this->theModel->addQuads(DirectX::XMFLOAT3(2.0f, -0.5f, 4.0f), 1, 1, 0, 0);
-	this->theModel->addQuads(DirectX::XMFLOAT3(2.0f, -0.5f, 4.0f), 1, 0, 1, 1);
-	this->theModel->addQuads(DirectX::XMFLOAT3(2.0f, -0.5f, 4.0f), 0, 1, 1, 1);
-	this->theModel->addQuads(DirectX::XMFLOAT3(2.0f, -0.5f, 4.0f), 1, 1, 0, 1);*/
-	//this->theModel->addTri(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT3(0.5f, 0.5f, 0.0f), DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f));
-
-
-	//this->theModel->addQuads(arr, this->Direct3D->GetDevice());
-	//this->theModel->addQuads(triangleVertices7, this->Direct3D->GetDevice());
-	//for (int i = 0; i < 6; i++)
-	//{
-	//	//add += 0.5f;s
-	//	for (int j = 0; j < 6; j++)
-	//	{
-	//		triangleVertices7[j].z += add;
-	//	}
-
-	//	this->theModel->addQuads(triangleVertices7, this->Direct3D->GetDevice());
-
-	//}
-	//for (int i = 0; i < 6; i++)
-	//{
-	//	triangleVertices6[i].x += 1.0f;
-	//}
-	//for (int i = 0; i < 6; i++)
-	//{
-	//	for (int j = 0; j < 6; j++)
-	//	{
-	//		triangleVertices6[j].z += add;
-	//	}
-	//	this->theModel->addQuads(triangleVertices6, this->Direct3D->GetDevice());
-	//}
-	//for (int i = 0; i < 6; i++)
-	//{
-	//	triangleVertices6[i].z -= 6.0f;
-	//	triangleVertices6[i].x += 1.0f;
-	//}
-	//for (int i = 0; i < 6; i++)
-	//{
-	//	for (int j = 0; j < 6; j++)
-	//	{
-	//		triangleVertices6[j].z += add;
-	//	}
-	//	this->theModel->addQuads(triangleVertices6, this->Direct3D->GetDevice());
-	//}
-	//for (int i = 0; i < 6; i++)
-	//{
-	//	triangleVertices6[i].z -= 6.0f;
-	//	triangleVertices6[i].x += 1.0f;
-	//}
-	//for (int i = 0; i < 6; i++)
-	//{
-	//	for (int j = 0; j < 6; j++)
-	//	{
-	//		triangleVertices6[j].z += add;
-	//	}
-	//	this->theModel->addQuads(triangleVertices6, this->Direct3D->GetDevice());
-	//}
-	//for (int i = 0; i < 6; i++)
-	//{
-	//	//add += 0.5f;
-	//	for (int j = 0; j < 6; j++)
-	//	{
-	//		triangleVertices7[j].z += add;
-	//	}
-
-	//	this->theModel->addQuads(triangleVertices7, this->Direct3D->GetDevice());
-
-	//}
-	//for (int i = 0; i < 6; i++)
-	//{
-	//	//add += 0.5f;
-	//	for (int j = 0; j < 6; j++)
-	//	{
-	//		triangleVertices7[j].z += add;
-	//	}
-
-	//	this->theModel->addQuads(triangleVertices7, this->Direct3D->GetDevice());
-
-	//}
-	////this->theModel->addQuads(TwoTris, this->Direct3D->GetDevice());
-	//if (this->theModel->addQuads(triangleVertices, this->Direct3D->GetDevice()))
-	//{
-
-	//}
-	//else
-	//{
-	//	MessageBox(hwnd, "Could not create another quads", "Error", MB_OK);
-	//}
-	//this->theModel->addQuads(triangleVertices2,this->Direct3D->GetDevice());
-	//this->theModel->addQuads(triangleVertices3, this->Direct3D->GetDevice());
-	//this->theModel->addQuads(triangleVertices4, this->Direct3D->GetDevice());
-	//this->theModel->addQuads(triangleVertices5, this->Direct3D->GetDevice());
-	//this->theModel->addQuads(triangleVertices6, this->Direct3D->GetDevice());
+	
 	for (int i = 0; i < cap; i++) {
 		if (theModel[i]->createTheVertexBuffer(this->Direct3D->GetDevice()))
 		{
@@ -335,18 +388,10 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 			MessageBox(hwnd, "Could not create vertex quads", "Error", MB_OK);
 		}
 	}
-	//TextureData* txt = nullptr;
-	//txt = new TextureData(BTH_IMAGE_WIDTH, BTH_IMAGE_HEIGHT, BTH_IMAGE_DATA, sizeof(BTH_IMAGE_DATA));
-	//unsigned char* image_data = BTH_IMAGE_DATA;
-	//txt->IMAGE_DATA= BTH_IMAGE_DATA;
-	//txt->IMAGE_HEIGHT = BTH_IMAGE_HEIGHT;
-	//txt->IMAGE_WIDTH = BTH_IMAGE_WIDTH;
-
 	theModel[0]->setSampler(this->Direct3D->GetDevice());
 	theModel[0]->setTheTexture(this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext(), "textures/rock_01_dif_32bit.tga");
 	theModel[1]->setTheTexture(this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext(), "textures/lovelive.tga");
-	//theModel[2]->setTheTexture(this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext(), "textures/bricks_red_32.tga");
-	
+
 	return result;
 }
 

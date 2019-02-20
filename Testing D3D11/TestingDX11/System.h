@@ -1,12 +1,11 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 #include <math.h>
-//#include<Keyboard.h>
 #include <d3d11.h>
 #include"Graphics.h"
 #include <DirectXMath.h>
-//#include <WICTextureLoader>
 #include "Keyboard.h"
+#include "Mouse.h"
 #include <string>
 using namespace DirectX;
 //using namespace DirectX::SimpleMath;
@@ -46,6 +45,7 @@ public:
 	void run();
 	void shutDown();
 	WPARAM getMsgWParam();
+
 
 };
 #endif

@@ -23,21 +23,12 @@ private:
 	//ID3D11RasterizerState* rasterState;
 	DirectX::XMMATRIX projectionMatrix;
 	DirectX::XMMATRIX worldMatrix;
-	//DirectX::XMMATRIX orthoMatrix;   
+	//DirectX::XMMATRIX orthoMatrix;  //switch to 
 
 	//maybe D3D should have CBData instead of ColorShader
 
 	float dist;
 	float gIncrement;
-	/*
-	XMVECTOR CamPos = XMVectorSet(0.0, 0.0, -2, 0.0);  //-dist 
-	XMVECTOR LookAt = XMVectorSet(0.0, 0.0, 0.0, 0.0); //change to first person view
-	XMVECTOR Up = XMVectorSet(0.0, 1.0, 0.0, 0.0);
-	XMMATRIX View = XMMatrixLookAtLH(CamPos, LookAt, Up);
-	XMMATRIX World = XMMatrixRotationY(gIncrement);
-	
-	*/
-
 
 public:
 	D3D();

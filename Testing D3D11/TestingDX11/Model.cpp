@@ -15,9 +15,9 @@ Model::~Model()
 
 }
 
-bool Model::addQuads(DirectX::XMFLOAT3 pos, float width,float height,float depth,int face)
+bool Model::addQuads(DirectX::XMFLOAT3 pos, float width, float height, float depth, int face)
 {//Will change vertexbuffer and vertexcount
-	return quads.addQuad(pos, width, height,depth,face,this->vertexCount);
+	return quads.addQuad(pos, width, height, depth, face, this->vertexCount);
 	this->vertexCount += 6;
 }
 
@@ -29,7 +29,7 @@ bool Model::addCube(DirectX::XMFLOAT3 pos, float width, float height, float dept
 
 bool Model::addTri(DirectX::XMFLOAT3 p1, DirectX::XMFLOAT3 p2, DirectX::XMFLOAT3 p3)
 {
-	return quads.addTri(p1, p2, p3,this->vertexCount);
+	return quads.addTri(p1, p2, p3, this->vertexCount);
 }
 
 void Model::shutdown()
@@ -48,6 +48,7 @@ void Model::shutdown()
 bool Model::createTheVertexBuffer(ID3D11Device *& gDevice)
 {
 	return this->cubes.insertVertexBuffer(gDevice, this->vertexBuffer, this->vertexCount);
+	//return this->quads.createVertexBuffer(gDevice, this->vertexBuffer, this->vertexCount);
 }
 
 void Model::setVertexBuffer(ID3D11DeviceContext *& gDeviceContext)
@@ -66,7 +67,7 @@ int Model::getVertexCount() const
 	return this->vertexCount;
 }
 
-void Model::setTheTexture( ID3D11Device *& gDevice, ID3D11DeviceContext *&gDeviceContext, char* filename)
+void Model::setTheTexture(ID3D11Device *& gDevice, ID3D11DeviceContext *&gDeviceContext, char* filename)
 {
 	this->texture.setTexture(gDevice, gDeviceContext, filename);
 }
@@ -85,6 +86,8 @@ void Model::setSampler(ID3D11Device*& gDevice)
 	HRESULT hr = gDevice->CreateSamplerState(&desc, &this->SamplerState);
 	if (FAILED(hr))
 	{
+		//MessageBox(hwnd, "Error compiling shader.  Check shader-error.txt for message.", "error", MB_OK);
 		//deal with error. Log it maybe
+		
 	}
 }

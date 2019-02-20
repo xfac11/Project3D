@@ -15,6 +15,8 @@ D3D::D3D()
 	this->depthStencilView = nullptr;
 	//rasterState = nullptr;
 
+	
+
 	this->dist = 0.1f;
 	this->gIncrement = 0;
 }
@@ -22,13 +24,12 @@ D3D::D3D()
 D3D::~D3D()
 {
 }
-
 void D3D::setIncrement(float g)
 {
 	this->gIncrement = g;
 }
 
-bool D3D::initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen, float screenDepth, float screenNear)
+bool D3D::initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen, float screenDepth, float screenNear) 
 {
 	//bool result = false;
 	HRESULT result;
@@ -45,10 +46,11 @@ bool D3D::initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 	//ID3D11Texture2D* backBufferPtr = nullptr;
 	//D3D11_TEXTURE2D_DESC depthBufferDesc;
 	//D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
-	//D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc; 
+	//D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc; //dno if we need this
 	//D3D11_RASTERIZER_DESC rasterDesc;
 	//D3D11_VIEWPORT viewport;
-	float fieldOfView, screenAspect;
+	float fieldOfView;
+	float screenAspect;
 
 	vSync_enabled = vsync;
 
@@ -95,6 +97,7 @@ bool D3D::initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 		if (FAILED(result))
 		{
 			//result = false;
+			MessageBox(hwnd, "Could not ID3D11Texture2D* backBufferPtr", "Error", MB_OK); //L"", L"", ;
 			return false;
 		}
 
@@ -103,6 +106,7 @@ bool D3D::initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 		if (FAILED(result))
 		{
 			//result = false;
+			MessageBox(hwnd, "Could not ID3D11Texture2D* backBufferPtr", "Error", MB_OK);
 			return false;
 		}
 		backBufferPtr->Release();
@@ -149,6 +153,7 @@ bool D3D::initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 			// deal with error...
 			return false;
 		}
+
 	}
 
 
@@ -162,12 +167,22 @@ bool D3D::initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 	vp.TopLeftY = 0;
 	deviceContext->RSSetViewports(1, &vp);
 
+	//do this later
+	//this->gIncrement += 0.8f * ImGui::GetIO().DeltaTime; 
+	//gConstantBufferData->offset = sin(this->gIncrement);
 
 	//fieldOfView = 3.141592654f / 4.0f; //0.785
 	fieldOfView = 0.45f*DirectX::XM_PI;
 	screenAspect = (float)screenWidth / (float)screenHeight;
 
-	this->projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, 0.1f, 100.f);
+
+	//move to ColorShader
+	this->projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, 0.1f, 20.f);
+	//this->projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, screenNear, screenDepth);
+	//this->worldMatrix = DirectX::XMMatrixIdentity();
+	//this->worldMatrix = DirectX::XMMatrixRotationY(this->gIncrement);
+	//this->worldMatrix = DirectX::XMMatrixTranspose(worldMatrix); //moved to colorshader
+	//this->orthoMatrix = DirectX::XMMatrixOrthographicLH((float)screenWidth, (float)screenHeight, screenNear, screenDepth);
 
 	return true;
 }
@@ -230,13 +245,13 @@ void D3D::BeginScene(float color[4])
 	//color[1] = green;
 	//color[2] = blue;
 	//color[3] = alpha;
-
+	
 	// Clear the back buffer.
 	deviceContext->ClearRenderTargetView(renderTargetView, color);
 	// Clear the depth buffer.
 	deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	deviceContext->OMSetDepthStencilState(this->depthStencilState, 0); //1
-	this->worldMatrix = DirectX::XMMatrixRotationY(this->gIncrement);//to here
+	this->worldMatrix = DirectX::XMMatrixRotationY(this->gIncrement);
 }
 
 void D3D::EndScene()

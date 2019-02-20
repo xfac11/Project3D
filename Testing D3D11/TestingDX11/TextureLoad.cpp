@@ -106,6 +106,7 @@ void TextureLoad::Shutdown()
 		delete[] m_targaData;
 		m_targaData = 0;
 	}
+	
 
 	return;
 }

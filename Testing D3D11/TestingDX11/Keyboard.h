@@ -12,7 +12,7 @@ private:
 	std::queue<unsigned char> charBuffer;
 public:
 	Keyboard();
-	~Keyboard();
+	virtual~Keyboard();
 
 	bool KeyIsPressed(const unsigned char keycode);
 	bool KeyBufferIsEmpty();
