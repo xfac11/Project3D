@@ -18,6 +18,7 @@ const float SCREEN_NEAR = 0.1f;
 class Graphics
 {
 private:
+	DirectX::XMVECTOR rotaxis;
 	D3D* Direct3D;
 	Camera* theCamera;
 	Model* *theModel;
