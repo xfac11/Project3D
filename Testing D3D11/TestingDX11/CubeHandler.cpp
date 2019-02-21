@@ -8,7 +8,7 @@ CubeHandler::CubeHandler()
 
 CubeHandler::~CubeHandler()
 {
-	delete[] cubes;
+	delete[] this->cubes;
 }
 
 void CubeHandler::addCube(DirectX::XMFLOAT3 pos, float width, float height, float depth)
@@ -21,42 +21,49 @@ void CubeHandler::addCube(DirectX::XMFLOAT3 pos, float width, float height, floa
 	this->nrOfCubes++;
 }
 
-bool CubeHandler::insertVertexBuffer(ID3D11Device *& gDevice, ID3D11Buffer *& gVertexBuffer, int & vertexCount)
+bool CubeHandler::insertVector(std::vector<Vertex3D> &model, int & vertexCount)
 {
-	int nrOfVertex = this->nrOfCubes * 6 * 6;
-	vertexCount = nrOfVertex;
-	Vertex3D *temp = new Vertex3D[nrOfVertex];
-	int vertices = 0;
-	for (int i = 0; i < this->nrOfCubes; i++)
+	int pos = 0;
+	if (this->nrOfCubes*6*6 == vertexCount)
 	{
-		for (int j = 0; j < 6; j++)
+		for (int i = 0; i < this->nrOfCubes; i++)
 		{
-			for (int k = 0; k < 2; k++)
+			for (int j = 0; j < 6; j++)
 			{
-				for (int l = 0; l < 3; l++)
+				for (int k = 0; k < 2; k++)
 				{
-					temp[vertices] = this->cubes[i].getQuad(j).getTri(k).getPoint(l);
-					vertices++;
+					for (int l = 0; l < 3; l++)
+					{
+						model.at(pos) = this->cubes[i].getQuad(j).getTri(k).getPoint(l);
+						pos++;
+					}
 				}
 			}
 		}
 	}
-	D3D11_SUBRESOURCE_DATA data;
-	HRESULT hr;
-	D3D11_BUFFER_DESC bufferDesc;
-	memset(&bufferDesc, 0, sizeof(bufferDesc));
-	bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	bufferDesc.ByteWidth = nrOfVertex * sizeof(Vertex3D);
-	data.pSysMem = temp;
-	hr = gDevice->CreateBuffer(&bufferDesc, &data, &gVertexBuffer);
-	if (FAILED(hr))
+	else
 	{
-		return false;
+		for (int i = 0; i < this->nrOfCubes; i++)
+		{
+			for (int j = 0; j < 6; j++)
+			{
+				for (int k = 0; k < 2; k++)
+				{
+					for (int l = 0; l < 3; l++)
+					{
+						model.push_back(this->cubes[i].getQuad(j).getTri(k).getPoint(l));
+						vertexCount++;
+					}
+				}
+			}
+		}
 	}
-
-	delete[] temp; //this tho
 	return true;
+}
+
+void CubeHandler::moveCube(int id)
+{
+	this->cubes[id].move(DirectX::XMFLOAT3(0.0f,0.0f,1.0f));
 }
 
 void CubeHandler::expand()
