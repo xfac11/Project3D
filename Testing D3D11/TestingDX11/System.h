@@ -28,7 +28,8 @@ private:
 
 	bool mouseSwitch;
 	bool flySwitch;
-
+	bool moveScreen;
+	
 	Direction forward; //have these in a own class?
 	Direction left_right;
 	Direction up_down;
