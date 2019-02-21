@@ -7,7 +7,19 @@ Model::Model()
 	this->constantBuffer = nullptr;
 	this->SamplerState = nullptr;
 	//this->indexCount = 0;
+	this->rot = 0;
+	this->moveM = 0;
 	this->vertexCount = 0;
+	DirectX::XMVECTOR rotaxis = DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+	DirectX::XMMATRIX rotTemp = DirectX::XMMatrixRotationAxis(rotaxis, 0);
+	DirectX::XMMATRIX scaleTemp = DirectX::XMMatrixScaling(0.0f, 0.0f, 0.0f);
+	DirectX::XMMATRIX translTemp = DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f);
+	DirectX::XMStoreFloat4x4(&this->Rotation,rotTemp);
+	DirectX::XMStoreFloat4x4(&this->Scale, scaleTemp);
+	DirectX::XMStoreFloat4x4(&this->Translation, translTemp);
+
+	scaleTemp = DirectX::XMLoadFloat4x4(&this->Scale);
+	translTemp = DirectX::XMLoadFloat4x4(&this->Translation);
 }
 
 Model::~Model()
@@ -15,10 +27,10 @@ Model::~Model()
 
 }
 
-bool Model::addQuads(DirectX::XMFLOAT3 pos, float width, float height, float depth, int face)
+bool Model::addQuads(DirectX::XMFLOAT3 pos, float width,float height,float depth,int face)
 {//Will change vertexbuffer and vertexcount
-	return quads.addQuad(pos, width, height, depth, face, this->vertexCount);
 	this->vertexCount += 6;
+	return quads.addQuad(pos, width, height,depth,face,this->vertexCount);
 }
 
 bool Model::addCube(DirectX::XMFLOAT3 pos, float width, float height, float depth)
@@ -29,7 +41,7 @@ bool Model::addCube(DirectX::XMFLOAT3 pos, float width, float height, float dept
 
 bool Model::addTri(DirectX::XMFLOAT3 p1, DirectX::XMFLOAT3 p2, DirectX::XMFLOAT3 p3)
 {
-	return quads.addTri(p1, p2, p3, this->vertexCount);
+	return quads.addTri(p1, p2, p3,this->vertexCount);
 }
 
 void Model::shutdown()
@@ -45,13 +57,44 @@ void Model::shutdown()
 	this->texture.cleanUp();
 }
 
-bool Model::createTheVertexBuffer(ID3D11Device *& gDevice)
+bool Model::insertCubesInVec()
 {
-	return this->cubes.insertVertexBuffer(gDevice, this->vertexBuffer, this->vertexCount);
-	//return this->quads.createVertexBuffer(gDevice, this->vertexBuffer, this->vertexCount);
+	return this->cubes.insertVector(body, this->vertexCount);
 }
 
-void Model::setVertexBuffer(ID3D11DeviceContext *& gDeviceContext)
+void Model::moveCube(int id)
+{
+	//this->cubes.moveCube(id);
+	//insertCubesInVec();
+}
+
+bool Model::createTheVertexBuffer(ID3D11Device *& gDevice)
+{
+	unsigned int nrOfVertex = body.size();
+	this->vertexCount = nrOfVertex;
+	Vertex3D *temp = new Vertex3D[nrOfVertex];
+	int vertices = 0;
+	for (int i = 0; i < nrOfVertex; i++)
+	{
+		temp[i] = body.at(i);
+	}
+	D3D11_SUBRESOURCE_DATA data;
+	HRESULT hr;
+	D3D11_BUFFER_DESC bufferDesc;
+	memset(&bufferDesc, 0, sizeof(bufferDesc));
+	bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	bufferDesc.ByteWidth = nrOfVertex * sizeof(Vertex3D);
+	data.pSysMem = temp;
+	hr = gDevice->CreateBuffer(&bufferDesc, &data, &this->vertexBuffer);
+	if (FAILED(hr))
+	{
+		return false;
+	}
+	return true;
+}
+//Sets texture in PS and vertex buffer for input
+void Model::setVertexBandTexture(ID3D11DeviceContext *& gDeviceContext)
 {
 	UINT32 vertexSize = sizeof(Vertex3D);
 
@@ -59,6 +102,7 @@ void Model::setVertexBuffer(ID3D11DeviceContext *& gDeviceContext)
 	gDeviceContext->PSSetShaderResources(0, 1, &this->texture.getTexture());
 	gDeviceContext->IASetVertexBuffers(0, 1, &this->vertexBuffer, &vertexSize, &offset);
 	gDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	gDeviceContext->PSSetSamplers(0, 1, &this->SamplerState);
 	//gDeviceContext->GSSetShader(nullptr, nullptr, 0); //already initilized?+
 }
 
@@ -67,9 +111,9 @@ int Model::getVertexCount() const
 	return this->vertexCount;
 }
 
-void Model::setTheTexture(ID3D11Device *& gDevice, ID3D11DeviceContext *&gDeviceContext, char* filename)
+void Model::setTheTexture( ID3D11Device *& gDevice, ID3D11DeviceContext *&gDeviceContext,std::string fileName)
 {
-	this->texture.setTexture(gDevice, gDeviceContext, filename);
+	this->texture.setTexture(gDevice, gDeviceContext,fileName);
 }
 
 void Model::setSampler(ID3D11Device*& gDevice)
@@ -86,8 +130,60 @@ void Model::setSampler(ID3D11Device*& gDevice)
 	HRESULT hr = gDevice->CreateSamplerState(&desc, &this->SamplerState);
 	if (FAILED(hr))
 	{
-		//MessageBox(hwnd, "Error compiling shader.  Check shader-error.txt for message.", "error", MB_OK);
 		//deal with error. Log it maybe
-		
 	}
+}
+
+void Model::loadOBJ(char * file, ID3D11Device * device, ID3D11DeviceContext * deviceContext)
+{
+	std::string txt = load.loadFile(file, body);
+	this->texture.setTexture(device, deviceContext, txt);
+	this->vertexCount += body.size();
+}
+
+void Model::draw(ColorShader & shader, ID3D11DeviceContext * deviceContext)
+{
+	this->setVertexBandTexture(deviceContext);
+	//Maybe shader.Render so the worldmatrix and all that updates everytime a new object gets drawn?
+	shader.RenderShader(deviceContext, this->vertexCount);
+}
+
+void Model::rotate(float angle)
+{
+	//this->world = DirectX::XMMatrixRotationY(angle);
+}
+
+DirectX::XMFLOAT4X4 Model::getId()
+{
+	return this->world;
+}
+
+void Model::setWorld(DirectX::XMMATRIX mtrx)
+{
+	DirectX::XMStoreFloat4x4(&this->world, mtrx);
+	//this->world = mtrx;
+}
+
+void Model::setWorld()
+{
+	DirectX::XMMATRIX rotTemp;
+	DirectX::XMMATRIX scaleTemp;
+	DirectX::XMMATRIX translTemp;
+	rotTemp=DirectX::XMLoadFloat4x4(&this->Rotation);
+	scaleTemp = DirectX::XMLoadFloat4x4(&this->Scale);
+	translTemp = DirectX::XMLoadFloat4x4(&this->Translation);
+	DirectX::XMStoreFloat4x4(&this->world,(rotTemp*translTemp));
+	
+}
+
+void Model::setPosition(float x, float y, float z)
+{
+	DirectX::XMMATRIX tempTransl = DirectX::XMMatrixTranslation(x, y, z);
+	DirectX::XMStoreFloat4x4(&this->Translation, tempTransl);
+}
+
+void Model::rotate(DirectX::XMVECTOR axis, float angle)
+{
+	DirectX::XMMATRIX tempRot = DirectX::XMMatrixRotationAxis(axis,angle);
+	DirectX::XMStoreFloat4x4(&this->Rotation, tempRot);
 }
