@@ -15,10 +15,10 @@ Mandatory techniques or implementation details:
 Geometry (2):
     _Filip_
   o Parsing and rendering an existing model format (OBJ, MD5, etc). This includes parsing and using the material defined in the           
-    format (textures). If you use a library like Assimp, it does not count
+    format (textures). If you use a library like Assimp, it does not count Done (not if Material has to be loaded in)
  
    
-  o Height-map terrain rendering, user can walk on the terrain using WASD keys. 
+  o Height-map terrain rendering, user can walk on the terrain using WASD keys._Karlos_
  
   
 Texturing and Lighting (1): 
