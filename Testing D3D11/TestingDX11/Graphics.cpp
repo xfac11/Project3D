@@ -195,6 +195,7 @@ Graphics::Graphics()
 	this->jumpTimer = 0.f;
 	this->isJumping = false;
 	this->height = 0.f;
+	this->rotaxis = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 }
 
 Graphics::~Graphics()
