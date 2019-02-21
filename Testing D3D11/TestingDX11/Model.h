@@ -32,6 +32,7 @@ public:
 	void setWorld(DirectX::XMMATRIX mtrx);
 	void setWorld();
 	void setPosition(float x, float y, float z);
+	void move(float x, float y, float z);
 	void rotate(DirectX::XMVECTOR axis, float angle);
 	float rot;
 	float moveM;
@@ -45,7 +46,7 @@ private:
 	DirectX::XMFLOAT4X4 Rotation;
 	DirectX::XMFLOAT4X4 Scale;
 	DirectX::XMFLOAT4X4 Translation;
-
+	DirectX::XMFLOAT3 position;
 	Texture texture;
 	Loader load;
 	int vertexCount;
