@@ -18,16 +18,18 @@ Geometry (2):
     format (textures). If you use a library like Assimp, it does not count Done (not if Material has to be loaded in)
  
    
-  o Height-map terrain rendering, user can walk on the terrain using WASD keys._Karlos_
  
   
 Texturing and Lighting (1): 
     _Daniel_
+  o Textures
   o Normal mapping
+  o Color/light etc
+  o Phong Shading (specular)
 
 Keyboard, inputs, Camera, FPS
   _Karlos_
   o FPS done! 
   o Keyboard done!
   o simple physics (jump and fall)
-  
+  x Height-map terrain rendering, user can walk on the terrain using WASD keys.
