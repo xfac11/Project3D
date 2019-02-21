@@ -45,7 +45,8 @@ void Texture::setTexture2(ID3D11Device*& gDevice, ID3D11DeviceContext  *&gDevice
 
 void Texture::setTexture(ID3D11Device*& gDevice, ID3D11DeviceContext *& gDeviceContext,std::string fileName)
 {
-	const char *file= fileName.c_str();
+	std::string fileTexture = "OBJ/" + fileName;
+	const char *file= fileTexture.c_str();
 	testTexture.Initialize(gDevice, gDeviceContext, file);
 	/*this->textureView = testTexture.GetTexture();
 
