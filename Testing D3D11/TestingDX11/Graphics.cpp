@@ -129,13 +129,42 @@ bool Graphics::render()
 	this->theCamera->SetRotation(this->camRot);
 	this->Direct3D->setIncrement(this->gIncrement);
 	this->theCamera->Render();
-	//this->theColorShader->Render(this->Direct3D->GetDeviceContext(), this->theModel->getVertexCount(), this->Direct3D->GetWorldMatrix(), this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix());
-	for (int i = 0; i < cap; i++) {
-		this->theModel[i]->setVertexBuffer(this->Direct3D->GetDeviceContext());
-		this->theColorShader->Render(this->Direct3D->GetDeviceContext(), this->theModel[i]->getVertexCount(), this->Direct3D->GetWorldMatrix(), this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix());
-		this->Direct3D->setIncrement(3.14f);
+	this->theModel[0].setWorld(DirectX::XMMatrixIdentity());
+	this->theModel[1].setWorld(DirectX::XMMatrixIdentity());
+	//this->theModel[2].setWorld(DirectX::XMMatrixIdentity());
 
+	//DirectX::XMMATRIX Rotation;
+	//DirectX::XMMATRIX Scale;
+	//DirectX::XMMATRIX Translation;
+	////Define cube1's world space matrix
+	//DirectX::XMVECTOR rotaxis = DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+	//Rotation=DirectX::XMMatrixRotationY(this->theModel[2].rot);
+	////DirectX::XMMatrixRotationY
+	//Translation = DirectX::XMMatrixTranslation(0.0f, 0.0f, this->theModel[2].moveM);
+	//Set cube1's world space using the transformations
+	this->theModel[2].rotate(rotaxis, this->theModel[2].rot);
+	this->theModel[2].rot += 0.01f;
+	//this->theModel[2]->move(1.0f, 0.0f, 0.0f);
+	if (this->theModel[2].rot > 3.141590f*2)
+	{
+		this->theModel[2].rot = 0;
 	}
+	this->theModel[2].setWorld();
+	this->theModel[1].setWorld();
+	this->theModel[0].setWorld();
+
+	//this->Direct3D->setWorld(this->theModel[2].getId());
+	//this->theModel->setVertexBandTexture(this->Direct3D->GetDeviceContext());
+	//this->theModel[0].draw(*this->theColorShader, this->Direct3D->GetDeviceContext());
+	//this->theModel[1].draw(*this->theColorShader, this->Direct3D->GetDeviceContext());
+	this->theColorShader->SetShaderParameters(this->Direct3D->GetDeviceContext(), DirectX::XMLoadFloat4x4(&this->theModel[0].getId()), this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix());
+	this->theModel[0].draw(*this->theColorShader, this->Direct3D->GetDeviceContext());
+	this->theColorShader->SetShaderParameters(this->Direct3D->GetDeviceContext(), DirectX::XMLoadFloat4x4(&this->theModel[1].getId()), this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix());
+	this->theModel[1].draw(*this->theColorShader, this->Direct3D->GetDeviceContext());
+	this->theColorShader->SetShaderParameters(this->Direct3D->GetDeviceContext(), DirectX::XMLoadFloat4x4(&this->theModel[2].getId()), this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix());
+	this->theModel[2].draw(*this->theColorShader, this->Direct3D->GetDeviceContext());
+	//this->theColorShader->Render(this->Direct3D->GetDeviceContext(), this->theModel->getVertexCount(), this->Direct3D->GetWorldMatrix(), this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix());
+	
 	
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
@@ -374,24 +403,21 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	//this->theModel->addQuads(triangleVertices, nrTriVer, this->Direct3D->GetDevice());
 	//this->theModel->createTheVertexBuffer(this->Direct3D->GetDevice());
 
-	
-	this->theModel[0]->addCube(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), 1, 1, 1);
-	this->theModel[1]->addCube(DirectX::XMFLOAT3(0.0f, 2.0f, 3.0f), 1, 1, 1);
-	
-	for (int i = 0; i < cap; i++) {
-		if (theModel[i]->createTheVertexBuffer(this->Direct3D->GetDevice()))
-		{
-
-		}
-		else
-		{
-			MessageBox(hwnd, "Could not create vertex quads", "Error", MB_OK);
-		}
-	}
-	theModel[0]->setSampler(this->Direct3D->GetDevice());
-	theModel[0]->setTheTexture(this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext(), "textures/rock_01_dif_32bit.tga");
-	theModel[1]->setTheTexture(this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext(), "textures/lovelive.tga");
-
+	this->theModel[0].loadOBJ("stall.obj",this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext());
+	this->theModel[0].setTheTexture(this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext(), "stallTexture.tga");
+	this->theModel[0].createTheVertexBuffer(this->Direct3D->GetDevice());
+	this->theModel[1].loadOBJ("eb_house_plant_01.obj", this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext());
+	this->theModel[1].createTheVertexBuffer(this->Direct3D->GetDevice());
+	this->theModel[2].addCube(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), 2, 2, 2);
+	this->theModel[2].insertCubesInVec();
+	this->theModel[2].setTheTexture(this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext(), "rock_01_dif_32bit.tga");
+	this->theModel[2].createTheVertexBuffer(this->Direct3D->GetDevice());
+	this->theModel[0].setSampler(this->Direct3D->GetDevice());
+	this->theModel[1].setSampler(this->Direct3D->GetDevice());
+	this->theModel[2].setSampler(this->Direct3D->GetDevice());
+	this->theModel[2].setPosition(3.0f, 3.0f, 0.0f);
+	this->theModel[1].setPosition(-10.0f, 0.0f, 0.0f);
+	this->theModel[0].setPosition(0.0f, 10.0f, 0.0f);
 	return result;
 }
 
