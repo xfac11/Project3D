@@ -17,7 +17,7 @@ Model::Model()
 	DirectX::XMStoreFloat4x4(&this->Rotation,rotTemp);
 	DirectX::XMStoreFloat4x4(&this->Scale, scaleTemp);
 	DirectX::XMStoreFloat4x4(&this->Translation, translTemp);
-
+	this->position = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
 	scaleTemp = DirectX::XMLoadFloat4x4(&this->Scale);
 	translTemp = DirectX::XMLoadFloat4x4(&this->Translation);
 }
@@ -178,7 +178,19 @@ void Model::setWorld()
 
 void Model::setPosition(float x, float y, float z)
 {
-	DirectX::XMMATRIX tempTransl = DirectX::XMMatrixTranslation(x, y, z);
+	this->position.x = x;
+	this->position.y = y;
+	this->position.z = z;
+	DirectX::XMMATRIX tempTransl = DirectX::XMMatrixTranslation(this->position.x, this->position.y, this->position.z);
+	DirectX::XMStoreFloat4x4(&this->Translation, tempTransl);
+}
+
+void Model::move(float x, float y, float z)
+{
+	this->position.x += x;
+	this->position.y += y;
+	this->position.z += z;
+	DirectX::XMMATRIX tempTransl = DirectX::XMMatrixTranslation(this->position.x, this->position.y, this->position.z);
 	DirectX::XMStoreFloat4x4(&this->Translation, tempTransl);
 }
 
