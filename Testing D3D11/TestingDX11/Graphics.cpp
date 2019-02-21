@@ -201,7 +201,7 @@ Graphics::Graphics()
 
 Graphics::~Graphics()
 {
-	this->Shutdown(); //????
+	//this->Shutdown(); //????
 }
 
 bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
