@@ -8,13 +8,13 @@ Loader::~Loader()
 {
 }
 
-std::string Loader::loadFile(char * file, std::vector<Vertex3D>& outVec)
+std::string Loader::loadFile(std::string file, std::vector<Vertex3D>& outVec)
 {
 	//"r" for reading
-	
+	std::string fileTemp="OBJ/"+file;
 	std::FILE *infile;
 	errno_t err;
-	err=fopen_s(&infile,file, "r");
+	err=fopen_s(&infile,fileTemp.c_str(), "r");
 	char firstWord[128];
 	char materialFile[256];
 	char materialToUse[256];
@@ -149,7 +149,9 @@ std::string Loader::loadFile(char * file, std::vector<Vertex3D>& outVec)
 
 
 	std::FILE *mtlFile;
-	err = fopen_s(&mtlFile, materialFile, "r");
+	std::string mtlFileTemp = materialFile;
+	std::string objfile = "OBJ/" + mtlFileTemp;
+	err = fopen_s(&mtlFile, objfile.c_str(), "r");
 	if (err != 0)
 	{
 		return std::string();
