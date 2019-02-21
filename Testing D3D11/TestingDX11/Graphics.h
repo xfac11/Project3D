@@ -2,7 +2,7 @@
 #define GRAPHICS_H
 #include "D3D.h"
 #include "Camera.h"
-#include "ColorShader.h"
+//#include "ColorShader.h"
 #include "Model.h"
 #include "Triangle.h"
 #include <string>
@@ -18,12 +18,11 @@ const float SCREEN_NEAR = 0.1f;
 class Graphics
 {
 private:
-	DirectX::XMVECTOR rotaxis;
 	D3D* Direct3D;
 	Camera* theCamera;
 	Model* *theModel;
 	ColorShader* theColorShader;
-	int cap = 2;
+	int cap;
 
 	float jumpTimer;
 	bool isJumping;
@@ -33,6 +32,8 @@ private:
 	DirectX::XMFLOAT3 camPos; //scene class
 	DirectX::XMFLOAT3 camRot; //scene class
 	float gIncrement; //scene class
+
+	DirectX::XMVECTOR rotaxis;
 
 	void renderImgui();
 	bool render(); //float [4]color
@@ -46,6 +47,6 @@ public:
 	bool Initialize(int screenWidth, int screenHeight, HWND hwnd);
 
 	void Shutdown();
-	bool Frame();
+	bool Frame(bool move1, bool move2);
 };
 #endif

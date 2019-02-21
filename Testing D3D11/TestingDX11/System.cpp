@@ -235,6 +235,10 @@ System::System(HINSTANCE hInstance, LPCSTR name, int nCmdShow)
 	this->left_right = Neutral;
 	this->up_down = Neutral;
 
+
+	move1 = false;
+	move2 = false;
+
 	static bool raw_input_initialized = false; //can this be local variable?
 	if (raw_input_initialized == false)
 	{
@@ -281,70 +285,72 @@ void System::run()
 			else
 			{
 				//Game
-				//make keyboard stuff into private functionÂ´?
+				//make keyboard stuff into private function´?
 
+				
 				int xMouse = 0;
 				int yMouse = 0;
-				
-				while(!this->theMouse->EventBufferIsEmpty())
-				{ 
+				unsigned char charKey;
+
+				while (!this->theMouse->EventBufferIsEmpty())
+				{
 					MouseEvent mEvent = theMouse->ReadEvent();
 					//std::string posMsg = "Mouse pos: X=" + std::to_string(mEvent.GetPosX()-384) + ", Y="+ std::to_string(mEvent.GetPosY()-384) + "\n";
-					if(mEvent.GetType()==MouseEventType::RAW_MOVE)
-					{ 
+					if (mEvent.GetType() == MouseEventType::RAW_MOVE)
+					{
 						//std::string rawMsg = "raw x: " + std::to_string(mEvent.GetPosX()) + ", Y:" + std::to_string(mEvent.GetPosY()) + "\n";
 						//OutputDebugStringA(rawMsg.c_str());
 						xMouse = mEvent.GetPosX();
 						yMouse = mEvent.GetPosY();
 					}
-	/*				if (mEvent.GetType() == LPress)
-					{
-						OutputDebugStringA("Pressed LeftMouse\n");
-					}
-					if (mEvent.GetType() == LRelease)
-					{
-						OutputDebugStringA("Released LeftMouse\n");
-					}
-					if (mEvent.GetType() == RPress)
-					{
-						OutputDebugStringA("Pressed RightMouse\n");
-					}
-					if (mEvent.GetType() == RRelease)
-					{
-						OutputDebugStringA("Released RightMouse\n");
-					}
-					if (mEvent.GetType() == MPress)
-					{
-						OutputDebugStringA("Pressed MiddleMouse\n");
-					}
-					if (mEvent.GetType() == MRelease)
-					{
-						OutputDebugStringA("Released MiddleMouse\n");
-					}
-					if (mEvent.GetType() == WheelUp)
-					{
-						OutputDebugStringA("WheelUp\n");
-					}
-					if (mEvent.GetType() == WheelDown)
-					{
-						OutputDebugStringA("WheelDown\n");
-					}
-					if (mEvent.GetType() == FPress)
-					{
-						OutputDebugStringA("Pressed FrontMouse\n");
-					}
-					if (mEvent.GetType() == FRelease)
-					{
-						OutputDebugStringA("Released FrontMouse\n");
-					}
-					if (mEvent.GetType() == BPress)
-					{
-						OutputDebugStringA("Pressed BackMouse\n");
-					}
-					if (mEvent.GetType() == BRelease)
-					{
-						OutputDebugStringA("Released BackMouse\n");
-					}*/
+					/*				if (mEvent.GetType() == LPress)
+									{
+										OutputDebugStringA("Pressed LeftMouse\n");
+									}
+									if (mEvent.GetType() == LRelease)
+									{
+										OutputDebugStringA("Released LeftMouse\n");
+									}
+									if (mEvent.GetType() == RPress)
+									{
+										OutputDebugStringA("Pressed RightMouse\n");
+									}
+									if (mEvent.GetType() == RRelease)
+									{
+										OutputDebugStringA("Released RightMouse\n");
+									}
+									if (mEvent.GetType() == MPress)
+									{
+										OutputDebugStringA("Pressed MiddleMouse\n");
+									}
+									if (mEvent.GetType() == MRelease)
+									{
+										OutputDebugStringA("Released MiddleMouse\n");
+									}
+									if (mEvent.GetType() == WheelUp)
+									{
+										OutputDebugStringA("WheelUp\n");
+									}
+									if (mEvent.GetType() == WheelDown)
+									{
+										OutputDebugStringA("WheelDown\n");
+									}
+									if (mEvent.GetType() == FPress)
+									{
+										OutputDebugStringA("Pressed FrontMouse\n");
+									}
+									if (mEvent.GetType() == FRelease)
+									{
+										OutputDebugStringA("Released FrontMouse\n");
+									}
+									if (mEvent.GetType() == BPress)
+									{
+										OutputDebugStringA("Pressed BackMouse\n");
+									}
+									if (mEvent.GetType() == BRelease)
+									{
+										OutputDebugStringA("Released BackMouse\n");
+									}*/
 
 				}
 				while (!theKeyboard->CharBufferIsEmpty()) //decide if or while
@@ -361,6 +367,7 @@ void System::run()
 				{
 					KeyboardEvent keyEvent = theKeyboard->ReadKey();
 					unsigned char theKey = keyEvent.GetKeyCode();
+					charKey = theKey;
 					std::string theMsg = "Key ";
 					if (keyEvent.IsPress())
 					{
@@ -393,6 +400,15 @@ void System::run()
 						{
 							moveScreen = false;
 						}
+
+						if (theKey == 'J')
+						{
+							move1 = true;
+						}
+						if (theKey == 'K')
+						{
+							move2 = true;
+						}
 					}
 					if (keyEvent.IsRelease())
 					{
@@ -416,20 +432,30 @@ void System::run()
 						{
 							moveScreen = true;
 						}
+
+						if (theKey == 'J')//
+						{
+							move1 = false;
+						}
+						if (theKey == 'K')
+						{
+							move2 = false;
+						}
 					}
 					theMsg += "\n";
 					OutputDebugStringA(theMsg.c_str());
 				}
-				
+
 				if (this->mouseSwitch == false)
 					SetCursorPos(400, 400);
+				
 				if (moveScreen == false)
 				{
 					xMouse = 0;
 					yMouse = 0;
 				}
 				graphics->move(forward,left_right, this->up_down, this->flySwitch, xMouse, yMouse);
-				graphics->Frame();
+				graphics->Frame(move1, move2);
 				
 			}
 		}

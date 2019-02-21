@@ -29,10 +29,16 @@ private:
 	bool mouseSwitch;
 	bool flySwitch;
 	bool moveScreen;
-	
+
 	Direction forward; //have these in a own class?
 	Direction left_right;
 	Direction up_down;
+
+
+	//temp pls remove this later
+	bool move1;
+	bool move2;
+
 
 	static LRESULT CALLBACK  WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 	HWND InitWindow(HINSTANCE hInstance, float height, float width);
