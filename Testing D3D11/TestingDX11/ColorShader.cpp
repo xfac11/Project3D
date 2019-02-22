@@ -175,37 +175,37 @@ bool ColorShader::InitializeShader(ID3D11Device*& device, HWND hwnd)//, WCHAR* v
 	pGS->Release();
 	return true;
 }
-//
-//void ColorShader::ShutdownShader()
-//{
-//	// Release the matrix constant buffer.
-//	//if (m_matrixBuffer)
-//	//{
-//	//	m_matrixBuffer->Release();
-//	//	m_matrixBuffer = 0;
-//	//}
-//
-//	// Release the layout.
-//	if (vertexLayout)
-//	{
-//		vertexLayout->Release();
-//		vertexLayout = 0;
-//	}
-//
-//	// Release the pixel shader.
-//	if (pixelShader)
-//	{
-//		pixelShader->Release();
-//		pixelShader = 0;
-//	}
-//
-//	// Release the vertex shader.
-//	if (vertexShader)
-//	{
-//		vertexShader->Release();
-//		vertexShader = 0;
-//	}
-//}
+
+void ColorShader::ShutdownShader()
+{
+	// Release the matrix constant buffer.
+	//if (m_matrixBuffer)
+	//{
+	//	m_matrixBuffer->Release();
+	//	m_matrixBuffer = 0;
+	//}
+
+	// Release the layout.
+	if (vertexLayout)
+	{
+		vertexLayout->Release();
+		vertexLayout = 0;
+	}
+
+	// Release the pixel shader.
+	if (pixelShader)
+	{
+		pixelShader->Release();
+		pixelShader = 0;
+	}
+
+	// Release the vertex shader.
+	if (vertexShader)
+	{
+		vertexShader->Release();
+		vertexShader = 0;
+	}
+}
 
 void ColorShader::OutputShaderErrorMessage(ID3D10Blob * errorMessage, HWND hwnd, WCHAR * shaderFilename)
 {
@@ -261,7 +261,7 @@ bool ColorShader::SetShaderParameters(ID3D11DeviceContext *& deviceContext, Dire
 	matricesPerFrame->worldMatrix = WorldViewProj;
 	//Lock the m_matrixBuffer, set the new matrices inside it, and then unlock it.
 
-		// Lock the constant buffer so it can be written to.
+	// Lock the constant buffer so it can be written to.
 	result = deviceContext->Map(MatrixPerFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
 	if (FAILED(result))
 	{

@@ -1,22 +1,22 @@
 #ifndef KEYBOARDEVENT_H
 #define KEYBOARDEVENT_H
-enum KeyboardEventType
-{
-	Press,
-	Relsease,
-	Invalid
-};
 class KeyboardEvent
 {
-
+public:
+	enum EventType
+	{
+		Press,
+		Relsease,
+		Invalid
+	};
 private:
-	KeyboardEventType type;
+	EventType type;
 	unsigned char key;
 public:
 
 	KeyboardEvent();
-	KeyboardEvent(const KeyboardEventType type, const unsigned char key);
-	virtual~KeyboardEvent();
+	KeyboardEvent(const EventType type, const unsigned char key);
+	~KeyboardEvent();
 	bool IsPress()const;
 	bool IsRelease() const;
 	bool isValid() const;

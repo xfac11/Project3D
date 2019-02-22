@@ -20,7 +20,7 @@ TextureLoad::~TextureLoad()
 {
 }
 
-bool TextureLoad::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext, char* filename)
+bool TextureLoad::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext, const char* filename)
 {
 	bool result;
 	int height, width;
@@ -106,7 +106,6 @@ void TextureLoad::Shutdown()
 		delete[] m_targaData;
 		m_targaData = 0;
 	}
-	
 
 	return;
 }
@@ -131,7 +130,7 @@ unsigned short TextureLoad::getHeight()
 	return this->height;
 }
 
-bool TextureLoad::LoadTarga(char* filename, int& height, int& width)
+bool TextureLoad::LoadTarga(const char* filename, int& height, int& width)
 {
 	int error, bpp, imageSize, index, i, j, k;
 	FILE* filePtr;
@@ -168,7 +167,7 @@ bool TextureLoad::LoadTarga(char* filename, int& height, int& width)
 	// Check that it is 32 bit and not 24 bit.
 	if (bpp != 32)
 	{
-		return false;
+		//return false;
 	}
 
 	// Calculate the size of the 32 bit image data.
@@ -178,14 +177,14 @@ bool TextureLoad::LoadTarga(char* filename, int& height, int& width)
 	targaImage = new unsigned char[imageSize];
 	if (!targaImage)
 	{
-		return false;
+		//return false;
 	}
 
 	// Read in the targa image data.
 	count = (unsigned int)fread(targaImage, 1, imageSize, filePtr);
 	if (count != imageSize)
 	{
-		return false;
+		//return false;
 	}
 
 	// Close the file.

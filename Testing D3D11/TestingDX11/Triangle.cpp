@@ -9,7 +9,7 @@ Triangle::Triangle(DirectX::XMFLOAT3 p1, DirectX::XMFLOAT3 p2, DirectX::XMFLOAT3
 {
 	this->points[0].x = p1.x;
 	this->points[0].y = p1.y;
-	this->points[0].z = p1.z;
+	this->points[0].z = p1.z; 
 	this->points[1].x = p2.x;
 	this->points[1].y = p2.y;
 	this->points[1].z = p2.z;
@@ -36,20 +36,21 @@ Triangle::~Triangle()
 void Triangle::move(float x, float y, float z)
 {
 	DirectX::XMMATRIX trans = DirectX::XMMatrixTranslation(x, y, z);
-	//trans = DirectX::XMMatrixTranspose(trans);
 
-	DirectX::XMVECTOR point1 = DirectX::XMVectorSet(this->points[0].x + x, this->points[0].y + y, this->points[0].z + z, 1.0f);
-	DirectX::XMVECTOR point2 = DirectX::XMVectorSet(this->points[1].x + x, this->points[1].y + y, this->points[1].z + z, 1.0f);
-	DirectX::XMVECTOR point3 = DirectX::XMVectorSet(this->points[2].x + x, this->points[2].y + y, this->points[2].z + z, 1.0f);
+	trans = DirectX::XMMatrixTranspose(trans);
+
+	DirectX::XMVECTOR point1 = DirectX::XMVectorSet(this->points[0].x, this->points[0].y, this->points[0].z, 1.0f);
+	DirectX::XMVECTOR point2 = DirectX::XMVectorSet(this->points[1].x, this->points[1].y, this->points[1].z, 1.0f);
+	DirectX::XMVECTOR point3 = DirectX::XMVectorSet(this->points[2].x, this->points[2].y, this->points[2].z, 1.0f);
 	DirectX::XMVECTOR newP1 = DirectX::XMVector3Transform(point1, trans);
 	DirectX::XMVECTOR newP2 = DirectX::XMVector3Transform(point2, trans);
 	DirectX::XMVECTOR newP3 = DirectX::XMVector3Transform(point2, trans);
-	updatePos(point1, point2, point3);
+	updatePos(newP1, newP2, newP3);
 }
 
 void Triangle::setPosition(float x, float y, float z)
 {
-
+	
 }
 
 void Triangle::setPosition(DirectX::XMFLOAT3 pos)
@@ -79,7 +80,7 @@ void Triangle::rotateY(float offset)
 	DirectX::XMVECTOR point1 = DirectX::XMVectorSet(this->points[0].y, -this->points[0].x, this->points[0].z, 1.0f);
 	DirectX::XMVECTOR point2 = DirectX::XMVectorSet(this->points[1].y, -this->points[1].x, this->points[1].z, 1.0f);
 	DirectX::XMVECTOR point3 = DirectX::XMVectorSet(this->points[2].y, -this->points[2].x, this->points[2].z, 1.0f);
-	DirectX::XMVECTOR newP1 = DirectX::XMVector3Transform(point1, trans);
+	DirectX::XMVECTOR newP1 = DirectX::XMVector3Transform(point1,trans);
 	DirectX::XMVECTOR newP2 = DirectX::XMVector3Transform(point2, trans);
 	DirectX::XMVECTOR newP3 = DirectX::XMVector3Transform(point2, trans);
 	updatePos(point1, point2, point3);

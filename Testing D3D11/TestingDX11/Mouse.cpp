@@ -146,7 +146,7 @@ bool Mouse::EventBufferIsEmpty()
 MouseEvent Mouse::ReadEvent()
 {
 	MouseEvent temp = MouseEvent();
-	if (this->eventBuffer.empty()==false)
+	if (this->eventBuffer.empty() == false)
 	{
 		temp = this->eventBuffer.front();
 		this->eventBuffer.pop();

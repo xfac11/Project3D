@@ -14,7 +14,7 @@ class Loader
 public:
 	Loader();
 	~Loader();
-	std::string loadFile(char* file, std::vector<Vertex3D> &outVec);
+	std::string loadFile(std::string file, std::vector<Vertex3D> &outVec);
 
 private:
 

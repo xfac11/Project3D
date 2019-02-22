@@ -16,6 +16,7 @@ MouseEvent::MouseEvent(const MouseEventType type, const int x, const int y)
 
 MouseEvent::~MouseEvent()
 {
+
 }
 
 bool MouseEvent::IsValid()

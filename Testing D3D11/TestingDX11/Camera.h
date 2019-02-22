@@ -20,9 +20,9 @@ public:
 	{
 		_mm_free(p);
 	}
-	void SetPosition(float x, float y, float z);
+	void SetPosition(float x, float y , float z);
 	void SetPosition(DirectX::XMFLOAT3 position);
-	void SetRotation(float x, float y, float z);
+	void SetRotation(float x, float y , float z);
 	void SetRotation(DirectX::XMFLOAT3 rotation);
 
 	DirectX::XMFLOAT3 GetPosition();

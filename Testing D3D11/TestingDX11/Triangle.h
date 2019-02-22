@@ -20,6 +20,6 @@ public:
 	Vertex3D getPoint(const int id);
 private:
 	Vertex3D points[3];
-
+	
 };
 #endif // !TRIANGLE_H
