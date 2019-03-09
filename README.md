@@ -23,8 +23,8 @@ Geometry (2):
   
 Texturing and Lighting (1): 
     _Daniel_
-  o Textures
-  o Normal mapping
+  o Textures (DONE)
+  o Normal mapping (DONE)
   o Color/light etc
   o Phong Shading (specular)
 
@@ -46,7 +46,7 @@ Core techniques (1,1):
   o Parsing and rendering an existing model format (OBJ, MD5, etc). This includes parsing and using the material defined in the           format (textures). If you use a library like Assimp, it does not count. (Filip,DONE)
 o Height-map terrain rendering, user can walk on the terrain using WASD keys. (Karlos, DONE)
 - Texturing and Lighting (1,2): 
-  o Normal mapping(Daniel) 
+  o Normal mapping (Daniel, DONE) 
 - Projection Techniques (1,1): 
   o Shadow mapping 
   o Skybox (om denna ger poäng, gör denna)
