@@ -30,10 +30,12 @@ Texturing and Lighting (1):
 
 Keyboard, inputs, Camera, FPS
   _Karlos_
+  o DirectX 3D class system setup
   o FPS done! 
   o Keyboard done!
   o simple physics (jump and fall)
-  x Height-map terrain rendering, user can walk on the terrain using WASD keys.
+  o Height-map terrain rendering, user can walk on the terrain using WASD keys.(done!) (can be slimmed)
+  x Particle systems with Billboarded particles
   
   
   1/9 Tekniker gjorda 
@@ -42,7 +44,7 @@ Core techniques (1,1):
   o Deferred Rendering (Filip)
 - Geometry (2,1): 
   o Parsing and rendering an existing model format (OBJ, MD5, etc). This includes parsing and using the material defined in the           format (textures). If you use a library like Assimp, it does not count. (Filip,DONE)
-o Height-map terrain rendering, user can walk on the terrain using WASD keys. (Karlos)
+o Height-map terrain rendering, user can walk on the terrain using WASD keys. (Karlos, DONE)
 - Texturing and Lighting (1,2): 
   o Normal mapping(Daniel) 
 - Projection Techniques (1,1): 
@@ -56,7 +58,7 @@ o Height-map terrain rendering, user can walk on the terrain using WASD keys. (K
   o Back face culling using Geometry Shader (Karlos Done kindof (fix model if problem)
  
 - Other techniques (2,3):
-  o Particle systems with Billboarded particles ▪ If Particles are updated on the GPU, counts as 2 
+  o Particle systems with Billboarded particles ▪ If Particles are updated on the GPU, counts as 2 (Karlos)
   o Gaussian filter in Compute Shader  
   o Bilateral filter in CS (any filter that can be applied in two passes) 
   o Mouse Picking () 
