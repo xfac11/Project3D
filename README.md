@@ -34,3 +34,34 @@ Keyboard, inputs, Camera, FPS
   o Keyboard done!
   o simple physics (jump and fall)
   x Height-map terrain rendering, user can walk on the terrain using WASD keys.
+  
+  
+  1/9 Tekniker gjorda 
+
+Core techniques (1,1): 
+  o Deferred Rendering (Filip)
+- Geometry (2,1): 
+  o Parsing and rendering an existing model format (OBJ, MD5, etc). This includes parsing and using the material defined in the           format (textures). If you use a library like Assimp, it does not count. (Filip,DONE)
+o Height-map terrain rendering, user can walk on the terrain using WASD keys. (Karlos)
+- Texturing and Lighting (1,2): 
+  o Normal mapping(Daniel) 
+- Projection Techniques (1,1): 
+  o Shadow mapping 
+  o Skybox (om denna ger poäng, gör denna)
+
+
+- Acceleration Techniques (2,1): 
+  o Portal Culling 
+  o Front to Back rendering 
+  o Back face culling using Geometry Shader (Karlos Done kindof (fix model if problem)
+ 
+- Other techniques (2,3):
+  o Particle systems with Billboarded particles ▪ If Particles are updated on the GPU, counts as 2 
+  o Gaussian filter in Compute Shader  
+  o Bilateral filter in CS (any filter that can be applied in two passes) 
+  o Mouse Picking () 
+  o Screen-Space Antialiasing 
+  o Water-effect (based on vertex or texture animations) 
+  o Glow-effect 
+  o Make a small game in your application
+
