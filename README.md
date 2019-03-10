@@ -32,7 +32,7 @@ Keyboard, inputs, Camera, FPS
   _Karlos_
   o DirectX 3D class system setup
   o FPS done! 
-  o Keyboard done!
+  o Keyboard and Mouse done!
   o simple physics (jump and fall)
   o Height-map terrain rendering, user can walk on the terrain using WASD keys.(done!) (can be slimmed)
   x Particle systems with Billboarded particles
