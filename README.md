@@ -41,7 +41,7 @@ Keyboard, inputs, Camera, FPS
   4/9 Tekniker gjorda 
 
 Core techniques (1,1): 
-  - Deferred Rendering (Filip)
+  - Deferred Rendering (Filip) Lightpos follows objects. possible the postexture or normal
 
 Geometry (2,1): 
   - Parsing and rendering an existing model format (OBJ, MD5, etc). This includes parsing and using the material defined in the           format (textures). If you use a library like Assimp, it does not count. (Filip,DONE)
