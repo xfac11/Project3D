@@ -38,14 +38,14 @@ Keyboard, inputs, Camera, FPS
   - x Particle systems with Billboarded particles
   
   
-  5/9 Tekniker gjorda 
+  4/9 Tekniker gjorda 
 
 Core techniques (1,1): 
   - Deferred Rendering (Filip)
 
 Geometry (2,1): 
   - Parsing and rendering an existing model format (OBJ, MD5, etc). This includes parsing and using the material defined in the           format (textures). If you use a library like Assimp, it does not count. (Filip,DONE)
-  - Height-map terrain rendering (Karlos, DONE), user can walk on the terrain using WASD keys. (Karlos, DONE)
+  - Height-map terrain rendering, user can walk on the terrain using WASD keys. (Karlos, DONE)
 
 Texturing and Lighting (1,2): 
   - Normal mapping (Daniel, DONE) 
@@ -57,7 +57,7 @@ Projection Techniques (1,1):
 
 
 Acceleration Techniques (2,1): 
-  - Portal Culling 
+  - Portal Culling (Daniel)
   - Front to Back rendering 
   - Back face culling using Geometry Shader (Karlos Done kindof (fix model if problem)
  
