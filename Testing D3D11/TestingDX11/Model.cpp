@@ -172,7 +172,7 @@ void Model::setWorld()
 	rotTemp=DirectX::XMLoadFloat4x4(&this->Rotation);
 	scaleTemp = DirectX::XMLoadFloat4x4(&this->Scale);
 	translTemp = DirectX::XMLoadFloat4x4(&this->Translation);
-	DirectX::XMStoreFloat4x4(&this->world,(rotTemp*translTemp));
+	DirectX::XMStoreFloat4x4(&this->world,(translTemp*rotTemp*scaleTemp));
 	
 }
 
