@@ -12,7 +12,7 @@ Model::Model()
 	this->vertexCount = 0;
 	DirectX::XMVECTOR rotaxis = DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 	DirectX::XMMATRIX rotTemp = DirectX::XMMatrixRotationAxis(rotaxis, 0);
-	DirectX::XMMATRIX scaleTemp = DirectX::XMMatrixScaling(0.0f, 0.0f, 0.0f);
+	DirectX::XMMATRIX scaleTemp = DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f);
 	DirectX::XMMATRIX translTemp = DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f);
 	DirectX::XMStoreFloat4x4(&this->Rotation,rotTemp);
 	DirectX::XMStoreFloat4x4(&this->Scale, scaleTemp);
