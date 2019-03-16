@@ -19,12 +19,15 @@ private:
 	ID3D11RenderTargetView* renderTargetView;
 	ID3D11Texture2D* depthStencilBuffer;
 	ID3D11DepthStencilState* depthStencilState;
+	ID3D11DepthStencilState* depthDisStencilState;
 	ID3D11DepthStencilView* depthStencilView;
+	D3D11_VIEWPORT vp;
 	//ID3D11RasterizerState* rasterState;
 	DirectX::XMMATRIX projectionMatrix;
 	DirectX::XMMATRIX worldMatrix;
 	DirectX::XMMATRIX orthoMatrix;  //switch to 
 
+	ID3D11Debug *debug;
 	//maybe D3D should have CBData instead of ColorShader
 
 	float dist;
@@ -57,12 +60,16 @@ public:
 	void BeginScene(float color[4]);
 	void EndScene();
 	void setWorld(DirectX::XMMATRIX world);
+	void setBackBuffer();
+	void turnOffZ();
+	void turnOnZ();
+	void resetViewPort();
 	ID3D11Device*& GetDevice();
 	ID3D11DeviceContext*& GetDeviceContext();
 
 	DirectX::XMMATRIX& GetProjectionMatrix();
 	DirectX::XMMATRIX& GetWorldMatrix();
-	//DirectX::XMMATRIX& GetOrthoMatrix();
+	DirectX::XMMATRIX& GetOrthoMatrix();
 
 	int & GetVideoCardInfo(char* cardName);//(, int& memory);
 };

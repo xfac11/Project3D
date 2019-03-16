@@ -4,7 +4,7 @@ D3D::D3D()
 {
 	this->vSync_enabled = NULL;
 	this->videoCardMemory = NULL;
-	this->videoCardDescription[128] = NULL;
+	this->videoCardDescription[127] = NULL;
 
 	this->swapChain =  nullptr;
 	this->device = nullptr;
@@ -12,9 +12,10 @@ D3D::D3D()
 	this->renderTargetView = nullptr;
 	this->depthStencilBuffer = nullptr;
 	this->depthStencilState = nullptr;
+	this->depthDisStencilState = nullptr;
 	this->depthStencilView = nullptr;
 	//rasterState = nullptr;
-
+	this->debug = nullptr;
 	this->dist = 0.1f;
 	this->gIncrement = 0;
 }
@@ -45,7 +46,6 @@ bool D3D::initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 	//ID3D11Texture2D* backBufferPtr = nullptr;
 	//D3D11_TEXTURE2D_DESC depthBufferDesc;
 	//D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
-	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
 	//D3D11_RASTERIZER_DESC rasterDesc;
 	//D3D11_VIEWPORT viewport;
 	float fieldOfView, screenAspect;
@@ -149,11 +149,25 @@ bool D3D::initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 			// deal with error...
 			return false;
 		}
+
+		ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
+		// Depth test parameters
+		depthStencilDesc.DepthEnable = false;
+		depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK::D3D11_DEPTH_WRITE_MASK_ALL;
+		depthStencilDesc.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS_EQUAL;
+
+		// Create depth stencil state
+		result = device->CreateDepthStencilState(&depthStencilDesc, &depthDisStencilState);
+		if (FAILED(result))
+		{
+			// deal with error...
+			return false;
+		}
+
 	}
 
-
+	deviceContext->OMSetDepthStencilState(this->depthStencilState, 0); //1
 	//void SetViewport()
-	D3D11_VIEWPORT vp;
 	vp.Width = (float)screenWidth;
 	vp.Height = (float)screenHeight;
 	vp.MinDepth = 0.0f;
@@ -170,7 +184,7 @@ bool D3D::initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 	fieldOfView = 0.45f*DirectX::XM_PI;
 	screenAspect = (float)screenWidth / (float)screenHeight;
 
-
+	orthoMatrix = DirectX::XMMatrixOrthographicLH((float)screenWidth, (float)screenHeight,0.1f, 100.f);
 	//move to ColorShader
 	this->projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, 0.1f, 100.f);
 	//this->projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, screenNear, screenDepth);
@@ -178,6 +192,8 @@ bool D3D::initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 	//this->worldMatrix = DirectX::XMMatrixRotationY(this->gIncrement);
 	//this->worldMatrix = DirectX::XMMatrixTranspose(worldMatrix); //moved to colorshader
 	//this->orthoMatrix = DirectX::XMMatrixOrthographicLH((float)screenWidth, (float)screenHeight, screenNear, screenDepth);
+
+	this->device->QueryInterface(__uuidof(ID3D11Debug), reinterpret_cast<void**>(&debug));
 
 	return true;
 }
@@ -219,16 +235,21 @@ void D3D::Shutdown()
 		deviceContext->Release();
 		deviceContext = nullptr;
 	}
-	if (device)
-	{
-		device->Release();
-		device = nullptr;
-	}
+
 	if (swapChain)
 	{
 		swapChain->Release();
 		swapChain = nullptr;
 	}
+
+	debug->ReportLiveDeviceObjects(D3D11_RLDO_SUMMARY | D3D11_RLDO_DETAIL);
+	if (device)
+	{
+		device->Release();
+		device = nullptr;
+	}
+	debug->Release();
+	
 	//return;
 }
 
@@ -244,9 +265,30 @@ void D3D::BeginScene(float color[4])
 	// Clear the back buffer.
 	deviceContext->ClearRenderTargetView(renderTargetView, color);
 	// Clear the depth buffer.
+	/*ID3D11BlendState* d3dBlendState;
+	D3D11_BLEND_DESC omDesc;
+	ZeroMemory(&omDesc,
+
+		sizeof(D3D11_BLEND_DESC));
+	omDesc.RenderTarget[0].BlendEnable =
+
+		true;
+	omDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+	omDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+	omDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	omDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	omDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+	omDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	omDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+	if (d3dBlendState)
+	{
+		d3dBlendState->Release();
+	}*/
+	//device->CreateBlendState(&omDesc, &d3dBlendState);
+	//deviceContext->OMSetBlendState(nullptr, 0, 0xffffffff);
 	deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-	deviceContext->OMSetDepthStencilState(this->depthStencilState, 0); //1
-	this->worldMatrix = DirectX::XMMatrixRotationY(this->gIncrement);//to here
+	//this->worldMatrix = DirectX::XMMatrixRotationY(this->gIncrement);//to here
 }
 
 void D3D::EndScene()
@@ -269,6 +311,26 @@ void D3D::setWorld(DirectX::XMMATRIX world)
 	this->worldMatrix = world;
 }
 
+void D3D::setBackBuffer()
+{
+	deviceContext->OMSetRenderTargets(1, &renderTargetView,this->depthStencilView);
+}
+
+void D3D::turnOffZ()
+{
+	deviceContext->OMSetDepthStencilState(this->depthDisStencilState, 1); //1
+}
+
+void D3D::turnOnZ()
+{
+	deviceContext->OMSetDepthStencilState(this->depthStencilState, 1); //1
+}
+
+void D3D::resetViewPort()
+{
+	deviceContext->RSSetViewports(1, &vp);
+}
+
 ID3D11Device *& D3D::GetDevice()
 {
 	return device;
@@ -289,10 +351,10 @@ DirectX::XMMATRIX & D3D::GetWorldMatrix()
 	return  worldMatrix;
 }
 
-/*DirectX::XMMATRIX & D3D::GetOrthoMatrix()
+DirectX::XMMATRIX & D3D::GetOrthoMatrix()
 {
 	return orthoMatrix;
-}*/
+}
 
 int & D3D::GetVideoCardInfo(char * cardName)//, int & memory)
 {
