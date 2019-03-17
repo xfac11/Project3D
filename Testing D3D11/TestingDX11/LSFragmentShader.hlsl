@@ -118,12 +118,12 @@ float4 PS_main(PS_IN input) : SV_Target0
 	//posCol = PositionTexture.Load(sampleIndices).xyz;
 	//posCol = float3(1.0f, 1.0f, 3.0f);
 	// Sample the normals from the normal render texture using the point sampler at this texture coordinate location.
-	normals = NormalTex.Sample(SampSt, input.TexCoord).xyz;//*2.0f - 1.0f;// back to [-1...1] 
+	normals = NormalTex.Sample(SampSt, input.TexCoord).xyz*2.0f - 1.0f;// back to [-1...1] 
 	if (length(normals) > 0.0f) //normals with that 
 	{
 
 
-		normals = normalize(normals);
+		//normals = normalize(normals);
 		//if (normals.x == 0.0f)
 		//{
 		//	if (normals.y == 0.0f)
@@ -135,7 +135,7 @@ float4 PS_main(PS_IN input) : SV_Target0
 		//	}
 		//}
 		//posCol = float3(0.0f, 0.0f, 10.0f);
-		float3 final_colour = float3(0.2f, 0.2f, 0.2f);
+		float3 final_colour = float3(0.0f, 0.0f, 0.0f);
 		float3 ambient = colors * final_colour;
 		// diffuse, no attenuation.
 		//for (int i = 0; i < 4; i++)
@@ -175,7 +175,7 @@ float4 PS_main(PS_IN input) : SV_Target0
 
 		float diffuse = max(howMuchLight, 0); //smooth
 		float3 diffusefinal = colors * lightColor.xyz*diffuse * lightPos.w *(1 / d);
-		final_colour = float3(ambient + diffusefinal + specular);
+		final_colour = float3(ambient + diffusefinal+specular);
 		//}
 
 		// UPDATE THIS LINE TO ACCOUNT FOR SATURATION (PIXEL COLOUR CANNOT GO OVER 1.0)

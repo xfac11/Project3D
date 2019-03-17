@@ -123,6 +123,7 @@ bool DefferedShader::Render(ID3D11DeviceContext *& deviceContext, int count, Dir
 void DefferedShader::RenderShader(ID3D11DeviceContext * deviceContext, int count)
 {
 
+	
 	deviceContext->VSSetShader(this->vertexShader, nullptr, 0);
 	deviceContext->HSSetShader(nullptr, nullptr, 0);
 	deviceContext->DSSetShader(nullptr, nullptr, 0);
@@ -171,7 +172,6 @@ bool DefferedShader::SetShaderParameters(ID3D11DeviceContext *& deviceContext, D
 	}
 
 	// Get a pointer to the data in the constant buffer.
-	//matricesPerFrame = (PerFrameMatrices*)mappedMemory.pData; //was in tutorial
 	memcpy(mappedMemory.pData, this->WVPdata, sizeof(MatrixBuffers));
 
 	// Unlock the constant buffer.
@@ -184,8 +184,7 @@ bool DefferedShader::SetShaderParameters(ID3D11DeviceContext *& deviceContext, D
 	}
 
 	// Get a pointer to the data in the constant buffer.
-	dataSpec = (Specular*)mappedMemory.pData; //was in tutorial
-	//memcpy(mappedMemorySpec.pData, dataSpec, sizeof(Specular));
+	memcpy(mappedMemorySpec.pData, dataSpec, sizeof(Specular));// use this and the flickering stops
 
 	// Unlock the constant buffer.
 	deviceContext->Unmap(SpecPerFrameBuffer, 0);
@@ -194,7 +193,7 @@ bool DefferedShader::SetShaderParameters(ID3D11DeviceContext *& deviceContext, D
 
 		// Set the position of the constant buffer in the vertex shader.
 	//bufferNumber = 0;
-
+	
 	// Finanly set the constant buffer in the vertex shader with the updated values.
 	//deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
 	//deviceContext->PSSetConstantBuffers(0, 1, &ConstantBuffer);
@@ -203,6 +202,7 @@ bool DefferedShader::SetShaderParameters(ID3D11DeviceContext *& deviceContext, D
 	//deviceContext->GSSetConstantBuffers(0, 1, &MatrixPerFrameBuffer);
 	deviceContext->VSSetConstantBuffers(0, 1, &MatrixPerFrameBuffer); //could have bufferNumber = 0 dno why tho
 	//deviceContext->GSSetConstantBuffers(0, 1, &MatrixPerFrameBuffer);
+	
 
 	return true;
 }
