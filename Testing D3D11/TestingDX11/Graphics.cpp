@@ -326,3 +326,123 @@ bool Graphics::Frame(unsigned char key)
 	
 	return render();
 }
+
+void Graphics::renderToTexture()
+{
+
+
+
+		// Set the render buffers to be the render target.
+	ID3D11RenderTargetView* renderTargetsToSet[] = { gBuffer->getRenView(0),
+												 gBuffer->getRenView(1),
+												 gBuffer->getRenView(2)
+												};
+
+	//this->Direct3D->GetDeviceContext()->OMSetRenderTargets(3, renderTargetsToSet, this->gBuffer->getDepthStcView());
+	gBuffer->setRenderTargets(Direct3D->GetDevice(),Direct3D->GetDeviceContext());
+	// Clear the render buffers.
+	float color[] = {
+		0.0f, 0.0f, 0.0f, 1.0f
+	};
+	gBuffer->clear(Direct3D->GetDeviceContext(), color);
+			
+		// Get the matrices from the camera and d3d objects.
+	
+
+	// Update the rotation variable each frame.
+
+	DirectX::XMMATRIX worldID = DirectX::XMMatrixIdentity();
+	ID3D11ShaderResourceView* null[] = { nullptr, nullptr, nullptr };
+	//this->Direct3D->GetDeviceContext()->PSSetShaderResources(0, 3, null);
+	// Rotate the world matrix by the rotation value so that the cube will spin.
+	DirectX::XMFLOAT3 spec(1.0f, 0.0f, 0.0f);
+	// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
+	this->dShader->SetShaderParameters(this->Direct3D->GetDeviceContext(), DirectX::XMLoadFloat4x4(&this->theModel[2]->getId()), this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix(), spec, 1.0f);
+	this->theModel[2]->draw(*this->dShader, this->Direct3D->GetDeviceContext());
+	this->dShader->SetShaderParameters(this->Direct3D->GetDeviceContext(), DirectX::XMLoadFloat4x4(&this->theModel[3]->getId()), this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix(), spec, 1.0f);
+	this->theModel[3]->draw(*this->dShader, this->Direct3D->GetDeviceContext());
+	this->dShader->SetShaderParameters(this->Direct3D->GetDeviceContext(), DirectX::XMLoadFloat4x4(&this->theModel[1]->getId()), this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix(), spec, 1.0f);
+	this->theModel[1]->draw(*this->dShader, this->Direct3D->GetDeviceContext());
+	this->dShader->SetShaderParameters(this->Direct3D->GetDeviceContext(), DirectX::XMLoadFloat4x4(&this->theModel[0]->getId()), this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix(), spec, 1.0f);
+	this->theModel[0]->draw(*this->dShader, Direct3D->GetDeviceContext());
+	// Render the model using the deferred shader.
+	
+	ID3D11RenderTargetView* nullRTV = nullptr;
+	this->Direct3D->GetDeviceContext()->OMSetRenderTargets(1, &nullRTV, nullptr);
+	// Reset the render target back to the original back buffer and not the render buffers anymore.
+	this->Direct3D->setBackBuffer();
+	this->Direct3D->resetViewPort();
+	// Reset the viewport back to the original.
+	//nullRTV->Release();
+}
+
+void Graphics::deferredRender()
+{
+	this->renderToTexture();
+	Direct3D->BeginScene(this->color);
+
+	Direct3D->turnOffZ();
+	fullQuad->Render(this->Direct3D->GetDeviceContext());//Prepares and sets the vertex buffer 
+
+	DirectX::XMVECTOR rotaxis = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	this->theModel[2]->rot += 0.01f;
+	float movex = sin(this->theModel[2]->rot);
+	//this->theModel[2]->move(0.0f, movex, 0.0f);
+	if (this->theModel[2]->rot > 3.141590f * 2)
+	{
+		this->theModel[2]->rot = 0;
+	}
+	//this->theModel[2]->setWorld();
+	//this->theModel[1]->setWorld();
+
+	PointLight light[4];
+	DirectX::XMMATRIX worldID = DirectX::XMMatrixIdentity();
+	worldID = DirectX::XMMatrixTranslation(this->theModel[2]->getPosition().x,
+		this->theModel[2]->getPosition().y, this->theModel[2]->getPosition().z);//Sets the position of the light to the sphere
+	DirectX::XMFLOAT3 lPos(0.0f, 0.0f, 0.0f);
+	DirectX::XMFLOAT3 lColor(1.0f, 1.0f, 0.0f);
+	light[0] = { worldID,lPos.x,lPos.y,lPos.z,10.0f,
+				lColor.x,lColor.y,lColor.z,1.0f };
+	//lColor = DirectX::XMFLOAT3(1.0f, 1.0f, 0.0f);
+	//worldID = DirectX::XMMatrixTranslation(15.0f, 6.0f, 0.0f);
+	//light[1] = { worldID,lPos.x,lPos.y,lPos.z,10.0f,
+	//			lColor.x,lColor.y,lColor.z,1.0f };
+	//worldID = DirectX::XMMatrixTranslation(7.0f, 6.0f, 10.0f);
+	//light[2] = { worldID,lPos.x,lPos.y,lPos.z,10.0f,
+	//			lColor.x,lColor.y,lColor.z,1.0f };
+	//worldID = DirectX::XMMatrixTranslation(7.0f, 6.0f, 15.0f);
+	//light[3] = { worldID,lPos.x,lPos.y,lPos.z,10.0f,
+	//			lColor.x,lColor.y,lColor.z,1.0f };
+	ID3D11ShaderResourceView* viewsToSet[] = { gBuffer->getShadResView(0),
+										   gBuffer->getShadResView(1),
+											gBuffer->getShadResView(2)
+	};
+	ID3D11ShaderResourceView* view = gBuffer->getShadResView(0);
+	ID3D11ShaderResourceView* view1 = gBuffer->getShadResView(1);
+	ID3D11ShaderResourceView* view2 = gBuffer->getShadResView(2);
+
+
+	ID3D11ShaderResourceView* null[] = { nullptr, nullptr, nullptr };
+	this->Direct3D->GetDeviceContext()->PSSetShaderResources(0, 3, null);
+	//}
+//	this->Direct3D->GetDeviceContext()->PSSetShaderResources(0, 1, nullptr);
+	//this->Direct3D->GetDeviceContext()->PSSetShaderResources(1, 1, nullptr);
+	//this->Direct3D->GetDeviceContext()->PSSetShaderResources(2, 1, nullptr);
+
+	this->Direct3D->GetDeviceContext()->PSSetShaderResources(0, 1, &view);
+	this->Direct3D->GetDeviceContext()->PSSetShaderResources(1, 1, &view1);
+	this->Direct3D->GetDeviceContext()->PSSetShaderResources(2, 1, &view2);
+
+	//this->gBuffer->setShaderResViews(this->Direct3D->GetDeviceContext());
+	//this->theColorShader->SetShaderParameters(this->Direct3D->GetDeviceContext(), DirectX::XMLoadFloat4x4(&this->theModel[2]->getId()), this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix());// lPos, lColor, 1.0f, 1.0f);
+	this->lShader->SetShaderParameters(this->Direct3D->GetDeviceContext(), worldID, this->theCamera->GetViewMatrix(), this->Direct3D->GetOrthoMatrix(), lPos, lColor, 1.0f, 1.0f, light, this->camPos);
+
+	//this->lShader->SetShaderParameters(this->Direct3D->GetDeviceContext(), DirectX::XMLoadFloat4x4(&this->theModel[2]->getId()), this->theCamera->GetViewMatrix(), this->Direct3D->GetOrthoMatrix(), this->gBuffer->getShaderResView(0), this->gBuffer->getShaderResView(1), lPos, lColor, 1.0f, 1.0f);
+	//Fix properties in the shaders. Entrypoint and shader type
+	//Fix properties in the shaders. Entrypoint and shader type
+
+	//this->theModel[2]->draw(*this->theColorShader, this->Direct3D->GetDeviceContext());
+	this->lShader->RenderShader(this->Direct3D->GetDeviceContext(), 6);
+	this->Direct3D->turnOnZ();
+
+}
