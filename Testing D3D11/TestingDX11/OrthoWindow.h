@@ -1,8 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Filename: orthowindowclass.h
 ////////////////////////////////////////////////////////////////////////////////
-#ifndef _ORTHOWINDOWCLASS_H_
-#define _ORTHOWINDOWCLASS_H_
+#ifndef ORTHOWINDOW H_
+#define ORTHOWINDOW_H
 
 
 //////////////
@@ -15,7 +15,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Class name: OrthoWindowClass
 ////////////////////////////////////////////////////////////////////////////////
-class OrthoWindowClass
+class OrthoWindow
 {
 private:
 	struct VertexType
@@ -25,24 +25,24 @@ private:
 	};
 
 public:
-	OrthoWindowClass();
-	OrthoWindowClass(const OrthoWindowClass&);
-	~OrthoWindowClass();
+	OrthoWindow();
+	~OrthoWindow();
 
-	bool Initialize(ID3D11Device*, int, int);
+	bool Initialize(ID3D11Device* device, int windowWidth, int windowHeight);
 	void Shutdown();
-	void Render(ID3D11DeviceContext*);
+	void Render(ID3D11DeviceContext* deviceContext);
 
 	int GetIndexCount();
 
 private:
-	bool InitializeBuffers(ID3D11Device*, int, int);
+	bool InitializeBuffers(ID3D11Device* device, int windowWidth, int windowHeight);
 	void ShutdownBuffers();
-	void RenderBuffers(ID3D11DeviceContext*);
+	void RenderBuffers(ID3D11DeviceContext* deviceContext);
 
 private:
-	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
-	int m_vertexCount, m_indexCount;
+	ID3D11Buffer *vertexBuffer;
+	ID3D11Buffer *indexBuffer;
+	int vertexCount;
+	int	indexCount;
 };
-
 #endif
