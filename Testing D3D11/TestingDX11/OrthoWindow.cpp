@@ -35,8 +35,6 @@ void OrthoWindow::Shutdown()
 {
 	// Release the vertex and index buffers.
 	ShutdownBuffers();
-
-	return;
 }
 
 
@@ -44,8 +42,6 @@ void OrthoWindow::Render(ID3D11DeviceContext* deviceContext)
 {
 	// Put the vertex and index buffers on the graphics pipeline to prepare them for drawing.
 	RenderBuffers(deviceContext);
-
-	return;
 }
 
 
@@ -212,8 +208,6 @@ void OrthoWindow::ShutdownBuffers()
 		vertexBuffer->Release();
 		vertexBuffer = 0;
 	}
-
-	return;
 }
 
 
@@ -235,6 +229,4 @@ void OrthoWindow::RenderBuffers(ID3D11DeviceContext* deviceContext)
 
 	// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	return;
 }
