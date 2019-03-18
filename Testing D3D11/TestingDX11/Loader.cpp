@@ -8,13 +8,14 @@ Loader::~Loader()
 {
 }
 
-std::string Loader::loadFile(std::string file, std::vector<Vertex3D>& outVec)
+std::string Loader::loadFile(std::string file, std::vector<Vertex3D>& outVec) //directX::XMFLOAT3
 {
 	//"r" for reading
-	std::string fileTemp="OBJ/"+file;
 	std::FILE *infile;
+	
+	std::string fileTemp = "OBJ/" + file;
 	errno_t err;
-	err=fopen_s(&infile,fileTemp.c_str(), "r");
+	err = fopen_s(&infile, fileTemp.c_str(), "r");
 	char firstWord[128];
 	char materialFile[256];
 	char materialToUse[256];
@@ -27,11 +28,13 @@ std::string Loader::loadFile(std::string file, std::vector<Vertex3D>& outVec)
 	if (err != 0)
 	{
 		//Can't open the file
+		fileTemp += "\n";
+		OutputDebugStringA(fileTemp.c_str());
 		return false;
 	}
 	//%s == string?
 	int res = 0;
-	res = fscanf_s(infile, "%s",firstWord, _countof(firstWord));
+	res = fscanf_s(infile, "%s", firstWord, _countof(firstWord));
 	while (res != EOF)
 	{
 		if (strcmp(firstWord, "v") == 0)
@@ -64,7 +67,7 @@ std::string Loader::loadFile(std::string file, std::vector<Vertex3D>& outVec)
 			int verIn[4];
 			int norIn[4];
 			int texIn[4];
-			fscanf_s(infile, "%d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d\n", &verIn[0], &texIn[0],&norIn[0],
+			fscanf_s(infile, "%d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d\n", &verIn[0], &texIn[0], &norIn[0],
 				&verIn[1], &texIn[1], &norIn[1], &verIn[2], &texIn[2], &norIn[2],
 				&verIn[3], &texIn[3], &norIn[3]);
 			//Convert drawing order
@@ -121,7 +124,7 @@ std::string Loader::loadFile(std::string file, std::vector<Vertex3D>& outVec)
 					outVec.push_back(temp);
 				}
 			}
-			
+
 		}
 		else if (strcmp(firstWord, "mtllib") == 0)
 		{
@@ -141,17 +144,10 @@ std::string Loader::loadFile(std::string file, std::vector<Vertex3D>& outVec)
 	// For each vertex of each triangle
 
 
-
-
-
-
-
-
-
 	std::FILE *mtlFile;
 	std::string mtlFileTemp = materialFile;
 	std::string objfile = "OBJ/" + mtlFileTemp;
-	err = fopen_s(&mtlFile, objfile.c_str(), "r");
+	err = fopen_s(&mtlFile, objfile.c_str(), "r");	
 	if (err != 0)
 	{
 		return std::string();
@@ -159,21 +155,21 @@ std::string Loader::loadFile(std::string file, std::vector<Vertex3D>& outVec)
 	char materialTest[256];
 	char materialTexture[256];
 	bool foundTexture = false;
-	res = fscanf_s(mtlFile, "%s %s", firstWord, _countof(firstWord),materialTest,_countof(materialTest));
-	while (res != EOF&&!foundTexture)
+	res = fscanf_s(mtlFile, "%s %s", firstWord, _countof(firstWord), materialTest, _countof(materialTest));
+	while (res != EOF && !foundTexture)
 	{
 		if (strcmp(firstWord, "newmtl") == 0)
 		{
 			if (strcmp(materialTest, materialToUse))
 			{
-				res=fscanf_s(mtlFile, "%s", firstWord, _countof(firstWord));
-				while (res!=EOF&&!foundTexture)
+				res = fscanf_s(mtlFile, "%s", firstWord, _countof(firstWord));
+				while (res != EOF && !foundTexture)
 				{
 					if (strcmp(firstWord, "map_Kd") == 0)
 					{
-						fscanf_s(mtlFile, "%s\n", materialTexture,_countof(materialTexture));
+						fscanf_s(mtlFile, "%s\n", materialTexture, _countof(materialTexture));
 						foundTexture = true;
-					}	
+					}
 					res = fscanf_s(mtlFile, "%s", firstWord, _countof(firstWord));
 				}
 			}

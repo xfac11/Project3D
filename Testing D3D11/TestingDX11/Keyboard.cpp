@@ -86,13 +86,13 @@ unsigned char Keyboard::ReadChar()
 void Keyboard::OnKeyPressed(const unsigned char key)
 {
 	this->KeyStates[key] = true;
-	this->keyBuffer.push(KeyboardEvent(KeyboardEvent::EventType::Press, key));
+	this->keyBuffer.push(KeyboardEvent(KeyboardEventType::Press, key));
 }
 
 void Keyboard::OnKeyReleased(const unsigned char key)
 {
 	this->KeyStates[key] = false;
-	this->keyBuffer.push(KeyboardEvent(KeyboardEvent::EventType::Relsease, key));
+	this->keyBuffer.push(KeyboardEvent(KeyboardEventType::Relsease, key));
 }
 
 void Keyboard::OnChar(const unsigned char key)

@@ -1,9 +1,10 @@
-
 cbuffer CB_PER_FRAME : register(b0)
 {
 	float4x4 world;
 	float4x4 view;
 	float4x4 proj;
+	float3 camPos;
+	float padding;
 };
 
 struct VS_IN
@@ -45,6 +46,6 @@ VS_OUT VS_main(VS_IN input)
 	//return output;
 
 
-	
+
 	return output;
 }

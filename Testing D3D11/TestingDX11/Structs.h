@@ -4,7 +4,10 @@
 #include <DirectXMath.h>
 struct PerFrameMatrices
 {
-	DirectX::XMMATRIX worldMatrix;
+	DirectX::XMMATRIX worldMatrix; //16b
+	DirectX::XMMATRIX WorldViewProj;
+	DirectX::XMFLOAT3 camPos; //12
+	float padding;
 };
 struct CBData //ConstantBufferData
 {
@@ -12,11 +15,31 @@ struct CBData //ConstantBufferData
 	float offset;
 	float padding1, padding2, padding3;
 };
+struct MatrixBuffers
+{
+	DirectX::XMMATRIX world;
+	DirectX::XMMATRIX view;
+	DirectX::XMMATRIX projection;
+	DirectX::XMFLOAT3 camPos; //12
+	float padding;
+};
+struct Specular
+{
+	DirectX::XMFLOAT3 specularAlbedo;
+	float specularPower;
+};
 enum Direction
 {
 	Neutral = 0,
 	Positive = 1,
 	Negative = -1
+};
+_declspec(align(16))struct PointLight
+{
+	DirectX::XMMATRIX world;
+	DirectX::XMFLOAT4 position;
+	DirectX::XMFLOAT4 color; //r=x, g=y, b=z, a=w
+	DirectX::XMFLOAT4 CameraPos;
 };
 //struct TextureData
 //{

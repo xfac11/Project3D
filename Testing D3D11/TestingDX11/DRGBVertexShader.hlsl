@@ -1,9 +1,10 @@
-
 cbuffer CB_PER_FRAME : register(b0)
 {
 	float4x4 world;//world
 	float4x4 view;//view
 	float4x4 proj;//proj
+	float3 camPos;
+	float padding;
 };
 
 struct VS_IN
@@ -42,7 +43,7 @@ VS_OUT VS_main(VS_IN input)
 	//output.Tex = input.Tex;
 
 	//// Calculate the normal vector against the world matrix only.
-	output.NormalWS = normalize(mul(float4((input.Normal),0.0f), world)).xyz;//=
+	output.NormalWS = normalize(mul(float4((input.Normal), 0.0f), world)).xyz;//=
 
 	//// Normalize the normal vector.
 	//output.NormalWS = normalize(input.Normal);
@@ -57,9 +58,9 @@ VS_OUT VS_main(VS_IN input)
 	//output.PosCS = mul(input.Pos, world);
 	//output.PosCS = mul(output.PosCS, view);
 	//output.PosCS = mul(world, float4(input.Pos, 1.0f));
-	output.PosCS = mul(proj,float4(input.Pos,1.0f));
+	output.PosCS = mul(proj, float4(input.Pos, 1.0f));
 	//output.PosCS = float4(input.Pos, 1.0f);
-	output.PositionWS = mul(float4(input.Pos,1.0f), world);
+	output.PositionWS = mul(float4(input.Pos, 1.0f), world);
 	//output.PositionWS = input.Pos.xyz;
 	output.Tex = input.Tex;
 
@@ -70,6 +71,6 @@ VS_OUT VS_main(VS_IN input)
 	//output.NormalWS = mul((float3x3)world, input.Normal);
 	//output.PositionWS = mul(world, input.Pos).xyz;
 
-	
+
 	return output;
 }

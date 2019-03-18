@@ -10,7 +10,7 @@ private:
 	bool leftIsDown;// = false;
 	bool rightIsDown; //= false;
 	bool middleIsDown; //=false;
-	bool forwardIsDown;
+	bool forwardIsDown; 
 	bool backIsDown;
 
 	int x;

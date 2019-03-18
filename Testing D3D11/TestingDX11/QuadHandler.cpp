@@ -1,9 +1,8 @@
 #include "QuadHandler.h"
-
 void QuadHandler::expandQuads()
 {
 	this->CAP += 6;
-	QuadVertex* *temp=new QuadVertex*[this->CAP];
+	QuadVertex* *temp = new QuadVertex*[this->CAP];
 	for (int i = 0; i < this->nrOfQuads; i++)
 	{
 		temp[i] = this->Quads[i];
@@ -40,15 +39,15 @@ QuadHandler::QuadHandler()
 
 QuadHandler::~QuadHandler()
 {
-	for (int i = 0; i < nrOfQuads; i++)
+	for (int i = 0; i < CAP; i++)
 	{
 		delete this->Quads[i];
 	}
 	delete[] this->Quads;
-	//delete[] this->quadVertex;
+	delete[] this->quadVertex;
 }
 
-bool QuadHandler::addQuad(DirectX::XMFLOAT3 pos, float width,float height, float depth,int face, int & vertexCount)
+bool QuadHandler::addQuad(DirectX::XMFLOAT3 pos, float width, float height, float depth, int face, int & vertexCount)
 {
 	bool result = false;
 	if (nrOfQuads == CAP)
@@ -60,7 +59,7 @@ bool QuadHandler::addQuad(DirectX::XMFLOAT3 pos, float width,float height, float
 		this->expandVertex();
 	}
 	result = true;
-	Quads[nrOfQuads] = new QuadVertex(pos,width,height,depth,face);
+	Quads[nrOfQuads] = new QuadVertex(pos, width, height, depth, face);
 	for (int j = 0; j < 2; j++)
 	{
 		for (int i = 0; i < 3; i++)
@@ -106,45 +105,28 @@ bool QuadHandler::addTri(DirectX::XMFLOAT3 p1, DirectX::XMFLOAT3 p2, DirectX::XM
 
 }
 
-bool QuadHandler::createVertexBuffer(ID3D11Device *& gDevice, ID3D11Buffer *& gVertexBuffer, int & vertexCount)
-{
-	D3D11_SUBRESOURCE_DATA data;
-	HRESULT hr;
-	D3D11_BUFFER_DESC bufferDesc;
-	memset(&bufferDesc, 0, sizeof(bufferDesc));
-	bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	bufferDesc.ByteWidth = this->nrOfVertex*sizeof(Vertex3D);
-	data.pSysMem = this->quadVertex;
-	hr=gDevice->CreateBuffer(&bufferDesc, &data, &gVertexBuffer);
-	if (FAILED(hr))
-	{
-		return false;
-	}
-	return true;
-}
+//bool QuadHandler::createVertexBuffer(ID3D11Device *& gDevice, ID3D11Buffer *& gVertexBuffer, int & vertexCount)
+//{
+//	D3D11_SUBRESOURCE_DATA data;
+//	HRESULT hr;
+//	D3D11_BUFFER_DESC bufferDesc;
+//	memset(&bufferDesc, 0, sizeof(bufferDesc));
+//	bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+//	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
+//	bufferDesc.ByteWidth = this->nrOfVertex * sizeof(Vertex3D);
+//	data.pSysMem = this->quadVertex;
+//	hr = gDevice->CreateBuffer(&bufferDesc, &data, &gVertexBuffer);
+//	if (FAILED(hr))
+//	{
+//		return false;
+//	}
+//	return true;
+//}
 
-bool QuadHandler::insertVector(std::vector<Vertex3D>& model, int & vertexCount)
-{
-	for (int i = 0; i < this->nrOfQuads; i++)
-	{
-		for (int k = 0; k < 2; k++)
-		{
-			for (int l = 0; l < 3; l++)
-			{
-				model.push_back(this->Quads[i]->getTri(k).getPoint(l));
-				vertexCount++;
-			}
-		}
-		
-	}
-	return true;
-}
-
-UINT32 QuadHandler::getSize(int id)
-{
-	return Quads[id]->getSize();
-}
+//UINT32 QuadHandler::getSize(int id)
+//{
+//	return Quads[id]->getSize();
+//}
 
 QuadVertex *& QuadHandler::getQuad(int id)
 {

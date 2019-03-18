@@ -19,28 +19,22 @@ private:
 	ID3D11RenderTargetView* renderTargetView;
 	ID3D11Texture2D* depthStencilBuffer;
 	ID3D11DepthStencilState* depthStencilState;
-	ID3D11DepthStencilState* depthDisStencilState;
+	ID3D11DepthStencilState* disableDepthStencilState;
 	ID3D11DepthStencilView* depthStencilView;
 	D3D11_VIEWPORT vp;
-	//ID3D11RasterizerState* rasterState;
+	//ID3D11RasterizerState* rasterState; 
 	DirectX::XMMATRIX projectionMatrix;
 	DirectX::XMMATRIX worldMatrix;
-	DirectX::XMMATRIX orthoMatrix;  //switch to 
+	//DirectX::XMMATRIX orthoMatrix;  //switch to 
 
-	ID3D11Debug *debug;
-	//maybe D3D should have CBData instead of ColorShader
+	//particles use this
+	ID3D11BlendState* alphaEnableBlendingState;
+	ID3D11BlendState* alphaDisableBlendingState;
+
+	ID3D11Debug* debug;
 
 	float dist;
 	float gIncrement;
-	/*
-	XMVECTOR CamPos = XMVectorSet(0.0, 0.0, -2, 0.0);  //-dist 
-	XMVECTOR LookAt = XMVectorSet(0.0, 0.0, 0.0, 0.0); //change to first person view
-	XMVECTOR Up = XMVectorSet(0.0, 1.0, 0.0, 0.0);
-	XMMATRIX View = XMMatrixLookAtLH(CamPos, LookAt, Up);
-	XMMATRIX World = XMMatrixRotationY(gIncrement);
-	
-	*/
-
 
 public:
 	D3D();
@@ -59,17 +53,20 @@ public:
 	void Shutdown();
 	void BeginScene(float color[4]);
 	void EndScene();
-	void setWorld(DirectX::XMMATRIX world);
+
+
 	void setBackBuffer();
-	void turnOffZ();
 	void turnOnZ();
+	void turnOffZ();
 	void resetViewPort();
+	void EnableAlphaBlending();
+	void DisableAlphaBlending();
+
+
 	ID3D11Device*& GetDevice();
 	ID3D11DeviceContext*& GetDeviceContext();
-
 	DirectX::XMMATRIX& GetProjectionMatrix();
 	DirectX::XMMATRIX& GetWorldMatrix();
-	DirectX::XMMATRIX& GetOrthoMatrix();
 
 	int & GetVideoCardInfo(char* cardName);//(, int& memory);
 };

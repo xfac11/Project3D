@@ -1,4 +1,4 @@
-ï»¿#include"System.h"
+#include"System.h"
 
 HWND System::InitWindow(HINSTANCE hInstance, float height, float width)
 {
@@ -36,7 +36,7 @@ LRESULT CALLBACK System::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 { //event-handling, event happens to window
 	if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
 		return true;
-
+	
 	System *sys;
 	if (message == WM_NCCREATE)
 	{
@@ -44,10 +44,10 @@ LRESULT CALLBACK System::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 		sys = (System*)((LPCREATESTRUCT)lParam)->lpCreateParams;
 		SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(sys));
 	}
-	else
+	else 
 		sys = (System*)(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 
-	if (message == WM_DESTROY)
+	if(message== WM_DESTROY)
 		PostQuitMessage(0);
 	else if (message == WM_CHAR)
 	{
@@ -66,7 +66,7 @@ LRESULT CALLBACK System::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 				if (!wasPressed)
 				{
 					sys->theKeyboard->OnChar(theChar);
-
+					
 				}
 			}
 			//OutputDebugStringA(msg.c_str());
@@ -94,8 +94,8 @@ LRESULT CALLBACK System::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 		unsigned char theKey = static_cast<unsigned char>(wParam);
 		sys->theKeyboard->OnKeyReleased(theKey);
 	}
-	else if (message == WM_MOUSEMOVE)
-	{
+	else if(message == WM_MOUSEMOVE)
+	{ 
 		int x = LOWORD(lParam);
 		int y = HIWORD(lParam);
 		sys->theMouse->OnMouseMove(x, y);
@@ -108,14 +108,14 @@ LRESULT CALLBACK System::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 		{
 			//std::unique_ptr<BYTE[]> rawdata = std::make_unique<BYTE[]>(dataSize); 
 			BYTE* rawdata = new BYTE[dataSize];
-			if (GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, rawdata, &dataSize, sizeof(RAWINPUTHEADER)) == dataSize)
+			if (GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, rawdata, &dataSize, sizeof(RAWINPUTHEADER))==dataSize)
 			{
 				RAWINPUT* raw = reinterpret_cast<RAWINPUT*>(rawdata);
-				if (raw->header.dwType == RIM_TYPEMOUSE)
+				if (raw->header.dwType==RIM_TYPEMOUSE)
 				{
 					sys->theMouse->OnMouseRAW(raw->data.mouse.lLastX, raw->data.mouse.lLastY);
 				}
-
+				
 			}
 			delete[] rawdata;
 		}
@@ -133,13 +133,13 @@ LRESULT CALLBACK System::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 		int y = HIWORD(lParam);
 		sys->theMouse->OnRightPressed(x, y);
 	}
-	else if (message == WM_MBUTTONDOWN)
-	{
+	else if(message == WM_MBUTTONDOWN)
+	{ 
 		int x = LOWORD(lParam);
 		int y = HIWORD(lParam);
 		sys->theMouse->OnMiddlePressed(x, y);
 	}
-	else if (message == WM_LBUTTONUP)
+	else if(message == WM_LBUTTONUP)
 	{
 		int x = LOWORD(lParam);
 		int y = HIWORD(lParam);
@@ -180,12 +180,12 @@ LRESULT CALLBACK System::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 	{
 		int x = LOWORD(lParam);
 		int y = HIWORD(lParam);
-
-		if (GET_XBUTTON_WPARAM(wParam) == 2)
+		
+		if (GET_XBUTTON_WPARAM(wParam)==2)
 		{
 			sys->theMouse->OnForwardPressed(x, y);
 		}
-		if (GET_XBUTTON_WPARAM(wParam) == 1)
+		if (GET_XBUTTON_WPARAM(wParam) ==1)
 		{
 			sys->theMouse->OnBackPressed(x, y);
 		}
@@ -230,9 +230,14 @@ System::System(HINSTANCE hInstance, LPCSTR name, int nCmdShow)
 	//theKeyboard->EnableAutoRepeatChars();
 	this->mouseSwitch = true;
 	this->flySwitch = true;
+	this->moveScreen = true;
 	this->forward = Neutral;
 	this->left_right = Neutral;
 	this->up_down = Neutral;
+
+
+	move1 = false;
+	move2 = false;
 
 	static bool raw_input_initialized = false; //can this be local variable?
 	if (raw_input_initialized == false)
@@ -257,9 +262,9 @@ System::~System()
 
 bool System::initialize()
 {
-
+	
 	this->hwnd = InitWindow(this->hinstance, HEIGHT, WIDTH);
-
+	
 	return this->hwnd;
 }
 
@@ -280,77 +285,13 @@ void System::run()
 			else
 			{
 				//Game
-				//make keyboard stuff into private functionï¿½?
+				//make keyboard stuff into private function´?
 
+				
 				int xMouse = 0;
 				int yMouse = 0;
-				unsigned char key =' ';
-				if (!theKeyboard->CharBufferIsEmpty()) //decide if or while
-				{
-					unsigned char theChar = theKeyboard->ReadChar();
-					std::string theMsg = "Character: ";
-					theMsg += theChar;
-					theMsg += "\n";
-					//OutputDebugStringA(theMsg.c_str());
-					//for typing
-					//char inputs
-				}
-				if (!theKeyboard->KeyBufferIsEmpty())
-				{
-					KeyboardEvent keyEvent = theKeyboard->ReadKey();
-					unsigned char theKey = keyEvent.GetKeyCode();
-					std::string theMsg = "Key ";
-					key = theKey;
-					if (keyEvent.IsPress())
-					{
-						theMsg += "Pressed: ";
-						theMsg += theKey;
+				unsigned char charKey;
 
-						if (theKey == 'W')
-							forward = Positive;
-						else if (theKey == 'S')
-							forward = Negative;
-						if (theKey == 'D')
-							left_right = Positive;
-						else if (theKey == 'A')
-							left_right = Negative;
-						if (theKey == 32) //32 == space
-							up_down = Positive;
-						else if (theKey == 16) //shift
-							up_down = Negative;
-
-						if (theKey == 'B')
-						{
-							this->change(this->flySwitch);
-						}
-						if (theKey == 'M')
-						{
-							this->change(this->mouseSwitch);
-							ShowCursor(this->mouseSwitch);
-						}
-					}
-					if (keyEvent.IsRelease())
-					{
-						theMsg += "Released: ";
-						theMsg += theKey;
-
-
-						if (theKey == 'W')
-							forward = Neutral;
-						else if (theKey == 'S')
-							forward = Neutral;
-						if (theKey == 'A')
-							left_right = Neutral;
-						else if (theKey == 'D')
-							left_right = Neutral;
-						if (theKey == 32) //32 == space
-							up_down = Neutral;
-						else if (theKey == 16) //shift
-							up_down = Neutral;
-					}
-					theMsg += "\n";
-					OutputDebugStringA(theMsg.c_str());
-				}
 				while (!this->theMouse->EventBufferIsEmpty())
 				{
 					MouseEvent mEvent = theMouse->ReadEvent();
@@ -412,12 +353,110 @@ void System::run()
 									}*/
 
 				}
+				while (!theKeyboard->CharBufferIsEmpty()) //decide if or while
+				{
+					unsigned char theChar = theKeyboard->ReadChar();
+					std::string theMsg = "Character: ";
+					theMsg += theChar;
+					theMsg += "\n";
+					//OutputDebugStringA(theMsg.c_str());
+					//for typing
+					//char inputs
+				}
+				while (!theKeyboard->KeyBufferIsEmpty())
+				{
+					KeyboardEvent keyEvent = theKeyboard->ReadKey();
+					unsigned char theKey = keyEvent.GetKeyCode();
+					charKey = theKey;
+					std::string theMsg = "Key ";
+					if (keyEvent.IsPress())
+					{
+						theMsg += "Pressed: ";
+						theMsg += theKey;
+						
+						if (theKey == 'W')
+							forward = Positive;
+						else if (theKey == 'S')
+							forward = Negative;
+						if (theKey == 'D')
+							left_right = Positive;
+						else if (theKey == 'A')
+							left_right = Negative;
+						if (theKey == 32) //32 == space
+							up_down = Positive;
+						else if (theKey == 16) //shift
+							up_down = Negative;
+
+						if (theKey == 'B')
+						{
+							this->change(this->flySwitch);
+						}
+						if (theKey == 'M')
+						{
+							this->change(this->mouseSwitch);
+							ShowCursor(this->mouseSwitch);
+						}
+						if (theKey == 9) //tab
+						{
+							moveScreen = false;
+						}
+
+						if (theKey == 'J')
+						{
+							move1 = true;
+						}
+						if (theKey == 'K')
+						{
+							move2 = true;
+						}
+					}
+					if (keyEvent.IsRelease())
+					{
+						theMsg += "Released: ";
+						theMsg += theKey;
+
+
+						if (theKey == 'W')
+							forward = Neutral;
+						else if (theKey == 'S')
+							forward = Neutral;
+						if (theKey == 'A' )
+							left_right = Neutral;
+						else if (theKey == 'D')
+							left_right = Neutral;
+						if (theKey == 32) //32 == space
+							up_down = Neutral;
+						else if (theKey == 16) //shift
+							up_down = Neutral;
+						if (theKey == 9) //tab
+						{
+							moveScreen = true;
+						}
+
+						if (theKey == 'J')//
+						{
+							move1 = false;
+						}
+						if (theKey == 'K')
+						{
+							move2 = false;
+						}
+					}
+					theMsg += "\n";
+					OutputDebugStringA(theMsg.c_str());
+				}
+
 				if (this->mouseSwitch == false)
 					SetCursorPos(400, 400);
-
-				graphics->move(forward, left_right, this->up_down, this->flySwitch, xMouse, yMouse);
-				graphics->Frame(key);
-
+				
+				if (moveScreen == false)
+				{
+					xMouse = 0;
+					yMouse = 0;
+				}
+				graphics->move(forward,left_right, this->up_down, this->flySwitch, xMouse, yMouse);
+				graphics->Frame(move1, move2);
+				
 			}
 		}
 		//shutDown();

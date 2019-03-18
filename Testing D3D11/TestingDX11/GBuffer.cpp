@@ -15,7 +15,7 @@ GBuffer::GBuffer()
 
 GBuffer::~GBuffer()
 {
-	
+
 }
 
 bool GBuffer::initialize(ID3D11Device * device, int height, int width, float nearPlane, float farPlane)
@@ -56,10 +56,10 @@ bool GBuffer::initialize(ID3D11Device * device, int height, int width, float nea
 	renTarViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 
 	for (int i = 0; i < GBUFFERCAP; i++)
-	{	
+	{
 		result = device->CreateRenderTargetView(this->texTures[i], &renTarViewDesc, &this->renderTars[i]);
 		if (FAILED(result))
-			return false;	
+			return false;
 
 	}
 	shaderResViewDesc.Texture2D.MostDetailedMip = 0;
@@ -99,7 +99,7 @@ bool GBuffer::initialize(ID3D11Device * device, int height, int width, float nea
 	depthStencViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	depthStencViewDesc.Texture2D.MipSlice = 0;
 
-	result=device->CreateDepthStencilView(depthBuffer, &depthStencViewDesc, &depthStencView);
+	result = device->CreateDepthStencilView(depthBuffer, &depthStencViewDesc, &depthStencView);
 	if (FAILED(result))
 	{
 		return false;
@@ -136,13 +136,26 @@ ID3D11RenderTargetView*& GBuffer::getRenView(int id)
 
 void GBuffer::shutDown()
 {
-	depthStencView->Release();
-	depthBuffer->Release();
+
 	for (int i = 0; i < GBUFFERCAP; i++)
 	{
 		this->texTures[i]->Release();
 		this->renderTars[i]->Release();
 		this->shaderResViews[i]->Release();
+	}
+
+	if (this->depthBuffer) 
+	{
+		this->depthBuffer->Release();
+	}
+	if (this->depthStencView)
+	{
+		this->depthStencView->Release();
+	}
+	
+	if (this->depthSource)
+	{
+		depthSource->Release();
 	}
 }
 
@@ -175,4 +188,3 @@ ID3D11Texture2D * GBuffer::getTexture(int id)
 {
 	return this->texTures[id];
 }
-

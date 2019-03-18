@@ -3,7 +3,7 @@ struct PS_IN
 	float4 PosCS : SV_POSITION;
 	float2 Tex : TEXCOORD;
 	float3 NormalWS : NORMALWS;
-	float4 PositionWS : POSITIONWS;
+	float3 PositionWS : POSITIONWS;
 };
 struct PS_OUT
 {
@@ -24,6 +24,8 @@ cbuffer CB_PER_FRAME : register(b1)
 	float4x4 world;//world
 	float4x4 view;//view
 	float4x4 proj;//proj
+	float3 camPos;
+	float padding;
 };
 
 Texture2D Tex : register(t0);
@@ -40,7 +42,7 @@ PS_OUT PS_main(PS_IN input)
 	////output.DiffuseAlbedo = float4(diffuseAlbedo, 1.0f);
 	////output.SpecularAlbedo = float4(SpecularAlbedo, SpecularPower);
 	//output.TexColor = Tex.Sample(SampSt, input.Tex);//float4(input.ThePoint, 1.0f);//World space position
-	
+
 	output.TexColor = Tex.Sample(SampSt, input.Tex);
 	//output.TexColor = float4(1.0f, 0.0f, 0.0f, 1.0f);
 
@@ -56,7 +58,7 @@ PS_OUT PS_main(PS_IN input)
 	float zP = input.PositionWS.z;
 	float3 norScale = float3(x, y, z);
 	output.Normal = float4(norScale, 1.0f);
-	output.Pos = float4(xP,yP,zP, 1.0f);
+	output.Pos = float4(xP, yP, zP, 1.0f);
 	//output.Pos = mul(world,float4(input.PositionWS, 1.0f));
 
 	return output;

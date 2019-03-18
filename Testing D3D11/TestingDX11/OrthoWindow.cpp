@@ -1,8 +1,4 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: OrthoWindow.cpp
-////////////////////////////////////////////////////////////////////////////////
 #include"OrthoWindow.h"
-
 
 OrthoWindow::OrthoWindow()
 {
@@ -18,7 +14,6 @@ OrthoWindow::~OrthoWindow()
 bool OrthoWindow::Initialize(ID3D11Device* device, int windowWidth, int windowHeight)
 {
 	bool result;
-
 
 	// Initialize the vertex and index buffer that hold the geometry for the ortho window model.
 	result = InitializeBuffers(device, windowWidth, windowHeight);
@@ -94,11 +89,11 @@ bool OrthoWindow::InitializeBuffers(ID3D11Device* device, int windowWidth, int w
 		return false;
 	}
 
-	 //Load the vertex array with data.
-	 //First triangle.
+	//Load the vertex array with data.
+	//First triangle.
 
-		// Load the vertex array with data.
-		// First triangle.
+	   // Load the vertex array with data.
+	   // First triangle.
 	vertices[0].x = left;
 	vertices[0].y = top;
 	vertices[0].z = 0.0f; // Top left.
@@ -184,10 +179,10 @@ bool OrthoWindow::InitializeBuffers(ID3D11Device* device, int windowWidth, int w
 
 	// Release the arrays now that the vertex and index buffers have been created and loaded.
 	delete[] vertices;
-	vertices = 0;
+	vertices = nullptr;
 
 	delete[] indices;
-	indices = 0;
+	indices = nullptr;
 
 	return true;
 }
@@ -213,13 +208,9 @@ void OrthoWindow::ShutdownBuffers()
 
 void OrthoWindow::RenderBuffers(ID3D11DeviceContext* deviceContext)
 {
-	unsigned int stride;
-	unsigned int offset;
-
-
-	// Set vertex buffer stride and offset.
-	stride = sizeof(VertexType);
-	offset = 0;
+	// Set vertex buffer stride and offset
+	unsigned int stride=sizeof(VertexType);
+	unsigned int offset= 0;
 
 	// Set the vertex buffer to active in the input assembler so it can be rendered.
 	deviceContext->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);

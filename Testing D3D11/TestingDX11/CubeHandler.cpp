@@ -24,7 +24,7 @@ void CubeHandler::addCube(DirectX::XMFLOAT3 pos, float width, float height, floa
 bool CubeHandler::insertVector(std::vector<Vertex3D> &model, int & vertexCount)
 {
 	int pos = 0;
-	if (this->nrOfCubes*6*6 == vertexCount)
+	if (this->nrOfCubes * 6 * 6 == vertexCount)
 	{
 		for (int i = 0; i < this->nrOfCubes; i++)
 		{
@@ -60,15 +60,14 @@ bool CubeHandler::insertVector(std::vector<Vertex3D> &model, int & vertexCount)
 	}
 	return true;
 }
-
 void CubeHandler::moveCube(int id)
 {
-	this->cubes[id].move(DirectX::XMFLOAT3(0.0f,0.0f,1.0f));
+	this->cubes[id].move(DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f));
 }
-
 void CubeHandler::expand()
 {
 	this->cubeCap += 5;
+	OutputDebugStringA("HALP");
 	Cube* temp = new Cube[this->cubeCap];
 	for (int i = 0; i < this->nrOfCubes; i++)
 	{

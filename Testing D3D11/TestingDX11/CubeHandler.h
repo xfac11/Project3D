@@ -8,7 +8,7 @@ public:
 	CubeHandler();
 	~CubeHandler();
 	void addCube(DirectX::XMFLOAT3 pos, float width, float height, float depth);
-	bool insertVector(std::vector<Vertex3D> &model , int & vertexCount);
+	bool insertVector(std::vector<Vertex3D> &model, int & vertexCount);
 	void moveCube(int id);
 private:
 	void expand();
