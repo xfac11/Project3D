@@ -190,7 +190,7 @@ bool Terrain::InitializeBuffers(ID3D11Device *& device)
 	return true;
 }
 
-bool Terrain::LoadSetupFile(char * filename)
+bool Terrain::LoadSetupFile(const char * filename)
 {
 	int stringLength = 256;
 	std::ifstream fileInput;
@@ -646,7 +646,7 @@ Terrain::~Terrain()
 {
 }
 
-bool Terrain::Initialize(ID3D11Device *&device, char* fileName)
+bool Terrain::Initialize(ID3D11Device *&device, const char* fileName)
 {
 	bool result = false;
 	result = LoadSetupFile(fileName);
