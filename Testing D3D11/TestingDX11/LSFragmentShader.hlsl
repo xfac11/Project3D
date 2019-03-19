@@ -174,8 +174,8 @@ float4 PS_main(PS_IN input) : SV_Target0
 			float3 specular = specularStrength * spec * lightColor.xyz;
 
 			float diffuse = max(howMuchLight, 0); //smooth
-			float3 diffusefinal = colors * lightColor.xyz*diffuse * lightPos.w *(1 / d);
-			final_colour = float3(ambient + diffusefinal + specular);
+			float3 diffusefinal = saturate(colors * lightColor.xyz*diffuse * lightPos.w *(1 / d));
+			final_colour = float3(ambient + diffusefinal + specular);//Specular is wrong. Will turn everything to lightcolor when inside the object  
 			//}
 
 			// UPDATE THIS LINE TO ACCOUNT FOR SATURATION (PIXEL COLOUR CANNOT GO OVER 1.0)
