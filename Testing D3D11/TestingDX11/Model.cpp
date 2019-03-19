@@ -144,7 +144,7 @@ void Model::setSampler(ID3D11Device*& gDevice)
 		
 	}
 }
-void Model::loadOBJ(char * file, ID3D11Device * device, ID3D11DeviceContext * deviceContext) //directX::XMFLOAT3
+void Model::loadOBJ(const char * file, ID3D11Device * device, ID3D11DeviceContext * deviceContext) //directX::XMFLOAT3
 {
 	std::string txt = load.loadFile(file, body);
 	if (txt == "")
