@@ -43,7 +43,7 @@ private:
 	//Vertex3D* terrainModel;
 
 
-	bool LoadSetupFile(char* filename);
+	bool LoadSetupFile(const char* filename);
 	bool LoadBitmapHeightMap();
 
 	void SetTerrainCoordinates();
@@ -58,7 +58,7 @@ private:
 public:
 	Terrain();
 	~Terrain();
-	bool Initialize(ID3D11Device*& device, char* fileName);
+	bool Initialize(ID3D11Device*& device, const char* fileName);
 	void Render(ColorShader & shader, ID3D11DeviceContext* deviceContext);
 	void Render(DeferedShader & shader, ID3D11DeviceContext* deviceContext);
 	//int GetIndexCount();
