@@ -3,6 +3,7 @@
 #include <d3d11.h>
 #include <directxmath.h>
 #include <fstream>
+#include <vector>
 #include "Vertex3D.h"
 #include "ColorShader.h"
 #include "DeferedShader.h"
@@ -15,10 +16,6 @@ private:
 		float x, y, z;
 	};
 
-	//struct ModelType
-	//{
-	//	float x, y, z;
-	//};
 	DirectX::XMFLOAT4X4 world;
 	DirectX::XMFLOAT4X4 Rotation;
 	DirectX::XMFLOAT4X4 Scale;
@@ -26,6 +23,7 @@ private:
 	DirectX::XMFLOAT3 position;
 
 	Texture texture;
+	Texture normal;
 	//grid stuff
 	int terrainWidth;
 	int terrainHeight;
@@ -41,15 +39,21 @@ private:
 	float heightScale;
 	char* terrainFilename;
 	HeightMapType* heightMap;
-	Vertex3D* terrainModel;
+	std::vector<Vertex3D> body;
+	//Vertex3D* terrainModel;
 
 
 	bool LoadSetupFile(char* filename);
 	bool LoadBitmapHeightMap();
-	void ShutdownHeightMap();
+
 	void SetTerrainCoordinates();
 	bool BuildTerrainModel();
-	void ShutdownTerrainModel();
+	
+
+	void calculateModelVectors();     //NORMAL MAPS
+	void calculateTangentBinormal(NM_Vertex vertex1, NM_Vertex vertex2, NM_Vertex vertex3, DirectX::XMFLOAT3& tangent, DirectX::XMFLOAT3& binormal, DirectX::XMFLOAT3& normal);
+	void calculateNormal(DirectX::XMFLOAT3 tangent, DirectX::XMFLOAT3 binormal, DirectX::XMFLOAT3 & normal);     //NORMAL MAPS
+
 
 public:
 	Terrain();
@@ -58,7 +62,7 @@ public:
 	void Render(ColorShader & shader, ID3D11DeviceContext* deviceContext);
 	void Render(DeferedShader & shader, ID3D11DeviceContext* deviceContext);
 	//int GetIndexCount();
-	void setTheTexture(ID3D11Device *& gDevice, ID3D11DeviceContext *&gDeviceContext, char* filename);
+	void setTheTexture(ID3D11Device *& gDevice, ID3D11DeviceContext *&gDeviceContext, std::string filename, std::string normalFileName);
 	void Shutdown();
 
 	void setWorld();

@@ -49,4 +49,10 @@ _declspec(align(16))struct PointLight
 //	//Image data stored in 8-bit RGBA format
 //	unsigned char IMAGE_DATA[16384];
 //};
+struct NM_Vertex  //normal maps vertex
+{
+	float x, y, z;
+	float u, v;
+	float nx, ny, nz;
+};
 #endif

@@ -14,7 +14,7 @@ D3D::D3D()
 	this->depthStencilState = nullptr;
 	this->disableDepthStencilState = nullptr;
 	this->depthStencilView = nullptr;
-	//this->rasterState = nullptr;
+	this->rasterState = nullptr;
 	this->alphaEnableBlendingState = nullptr;
 	this->alphaDisableBlendingState = nullptr;
 	
@@ -34,7 +34,6 @@ void D3D::setIncrement(float g)
 
 bool D3D::initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen, float screenDepth, float screenNear) 
 {
-	//bool result = false;
 	HRESULT result;
 	//IDXGIFactory* factory;
 	//IDXGIAdapter* adapter;
@@ -43,15 +42,14 @@ bool D3D::initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 	//unsigned long long stringLength;
 	//DXGI_MODE_DESC* displayModeList;
 	//DXGI_ADAPTER_DESC adapterDesc;
-	//int error;
+	
 	//DXGI_SWAP_CHAIN_DESC swapchainDesc;
 	//D3D_FEATURE_LEVEL featureLevel;
 	//ID3D11Texture2D* backBufferPtr = nullptr;
 	//D3D11_TEXTURE2D_DESC depthBufferDesc;
 	//D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
 	//D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc; //dno if we need this
-	//D3D11_RASTERIZER_DESC rasterDesc;
-	//D3D11_VIEWPORT viewport;
+
 	D3D11_BLEND_DESC blendStateDescription;
 	float fieldOfView;
 	float screenAspect;
@@ -203,18 +201,18 @@ bool D3D::initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 	//this->orthoMatrix = DirectX::XMMatrixOrthographicLH((float)screenWidth, (float)screenHeight, screenNear, screenDepth);
 
 
-	//D3D11_RASTERIZER_DESC rasterizerDesc; 
-	//ZeroMemory(&rasterizerDesc, sizeof(D3D11_RASTERIZER_DESC));
-	//rasterizerDesc.FillMode = D3D11_FILL_MODE::D3D11_FILL_SOLID;
-	//rasterizerDesc.CullMode = D3D11_CULL_MODE::D3D11_CULL_NONE;
+	D3D11_RASTERIZER_DESC rasterizerDesc; 
+	ZeroMemory(&rasterizerDesc, sizeof(D3D11_RASTERIZER_DESC));
+	rasterizerDesc.FillMode = D3D11_FILL_MODE::D3D11_FILL_SOLID;
+	rasterizerDesc.CullMode = D3D11_CULL_MODE::D3D11_CULL_NONE;
 
-	//result = device->CreateRasterizerState(&rasterizerDesc, &rasterState);
-	//if (FAILED(result)) //If error occurred
-	//{
-	//	MessageBox(NULL, "Failed to create rasterizer state.",
-	//		"D3D11 Initialisation Error", MB_OK);
-	//	return false;
-	//}
+	result = device->CreateRasterizerState(&rasterizerDesc, &rasterState);
+	if (FAILED(result)) //If error occurred
+	{
+		MessageBox(NULL, "Failed to create rasterizer state.",
+			"D3D11 Initialisation Error", MB_OK);
+		return false;
+	}
 
 
 	// Clear the blend state description.
@@ -258,11 +256,11 @@ void D3D::Shutdown()
 	{
 		swapChain->SetFullscreenState(false, NULL);
 	}
-	//if (rasterState)
-	//{
-	//	rasterState->Release();
-	//	rasterState = nullptr;
-	//}
+	if (rasterState)
+	{
+		rasterState->Release();
+		rasterState = nullptr;
+	}
 	if (depthStencilView)
 	{
 		depthStencilView->Release();
@@ -418,5 +416,4 @@ int & D3D::GetVideoCardInfo(char * cardName)//, int & memory)
 {
 	strcpy_s(cardName, 128, this->videoCardDescription);
 	return videoCardMemory;
-	//return;
 }

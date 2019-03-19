@@ -155,7 +155,7 @@ DirectX::XMFLOAT4X4 ParticleSystem::getWorld()
 	return this->world;
 }
 
-void ParticleSystem::billboard( DirectX::XMFLOAT3 camPos) 
+void ParticleSystem::billboard( DirectX::XMFLOAT3 camPos) //can do this in GS?
 {
 	DirectX::XMMATRIX worldMatrix;
 	DirectX::XMMATRIX translateMatrix;

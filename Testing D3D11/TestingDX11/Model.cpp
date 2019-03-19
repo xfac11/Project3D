@@ -59,6 +59,7 @@ void Model::shutdown()
 	if (this->SamplerState != nullptr)
 		this->SamplerState->Release();
 	this->texture.cleanUp();
+	this->normal.cleanUp();
 }
 
 bool Model::insertCubesInVec()
@@ -106,6 +107,7 @@ void Model::setVertexBandTexture(ID3D11DeviceContext *& gDeviceContext)
 
 	UINT32 offset = 0;
 	gDeviceContext->PSSetShaderResources(0, 1, &this->texture.getTexture());
+	gDeviceContext->PSSetShaderResources(1, 1, &this->normal.getTexture());
 	gDeviceContext->IASetVertexBuffers(0, 1, &this->vertexBuffer, &vertexSize, &offset);
 	gDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	gDeviceContext->PSSetSamplers(0, 1, &this->SamplerState);
@@ -117,9 +119,10 @@ int Model::getVertexCount() const
 	return this->vertexCount;
 }
 
-void Model::setTheTexture(ID3D11Device *& gDevice, ID3D11DeviceContext *&gDeviceContext, char* filename)
+void Model::setTheTexture(ID3D11Device *& gDevice, ID3D11DeviceContext *&gDeviceContext, std::string filename, std::string normalFileName)
 {
 	this->texture.setTexture(gDevice, gDeviceContext, filename);
+	this->normal.setTexture(gDevice, gDeviceContext, normalFileName);
 }
 
 void Model::setSampler(ID3D11Device*& gDevice)
@@ -239,4 +242,153 @@ void Model::billboard(DirectX::XMFLOAT3 camPos)
 DirectX::XMFLOAT3 Model::getPosition() const
 {
 	return this->position;
+}
+
+void Model::calculateModelVectors()
+{
+	int faceCount = vertexCount / 3;
+	int index = 0;
+	NM_Vertex vertex1;
+	NM_Vertex vertex2;
+	NM_Vertex vertex3;
+	DirectX::XMFLOAT3 tangent;
+	DirectX::XMFLOAT3 binormal;
+	DirectX::XMFLOAT3 normal;
+
+	// Go through all the faces and calculate the the tangent, binormal, and normal vectors.
+	for (int i = 0; i < faceCount; i++)
+	{
+		// Get the three vertices for this face from the model.
+		vertex1.x = body.at(index).x;
+		vertex1.y = body.at(index).y;
+		vertex1.z = body.at(index).z;
+		vertex1.u = body.at(index).u;
+		vertex1.v = body.at(index).v;
+		vertex1.nx = body.at(index).nx;
+		vertex1.ny = body.at(index).ny;
+		vertex1.nz = body.at(index).nz;
+		index++;
+
+		vertex2.x = body.at(index).x;
+		vertex2.y = body.at(index).y;
+		vertex2.z = body.at(index).z;
+		vertex2.u = body.at(index).u;
+		vertex2.v = body.at(index).v;
+		vertex2.nx = body.at(index).nx;
+		vertex2.ny = body.at(index).ny;
+		vertex2.nz = body.at(index).nz;
+		index++;
+
+		vertex3.x = body.at(index).x;
+		vertex3.y = body.at(index).y;
+		vertex3.z = body.at(index).z;
+		vertex3.u = body.at(index).u;
+		vertex3.v = body.at(index).v;
+		vertex3.nx = body.at(index).nx;
+		vertex3.ny = body.at(index).ny;
+		vertex3.nz = body.at(index).nz;
+		index++;
+		// Calculate the tangent and binormal of that face.
+		calculateTangentBinormal(vertex1, vertex2, vertex3, tangent, binormal, normal);
+
+		// Calculate the new normal using the tangent and binormal.
+		calculateNormal(tangent, binormal, normal);
+
+		// Store the normal, tangent, and binormal for this face back in the model structure.
+		body.at(index - 1).nx = normal.x;
+		body.at(index - 1).ny = normal.y;
+		body.at(index - 1).nz = normal.z;
+		body.at(index - 1).tx = tangent.x;
+		body.at(index - 1).ty = tangent.y;
+		body.at(index - 1).tz = tangent.z;
+		body.at(index - 1).bx = binormal.x;
+		body.at(index - 1).by = binormal.y;
+		body.at(index - 1).bz = binormal.z;
+
+		body.at(index - 2).nx = normal.x;
+		body.at(index - 2).ny = normal.y;
+		body.at(index - 2).nz = normal.z;
+		body.at(index - 2).tx = tangent.x;
+		body.at(index - 2).ty = tangent.y;
+		body.at(index - 2).tz = tangent.z;
+		body.at(index - 2).bx = binormal.x;
+		body.at(index - 2).by = binormal.y;
+		body.at(index - 2).bz = binormal.z;
+
+		body.at(index - 3).nx = normal.x;
+		body.at(index - 3).ny = normal.y;
+		body.at(index - 3).nz = normal.z;
+		body.at(index - 3).tx = tangent.x;
+		body.at(index - 3).ty = tangent.y;
+		body.at(index - 3).tz = tangent.z;
+		body.at(index - 3).bx = binormal.x;
+		body.at(index - 3).by = binormal.y;
+		body.at(index - 3).bz = binormal.z;
+	}
+}
+
+void Model::calculateTangentBinormal(NM_Vertex vertex1, NM_Vertex vertex2, NM_Vertex vertex3, DirectX::XMFLOAT3 & tangent, DirectX::XMFLOAT3 & binormal, DirectX::XMFLOAT3 & normal)
+{
+
+	// Calculate the two vectors for this face.
+	float vector1[3];
+	vector1[0] = vertex2.x - vertex1.x;
+	vector1[1] = vertex2.y - vertex1.y;
+	vector1[2] = vertex2.z - vertex1.z;
+	float vector2[3];
+	vector2[0] = vertex3.x - vertex1.x;
+	vector2[1] = vertex3.y - vertex1.y;
+	vector2[2] = vertex3.z - vertex1.z;
+
+	// Calculate the tu and tv texture space vectors.
+	float tuVector[2];
+	float tvVector[2];
+	tuVector[0] = vertex2.u - vertex1.u;
+	tvVector[0] = vertex2.v - vertex1.v;
+	tuVector[1] = vertex3.u - vertex1.u;
+	tvVector[1] = vertex3.v - vertex1.v;
+
+	// Calculate the denominator of the tangent/binormal equation.
+	float den = 1.0f / (tuVector[0] * tvVector[1] - tuVector[1] * tvVector[0]);
+
+	// Calculate the cross products and multiply by the coefficient to get the tangent and binormal.
+	tangent.x = (tvVector[1] * vector1[0] - tvVector[0] * vector2[0]) * den;
+	tangent.y = (tvVector[1] * vector1[1] - tvVector[0] * vector2[1]) * den;
+	tangent.z = (tvVector[1] * vector1[2] - tvVector[0] * vector2[2]) * den;
+
+	binormal.x = (tuVector[0] * vector2[0] - tuVector[1] * vector1[0]) * den;
+	binormal.y = (tuVector[0] * vector2[1] - tuVector[1] * vector1[1]) * den;
+	binormal.z = (tuVector[0] * vector2[2] - tuVector[1] * vector1[2]) * den;
+
+	// Calculate the length of this normal.
+	float length = sqrt((tangent.x * tangent.x) + (tangent.y * tangent.y) + (tangent.z * tangent.z));
+
+	// Normalize the normal and then store it
+	tangent.x = tangent.x / length;
+	tangent.y = tangent.y / length;
+	tangent.z = tangent.z / length;
+
+	// Calculate the length of this normal.
+	length = sqrt((binormal.x * binormal.x) + (binormal.y * binormal.y) + (binormal.z * binormal.z));
+
+	// Normalize the normal and then store it
+	binormal.x = binormal.x / length;
+	binormal.y = binormal.y / length;
+	binormal.z = binormal.z / length;
+}
+
+void Model::calculateNormal(DirectX::XMFLOAT3 tangent, DirectX::XMFLOAT3 binormal, DirectX::XMFLOAT3 & normal)
+{
+	// Calculate the cross product of the tangent and binormal which will give the normal vector.
+	normal.x = (tangent.y * binormal.z) - (tangent.z * binormal.y);
+	normal.y = (tangent.z * binormal.x) - (tangent.x * binormal.z);
+	normal.z = (tangent.x * binormal.y) - (tangent.y * binormal.x);
+
+	// Calculate the length of the normal.
+	float length = sqrt((normal.x * normal.x) + (normal.y * normal.y) + (normal.z * normal.z));
+
+	// Normalize the normal.
+	normal.x = normal.x / length;
+	normal.y = normal.y / length;
+	normal.z = normal.z / length;
 }

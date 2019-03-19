@@ -5,7 +5,6 @@
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "d3dcompiler.lib")
-//using namespace DirectX;
 __declspec(align(16)) class D3D
 {
 
@@ -22,10 +21,9 @@ private:
 	ID3D11DepthStencilState* disableDepthStencilState;
 	ID3D11DepthStencilView* depthStencilView;
 	D3D11_VIEWPORT vp;
-	//ID3D11RasterizerState* rasterState; 
+	ID3D11RasterizerState* rasterState; 
 	DirectX::XMMATRIX projectionMatrix;
 	DirectX::XMMATRIX worldMatrix;
-	//DirectX::XMMATRIX orthoMatrix;  //switch to 
 
 	//particles use this
 	ID3D11BlendState* alphaEnableBlendingState;

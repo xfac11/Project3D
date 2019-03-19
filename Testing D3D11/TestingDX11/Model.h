@@ -2,9 +2,9 @@
 #define MODEL_H
 #include <d3d11.h>
 #include <directxmath.h>
+#include <vector>
 #include "CubeHandler.h"
 #include "QuadHandler.h"
-#include <vector>
 #include "Texture.h"
 #include "Loader.h"
 #include "ColorShader.h" //defered
@@ -13,6 +13,7 @@
 class Model
 {
 public:
+
 	Model();
 	~Model();
 	//This before setVertexBuffer
@@ -26,7 +27,7 @@ public:
 	bool createTheVertexBuffer(ID3D11Device *& gDevice);
 	void setVertexBandTexture(ID3D11DeviceContext *& gDeviceContext);
 	int getVertexCount()const;
-	void setTheTexture(ID3D11Device*& gDevice, ID3D11DeviceContext *&gDeviceContext, char* filename);
+	void setTheTexture(ID3D11Device*& gDevice, ID3D11DeviceContext *&gDeviceContext,std::string filename, std::string normalFileName );
 	void setSampler(ID3D11Device*& gDevice);
 
 	void loadOBJ(char* file, ID3D11Device* device, ID3D11DeviceContext* deviceContext);
@@ -45,6 +46,7 @@ public:
 	DirectX::XMFLOAT3 getPosition()const;
 
 private:
+
 	ID3D11Buffer *vertexBuffer;
 	//ID3D11Buffer *indexBuffer;
 	//ID3D11Buffer *constantBuffer;
@@ -58,10 +60,19 @@ private:
 	DirectX::XMFLOAT3 position;
 
 	Texture texture;
+	Texture normal;
 	Loader load;
 	int vertexCount;
 	//int indexCount;
 	QuadHandler quads;
 	CubeHandler cubes;
+
+
+	void calculateModelVectors();     //NORMAL MAPS
+	void calculateTangentBinormal(NM_Vertex vertex1, NM_Vertex vertex2, NM_Vertex vertex3, DirectX::XMFLOAT3& tangent, DirectX::XMFLOAT3& binormal, DirectX::XMFLOAT3& normal);
+	void calculateNormal(DirectX::XMFLOAT3 tangent, DirectX::XMFLOAT3 binormal, DirectX::XMFLOAT3 & normal);     //NORMAL MAPS
+
+
+
 };
 #endif // !MODEL_H

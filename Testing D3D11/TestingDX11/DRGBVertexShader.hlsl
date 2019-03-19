@@ -13,6 +13,8 @@ struct VS_IN
 	float2 Tex : TEXCOORD;
 	float3 Normal : NORMALPOS;
 	float3 ThePoint : THEPOINT;
+	float3 Tangent : TANGENT; //Normal maps
+	float3 Binormal :BINORMAL; //Normal maps
 };
 
 struct VS_OUT
@@ -21,6 +23,8 @@ struct VS_OUT
 	float2 Tex : TEXCOORD;
 	float3 NormalWS : NORMALWS;
 	float4 PositionWS : POSITIONWS;
+	float3 Tangent : TANGENT; //Normal maps
+	float3 Binormal :BINORMAL; //Normal maps
 };
 
 
@@ -63,7 +67,8 @@ VS_OUT VS_main(VS_IN input)
 	output.PositionWS = mul(float4(input.Pos, 1.0f), world);
 	//output.PositionWS = input.Pos.xyz;
 	output.Tex = input.Tex;
-
+	output.Tangent = input.Tangent;
+	output.Binormal = input.Binormal;
 	//Color shader vertex shader
 	//output.PosCS = mul(proj, input.Pos);
 	////output.PosCS = input.Pos;

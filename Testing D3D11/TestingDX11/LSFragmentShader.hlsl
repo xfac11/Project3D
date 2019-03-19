@@ -25,6 +25,7 @@ cbuffer CB_PER_FRAME : register(b1)
 Texture2D NormalTex : register(t0);
 Texture2D Tex : register(t1);
 Texture2D PositionTexture : register(t2);
+Texture2D BumpNormalTex : register(t3);
 SamplerState SampSt :register(s0);
 struct PS_IN
 {
@@ -95,11 +96,11 @@ float4 PS_main(PS_IN input) : SV_Target0
 	//specularAlbedo, specularPower);
 
 
-
 	float3 colors;
+	float3 bumpNormal;
 	float3 normals;
 	//float3 lightDir;
-	//float lightIntensity;
+	float lightIntensity;
 	//float4 outputColor;
 	float3 posCol;
 	int3 sampleIndices = int3(input.TexCoord.xy, 0);
@@ -111,18 +112,17 @@ float4 PS_main(PS_IN input) : SV_Target0
 	float4 tex = Tex.Sample(SampSt, sampleIndices.xy);
 
 	//In the light pixel shader we start by retrieving the color data and normals for this pixel using the point sampler.
-	float2 test = float2(0.0f, 1.0f);
+	//float2 test = float2(0.0f, 1.0f);
 	// Sample the colors from the color render texture using the point sampler at this texture coordinate location.
-		colors = Tex.Sample(SampSt, input.TexCoord).xyz;
-		posCol = PositionTexture.Sample(SampSt, input.TexCoord).xyz;
-		//posCol = PositionTexture.Load(sampleIndices).xyz;
-		//posCol = float3(1.0f, 1.0f, 3.0f);
-		// Sample the normals from the normal render texture using the point sampler at this texture coordinate location.
-		normals = NormalTex.Sample(SampSt, input.TexCoord).xyz*2.0f - 1.0f;// back to [-1...1] 
-		if (length(normals) > 0.0f) //normals with that 
-		{
-
-
+	bumpNormal = BumpNormalTex.Sample(SampSt, input.TexCoord).xyz;
+	colors = Tex.Sample(SampSt, input.TexCoord).xyz;
+	posCol = PositionTexture.Sample(SampSt, input.TexCoord).xyz;
+	//posCol = PositionTexture.Load(sampleIndices).xyz;
+	//posCol = float3(1.0f, 1.0f, 3.0f);
+	// Sample the normals from the normal render texture using the point sampler at this texture coordinate location.
+	normals = NormalTex.Sample(SampSt, input.TexCoord).xyz *2.0f - 1.0f;// back to [-1...1] 
+	if (length(normals) > 0.0f) //normals with that 
+	{
 			//normals = normalize(normals);
 			//if (normals.x == 0.0f)
 			//{
@@ -134,13 +134,13 @@ float4 PS_main(PS_IN input) : SV_Target0
 			//		}
 			//	}
 			//}
-			//posCol = float3(0.0f, 0.0f, 10.0f);
-			float3 final_colour = float3(0.2f, 0.2f, 0.2f);
-			float3 ambient = colors * final_colour;
+			//posCol = float3(0.0f, 0.0f,10.0f);
+		float3 final_colour = float3(0.0f, 0.0f, 0.0f);
+		float3 ambient = colors * final_colour;
 			// diffuse, no attenuation.
 			//for (int i = 0; i < 4; i++)
 			//{
-			float3 lightPW = mul(float4(lightPos.xyz, 1.0f), world).xyz;
+		float3 lightPW = mul(float4(lightPos.xyz, 1.0f), world).xyz;
 
 			//float3 lightPW = lightPos.xyz;
 			//lightPos = mul((float3x3)world, lightPos);//sending the worldmat to the fragment shader 
@@ -149,10 +149,10 @@ float4 PS_main(PS_IN input) : SV_Target0
 			//float3 normal = mul((float3x3)thisWorld, input.Normal);
 			//normal = normalize(normal);
 
-			float3 vecToLight = lightPW - posCol;
-			float d = length(vecToLight);
+		float3 vecToLight = lightPW - posCol;
+		float d = length(vecToLight); //distance
 			vecToLight /= d;
-			float howMuchLight = dot(vecToLight, normals);
+		float howMuchLight = dot(vecToLight, normals); //bumpNormal
 			//cell-shading
 			/*float theShade = max(dot(normal, normalize(vecToLight)),0);
 				if( theShade < 0.2f)
@@ -166,22 +166,23 @@ float4 PS_main(PS_IN input) : SV_Target0
 				else if( theShade >= 0.8f)
 					theShade=0.8f;
 				float diffuse = max(theShade,0);*/
-			float specularStrength = 0.1;
-			float3 viewDir = normalize(camPos.xyz - posCol);
-			float3 reflectDir = reflect(-vecToLight, normals);
+		float specularStrength = 0.1;
+		float3 viewDir = normalize(camPos.xyz - posCol);
+		float3 reflectDir = reflect(-vecToLight, normals);
 
-			float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
-			float3 specular = specularStrength * spec * lightColor.xyz;
-
-			float diffuse = max(howMuchLight, 0); //smooth
-			float3 diffusefinal = saturate(colors * lightColor.xyz*diffuse * lightPos.w *(1 / d));
-			final_colour = float3(ambient + diffusefinal + specular);//Specular is wrong. Will turn everything to lightcolor when inside the object  
+		float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+		float3 specular = specularStrength * spec * lightColor.xyz;
+		lightIntensity = saturate(dot(bumpNormal, -vecToLight));
+		float diffuse = max(howMuchLight, 0); //smooth
+		float3 diffusefinal = saturate(colors * lightColor.xyz*diffuse * lightPos.w *(1 / d));
+		final_colour = float3(ambient + diffusefinal);
+		final_colour = saturate(final_colour * (howMuchLight ));
 			//}
 
 			// UPDATE THIS LINE TO ACCOUNT FOR SATURATION (PIXEL COLOUR CANNOT GO OVER 1.0)
-			final_colour = min(final_colour, float3(1.0, 1.0, 1.0));
-			return float4(final_colour, 1.0f);
-		}
+		final_colour = min(final_colour, float3(1.0, 1.0, 1.0));
+		return float4(final_colour, 1.0f);
+	}
 		//We can then perform our directional lighting equation using this sampled information.
 
 		// Invert the light direction for calculations.
@@ -193,11 +194,11 @@ float4 PS_main(PS_IN input) : SV_Target0
 		// Determine the final amount of diffuse color based on the color of the pixel combined with the light intensity.
 		//outputColor = saturate(colors * lightIntensity);
 
-		//return float4(1.0f, 0.1f, 0.0f, 1.0f);
-		float4 output;
+	//return float4(1.0f, 0.1f, 0.0f, 1.0f);
+	float4 output;
 		//output = float4(light,1.0f);
-		output = float4(0.0f,0.0f,0.0f, 1.0f);
+	output = float4(0.0f,0.0f,0.0f, 1.0f);
 		//output = float4(normals, 1.0f);
 
-		return output;
+	return output;
 }

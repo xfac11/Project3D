@@ -334,11 +334,11 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		MessageBox(hwnd, "Could not initialize Terrain.", "Error", MB_OK);
 		return false;
 	}
-	theTerrain->setTheTexture(this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext(), "pebbles_color_1024_32.tga");
+	theTerrain->setTheTexture(this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext(), "pebbles_color_1024_32.tga", "pebbles_normal_1024_32.tga");
 	theTerrain->setSampler(this->Direct3D->GetDevice());
 
 	this->theModel[0]->loadOBJ("stall.obj" , this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext());
-	this->theModel[0]->setTheTexture(this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext(), "stallTexture.tga");
+	this->theModel[0]->setTheTexture(this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext(), "stallTexture.tga", "smooth_32.tga");
 	this->theModel[0]->createTheVertexBuffer(this->Direct3D->GetDevice());
 	
 	this->theModel[1]->loadOBJ("eb_house_plant_01.obj", this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext());
@@ -346,18 +346,16 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 	this->theModel[2]->addCube({ 0,0,0 }, 2, 2, 2);
 	this->theModel[2]->insertCubesInVec();
-	this->theModel[2]->setTheTexture(this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext(), "rock_01_dif_32bit.tga");
+	this->theModel[2]->setTheTexture(this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext(), "pebbles_color_1024_32.tga", "pebbles_normal_1024_32.tga");
 	this->theModel[2]->createTheVertexBuffer(this->Direct3D->GetDevice());
 
-	this->theModel[3]->addCube({ 0,0,0 }, 1, 1, 1);
-	this->theModel[3]->insertCubesInVec();
-	this->theModel[3]->setTheTexture(this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext(), "rock_01_dif_32bit.tga");
+	this->theModel[3]->loadOBJ("cube.obj", this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext());
 	this->theModel[3]->createTheVertexBuffer(this->Direct3D->GetDevice());
 
 	//billboarded
 	this->theModel[4]->addCube(DirectX::XMFLOAT3(-2.25 / 4,0, 0),2.25/2,3.50/2, 0.00f);
 	this->theModel[4]->insertCubesInVec();
-	this->theModel[4]->setTheTexture(this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext(), "chika_takami.tga");
+	this->theModel[4]->setTheTexture(this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext(), "chika_takami.tga", "normal_test_32.tga");
 	this->theModel[4]->createTheVertexBuffer(this->Direct3D->GetDevice());
 
 
@@ -368,7 +366,7 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	this->theModel[4]->setSampler(this->Direct3D->GetDevice());
 	
 	this->theModel[2]->setPosition(0.0f, 3.0f, 9.0f);
-	this->theModel[3]->setPosition(0.0f, -3.0f, -5.0f);
+	this->theModel[3]->setPosition(0.0f, 3.0f, 5.0f);
 	this->theModel[4]->setPosition(20.0f, 10.0f, 10.0f);
 	this->theModel[1]->setPosition(24.0f, 0.0f, 64.0f);
 	this->theModel[0]->setPosition(7.0f, 0.0f, 7.0f);
@@ -546,10 +544,9 @@ void Graphics::deferredRender()
 
 	PointLight light[4];
 	DirectX::XMMATRIX worldID = DirectX::XMMatrixIdentity();
-	worldID = DirectX::XMMatrixTranslation(this->theModel[2]->getPosition().x,
-		this->theModel[2]->getPosition().y, this->theModel[2]->getPosition().z);//Sets the position of the light to the sphere
-	DirectX::XMFLOAT4 lPos(0.0f, 0.0f, 0.0f, 10.0f);
-	DirectX::XMFLOAT4 lColor(1.f, 0.5f, 1.0f, 0.0f);
+	worldID = DirectX::XMMatrixTranslation(30.0f, 40.0f, 33.0f);//Sets the position of the light to the sphere
+	DirectX::XMFLOAT4 lPos(0.0f, 0.0f, 0.0f, 70.0f);
+	DirectX::XMFLOAT4 lColor(0.3f, 0.3f,0.3f, 0.0f);
 	light[0] = { worldID, lPos, lColor };
 	//lColor = DirectX::XMFLOAT3(1.0f, 1.0f, 0.0f);
 	//worldID = DirectX::XMMatrixTranslation(15.0f, 6.0f, 0.0f);
@@ -568,6 +565,7 @@ void Graphics::deferredRender()
 	ID3D11ShaderResourceView* view = gBuffer->getShadResView(0);
 	ID3D11ShaderResourceView* view1 = gBuffer->getShadResView(1);
 	ID3D11ShaderResourceView* view2 = gBuffer->getShadResView(2);
+	ID3D11ShaderResourceView* view3 = gBuffer->getShadResView(3);
 
 
 	ID3D11ShaderResourceView* null[] = { nullptr, nullptr, nullptr };
@@ -580,6 +578,7 @@ void Graphics::deferredRender()
 	this->Direct3D->GetDeviceContext()->PSSetShaderResources(0, 1, &view);
 	this->Direct3D->GetDeviceContext()->PSSetShaderResources(1, 1, &view1);
 	this->Direct3D->GetDeviceContext()->PSSetShaderResources(2, 1, &view2);
+	this->Direct3D->GetDeviceContext()->PSSetShaderResources(3, 1, &view3);
 
 	//this->gBuffer->setShaderResViews(this->Direct3D->GetDeviceContext());
 	//this->theColorShader->SetShaderParameters(this->Direct3D->GetDeviceContext(), DirectX::XMLoadFloat4x4(&this->theModel[2]->getId()), this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix());// lPos, lColor, 1.0f, 1.0f);
