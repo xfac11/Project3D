@@ -16,29 +16,33 @@ public:
 	SkyBox();
 	~SkyBox();
 	void shutDown();
-	void initialize();
+	bool initialize(ID3D11DeviceContext * deviceContext, ID3D11Device* device, std::string file);
 	bool render(ID3D11DeviceContext * deviceContext, DirectX::XMMATRIX world, DirectX::XMMATRIX view, DirectX::XMMATRIX proj);
 private:
 	struct Vertex
 	{
-		DirectX::XMFLOAT4 pos; //16
-		DirectX::XMFLOAT3 texCoord; //4*3
-		float padding; //4*1
+		float x, y, z, w;//16 
+	};
+	struct Matrices
+	{
+		DirectX::XMMATRIX world;
+		DirectX::XMMATRIX view;
+		DirectX::XMMATRIX projection;
 	};
 	ID3D11Buffer *vertexBuffer;
-	ID3D11Buffer *constantBuffer;
+	ID3D11Buffer *constantBuffer;//World, view, proj
 	ID3D11PixelShader *ps;
 	ID3D11VertexShader *vs;
 	ID3D11InputLayout *vertexLayout;
 	ID3D11SamplerState* samplerState;
 	ID3D11ShaderResourceView* cubeSRV;
-	MatrixBuffers* WVPdata;
-	ID3D11Texture3D* cubeTex;
+	Matrices* WVPdata;
+	ID3D11Texture2D* cubeTex;
 	TextureLoad textureLoad[6];
-	std::vector<Vertex> body;
-	void initializeTexture(ID3D11DeviceContext * deviceContext, ID3D11Device* device, std::string file);
+	Vertex* cube;
+	bool initializeTexture(ID3D11DeviceContext * deviceContext, ID3D11Device* device, std::string file);
 	bool initializeShaders(ID3D11Device* device);
-	void initializeVertex();
-	bool setShaderParams(DirectX::XMMATRIX world, DirectX::XMMATRIX view, DirectX::XMMATRIX proj);
+	bool initializeVertex(ID3D11Device* device);
+	bool setShaderParams(ID3D11DeviceContext* deviceContext, DirectX::XMMATRIX world, DirectX::XMMATRIX view, DirectX::XMMATRIX proj);
 };
 #endif // !SKYBOX_H
