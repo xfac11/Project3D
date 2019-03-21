@@ -2,7 +2,6 @@
 #define DEFEREDSHADER_H
 #include <d3d11.h>
 #include <d3dcompiler.h>
-#include "Structs.h"
 #include <directxmath.h>
 #include <fstream>
 #include "Structs.h"
@@ -13,7 +12,7 @@ public:
 	~DeferedShader();
 	bool Initialize(ID3D11Device*device, HWND hwnd);
 	void Shutdown();
-	bool Render(ID3D11DeviceContext*& deviceContext, int count, DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix);
+	//bool Render(ID3D11DeviceContext*& deviceContext, int count, DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix);
 	void RenderShader(ID3D11DeviceContext* deviceContext, int count);
 	bool SetShaderParameters(ID3D11DeviceContext*& deviceContext, DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix, DirectX::XMFLOAT3 specularAlbedo, float specularPower);
 

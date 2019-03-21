@@ -190,7 +190,7 @@ bool Terrain::InitializeBuffers(ID3D11Device *& device)
 	return true;
 }
 
-bool Terrain::LoadSetupFile(const char * filename)
+bool Terrain::LoadSetupFile(char * filename)
 {
 	int stringLength = 256;
 	std::ifstream fileInput;
@@ -646,7 +646,7 @@ Terrain::~Terrain()
 {
 }
 
-bool Terrain::Initialize(ID3D11Device *&device, const char* fileName)
+bool Terrain::Initialize(ID3D11Device *&device, char* fileName)
 {
 	bool result = false;
 	result = LoadSetupFile(fileName);
@@ -680,7 +680,28 @@ bool Terrain::Initialize(ID3D11Device *&device, const char* fileName)
 	return result;
 }
 
-void Terrain::Render(ColorShader & shader, ID3D11DeviceContext * deviceContext)
+//void Terrain::Render(ColorShader & shader, ID3D11DeviceContext * deviceContext)
+//{
+//	// Set vertex buffer stride and offset.
+//	unsigned int stride = sizeof(Vertex3D);
+//	unsigned int offset = 0;
+//
+//	deviceContext->PSSetShaderResources(0, 1, &this->texture.getTexture());
+//	deviceContext->PSSetShaderResources(1, 1, &this->normal.getTexture());
+//	// Set the vertex buffer to active in the input assembler so it can be rendered.
+//	deviceContext->IASetVertexBuffers(0, 1, &this->vertexBuffer, &stride, &offset);
+//
+//	// Set the index buffer to active in the input assembler so it can be rendered.
+//	deviceContext->IASetIndexBuffer(this->indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+//
+//	// Set the type of primitive that should be rendered from this vertex buffer, in this case a line list.
+//	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);// D3D11_PRIMITIVE_TOPOLOGY_LINELIST); //D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);// 
+//
+//	deviceContext->PSSetSamplers(0, 1, &this->SamplerState);
+//	shader.RenderShader(deviceContext, indexCount);
+//}
+
+void Terrain::Render(DeferedShader & shader, ID3D11DeviceContext * deviceContext)
 {
 	// Set vertex buffer stride and offset.
 	unsigned int stride = sizeof(Vertex3D);
@@ -699,27 +720,7 @@ void Terrain::Render(ColorShader & shader, ID3D11DeviceContext * deviceContext)
 
 	deviceContext->PSSetSamplers(0, 1, &this->SamplerState);
 	shader.RenderShader(deviceContext, indexCount);
-}
-
-void Terrain::Render(DeferedShader & shader, ID3D11DeviceContext * deviceContext)
-{
-	// Set vertex buffer stride and offset.
-	unsigned int stride = sizeof(Vertex3D);
-	unsigned int offset = 0;
-
-	deviceContext->PSSetShaderResources(0, 1, &this->texture.getTexture());
-
-	// Set the vertex buffer to active in the input assembler so it can be rendered.
-	deviceContext->IASetVertexBuffers(0, 1, &this->vertexBuffer, &stride, &offset);
-
-	// Set the index buffer to active in the input assembler so it can be rendered.
-	deviceContext->IASetIndexBuffer(this->indexBuffer, DXGI_FORMAT_R32_UINT, 0);
-
-	// Set the type of primitive that should be rendered from this vertex buffer, in this case a line list.
-	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);// D3D11_PRIMITIVE_TOPOLOGY_LINELIST); //D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);// 
-
-	deviceContext->PSSetSamplers(0, 1, &this->SamplerState);
-	shader.RenderShader(deviceContext, indexCount);
+	//this->calculateModelVectors();
 }
 
 //int Terrain::GetIndexCount()
@@ -763,13 +764,119 @@ void Terrain::Shutdown()
 	}
 }
 
+bool Terrain::checkCollision(DirectX::XMFLOAT3 camPos)
+{
+	bool result = false;
+	bool found = false;
+	int faceCount = terrainWidth* 5 * 6;//this->vertexCount/3;
+	int index = 0;
+	DirectX::XMFLOAT3 vertex1 = {};
+	DirectX::XMFLOAT3 vertex2 = {};
+	DirectX::XMFLOAT3 vertex3 = {};
+
+	for (int i =0; i < faceCount&&found ==false; i++)
+	{	
+		vertex1.x = body.at(index).x;
+		vertex1.y = body.at(index).y;
+		vertex1.z = body.at(index).z;
+		index++;
+		vertex2.x = body.at(index).x;
+		vertex2.y = body.at(index).y;
+		vertex2.z = body.at(index).z;
+		index++;
+		vertex3.x = body.at(index).x;
+		vertex3.y = body.at(index).y;
+		vertex3.z = body.at(index).z;
+		index++;
+
+
+
+
+		//DirectX::XMFLOAT3 u = (vertex2.z - vertex1.z);
+		//DirectX::XMFLOAT3 v= (vertex3.z - vertex1.z);
+		//DirectX::XMFLOAT3 w = (camPos.z - vertex1);
+		
+
+		float w1 = ((vertex1.x*(vertex3.z - vertex1.z)) + ((camPos.z - vertex1.z)*(vertex3.x - vertex1.x)) - (camPos.x*(vertex3.z - vertex1.z))) /
+			(((vertex2.z - vertex1.z)*(vertex3.x - vertex1.x)) - ((vertex2.x - vertex1.x)*(vertex3.z - vertex1.z)));
+		
+		float temp = vertex3.z - vertex1.z;
+		if (temp == 0.f)
+			temp = 0.001f;
+		
+		float w2 = (camPos.z - vertex1.z - (w1 * (vertex2.z - vertex1.z))) /
+			temp;
+		if (w1 >= 0 && w2 >= 0 && (w1 + w2) <= 1.f)
+		{
+ 			found = true;
+		}
+	}
+	// IMPLEMENT HERE
+	if (found == true)
+	{
+		DirectX::XMFLOAT3 rayDir = DirectX::XMFLOAT3(0, -1.f, 0);
+		DirectX::XMFLOAT3 w;  // ray vectors
+		float r; // params to calc ray-plane intersect
+
+		// tri vectors and normal
+		DirectX::XMFLOAT3 u = DirectX::XMFLOAT3(vertex2.x - vertex1.x, vertex2.y - vertex1.y, vertex2.z - vertex1.z);
+		DirectX::XMFLOAT3 v = DirectX::XMFLOAT3(vertex3.x - vertex1.x, vertex3.y - vertex1.y, vertex3.z - vertex1.z);
+		DirectX::XMFLOAT3 normal;
+		DirectX::XMStoreFloat3(&normal, DirectX::XMVector3Cross(DirectX::XMLoadFloat3(&u), DirectX::XMLoadFloat3(&v)));
+
+		DirectX::XMFLOAT3 w0 = DirectX::XMFLOAT3(camPos.x - vertex1.x, camPos.y - vertex1.y, camPos.z - vertex1.z); //ray vector from origin to tri
+		float a;// = -dot(normal, w0);
+		DirectX::XMStoreFloat(&a, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&normal), DirectX::XMLoadFloat3(&w0)));
+		a = -a;
+
+		float b;// = dot(normal, rayDir);
+		DirectX::XMStoreFloat(&b, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&normal), DirectX::XMLoadFloat3(&rayDir)));
+
+		if (abs(b) < 0)
+			result = false;
+		r = a / b;
+		if (r < 0.f)
+			result = false;
+
+		DirectX::XMFLOAT3 I = DirectX::XMFLOAT3(camPos.x + r * rayDir.x, camPos.y + r * rayDir.y, camPos.z + r * rayDir.z);
+		float uu, uv, vv, wu, wv, D;
+		//uu = dot(u, u);
+		DirectX::XMStoreFloat(&uu, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&u), DirectX::XMLoadFloat3(&u)));
+		//uv = dot(u, v);
+		DirectX::XMStoreFloat(&uv, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&u), DirectX::XMLoadFloat3(&v)));
+		//vv = dot(v, v);
+		DirectX::XMStoreFloat(&vv, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&v), DirectX::XMLoadFloat3(&v)));
+
+		w = DirectX::XMFLOAT3(I.x - vertex1.x, I.y - vertex1.y, I.z - vertex1.z);
+		//wu = dot(w, u);
+		DirectX::XMStoreFloat(&wu, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&w), DirectX::XMLoadFloat3(&u)));
+		//wv = dot(w, v);
+		DirectX::XMStoreFloat(&wv, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&w), DirectX::XMLoadFloat3(&v)));
+		D = uv * uv - uu * vv;
+
+		//parametric coords
+		float s = (uv * wv - vv * wu) / D;
+		float t = (uv * wu - uu * wv) / D;
+		if (s < 0.f || s > 1.f)
+			result = false;
+		if (t < 0.f || (s + t) > 1.f)
+			result = false;
+		if (r > 2.f&&r < 4.f)
+			result = true;
+		else
+			result = false;
+
+	}
+	return result;
+}
+
 void Terrain::setWorld()
 {
-	//DirectX::XMMATRIX rotTemp;
-	//DirectX::XMMATRIX scaleTemp;
+	DirectX::XMMATRIX rotTemp;
+	DirectX::XMMATRIX scaleTemp;
 	DirectX::XMMATRIX translTemp;
-	//rotTemp = DirectX::XMLoadFloat4x4(&this->Rotation);
-	//scaleTemp = DirectX::XMLoadFloat4x4(&this->Scale);
+	rotTemp = DirectX::XMLoadFloat4x4(&this->Rotation);
+	scaleTemp = DirectX::XMLoadFloat4x4(&this->Scale);
 	translTemp = DirectX::XMLoadFloat4x4(&this->Translation);
 	DirectX::XMStoreFloat4x4(&this->world, (translTemp));
 }

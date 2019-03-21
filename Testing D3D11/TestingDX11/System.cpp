@@ -229,6 +229,7 @@ System::System(HINSTANCE hInstance, LPCSTR name, int nCmdShow)
 	theMouse = new Mouse;
 	//theKeyboard->EnableAutoRepeatChars();
 	this->mouseSwitch = true;
+	this->mouseShow = true;
 	this->flySwitch = true;
 	this->moveScreen = true;
 	this->forward = Neutral;
@@ -290,6 +291,8 @@ void System::run()
 				
 				int xMouse = 0;
 				int yMouse = 0;
+				int mousePosX = 0;
+				int mousePosY = 0;
 				unsigned char charKey;
 
 				while (!this->theMouse->EventBufferIsEmpty())
@@ -303,15 +306,24 @@ void System::run()
 						xMouse = mEvent.GetPosX();
 						yMouse = mEvent.GetPosY();
 					}
-					/*				if (mEvent.GetType() == LPress)
-									{
-										OutputDebugStringA("Pressed LeftMouse\n");
-									}
-									if (mEvent.GetType() == LRelease)
-									{
-										OutputDebugStringA("Released LeftMouse\n");
-									}
-									if (mEvent.GetType() == RPress)
+					if (mEvent.GetType() == MouseEventType::Move)
+					{
+						mousePosX = mEvent.GetPosX();
+						mousePosY = mEvent.GetPosY();
+						std::string temp = std::to_string(mousePosX) + " " + std::to_string(mousePosY) + "\n";
+						OutputDebugStringA(temp.c_str());
+					}
+					if (mEvent.GetType() == LPress)
+					{
+						this->mouseLeft = true;
+						OutputDebugStringA("Pressed LeftMouse\n");
+					}
+					if (mEvent.GetType() == LRelease)
+					{
+						this->mouseLeft = false;
+						OutputDebugStringA("Released LeftMouse\n");
+					}
+						/*			if (mEvent.GetType() == RPress)
 									{
 										OutputDebugStringA("Pressed RightMouse\n");
 									}
@@ -394,7 +406,11 @@ void System::run()
 						if (theKey == 'M')
 						{
 							this->change(this->mouseSwitch);
-							ShowCursor(this->mouseSwitch);
+						}
+						if (theKey == 'N')
+						{
+							this->change(this->mouseShow);
+							ShowCursor(this->mouseShow);
 						}
 						if (theKey == 9) //tab
 						{
@@ -447,14 +463,14 @@ void System::run()
 				}
 
 				if (this->mouseSwitch == false)
-					SetCursorPos(400, 400);
+					SetCursorPos(600, 600);
 				
 				if (moveScreen == false)
 				{
 					xMouse = 0;
 					yMouse = 0;
 				}
-				graphics->move(forward,left_right, this->up_down, this->flySwitch, xMouse, yMouse);
+				graphics->move(forward,left_right, this->up_down, this->flySwitch, xMouse, yMouse, mousePosX, mousePosY, mouseLeft); //mPosX, mPosY , mouseLeft 
 				graphics->Frame(move1, move2);
 				
 			}

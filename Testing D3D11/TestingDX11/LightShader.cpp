@@ -190,7 +190,7 @@ void LightShader::RenderShader(ID3D11DeviceContext * deviceContext, int count)
 }
 
 bool LightShader::SetShaderParameters(ID3D11DeviceContext *& deviceContext, DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix,
-		 PointLight light[], DirectX::XMFLOAT3 camPos)
+		 PointLight light, DirectX::XMFLOAT3 camPos)
 {
 	/*PointLight *temp = new PointLight[4];
 	for (int i = 0; i < 4; i++)
@@ -213,23 +213,28 @@ bool LightShader::SetShaderParameters(ID3D11DeviceContext *& deviceContext, Dire
 	DirectX::XMMATRIX WorldView = DirectX::XMMatrixMultiply(viewMatrix, worldMatrix);
 	DirectX::XMMATRIX WorldViewProj = DirectX::XMMatrixMultiply(projectionMatrix, WorldView);
 	WorldViewProj = DirectX::XMMatrixTranspose(WorldViewProj);
-	data->world = worldMatrix;
+	data->world = worldMatrix;//light.world;
 	data->view = XMMatrixTranspose(WorldView);
 	data->projection = WorldViewProj;
-	dataSpec->position.x = light[0].position.x;//lightPos.x;//temp[0].x; 
-	dataSpec->position.y = light[0].position.y;//temp[0].y;
-	dataSpec->position.z = light[0].position.z;//temp[0].z;
+	//for (int i = 0; i < 2; i++) //array  type
+	//{
+		dataSpec->position.x = light.position.x;//lightPos.x;//temp[0].x; 
+		dataSpec->position.y = light.position.y;//temp[0].y;
+		dataSpec->position.z = light.position.z;//temp[0].z;
 
-	dataSpec->position.w = light[0].position.w;//temp[0].w;
-	dataSpec->color.x = light[0].color.x;//lightColor.x;//temp[0].r;
-	dataSpec->color.y = light[0].color.y;//temp[0].g;
-	dataSpec->color.z = light[0].color.z;
-	dataSpec->color.w= light[0].color.w;//lightIntensity;
-	dataSpec->world = worldMatrix;
-	dataSpec->CameraPos.x = camPos.x;//temp[0].x; 
-	dataSpec->CameraPos.y = camPos.y;//temp[0].y;
-	dataSpec->CameraPos.z = camPos.z;//temp[0].z;
-	dataSpec->CameraPos.w = 10.0f;//temp[0].w;
+		dataSpec->position.w = light.position.w;//temp[0].w;
+		dataSpec->color.x = light.color.x;//lightColor.x;//temp[0].r;
+		dataSpec->color.y = light.color.y;//temp[0].g;
+		dataSpec->color.z = light.color.z;
+		dataSpec->color.w = light.color.w;//lightIntensity;
+		dataSpec->world = light.world;
+		dataSpec->CameraPos.x = camPos.x;//temp[0].x; 
+		dataSpec->CameraPos.y = camPos.y;//temp[0].y;
+		dataSpec->CameraPos.z = camPos.z;//temp[0].z;
+		dataSpec->CameraPos.w = 10.0f;//temp[0].w;
+	//}
+	
+	
 
 	// Lock the m_matrixBuffer, set the new matrices inside it, and then unlock it.
 

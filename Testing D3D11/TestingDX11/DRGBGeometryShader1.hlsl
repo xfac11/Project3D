@@ -4,8 +4,8 @@ struct GSInput
 	float2 Tex : TEXCOORD;
 	float3 NormalWS : NORMALWS;
 	float3 PositionWS : POSITIONWS;
-	float3 Tangent : TANGENT; //Normal maps
-	float3 Binormal :BINORMAL; //Normal maps
+	float3 TangentWS : TANGENTWS; //Normal maps
+	float3 BinormalWS :BINORMALWS; //Normal maps
 };
 
 struct GSOutput
@@ -14,8 +14,8 @@ struct GSOutput
 	float2 Tex : TEXCOORD;
 	float3 NormalWS : NORMALWS;
 	float3 PositionWS : POSITIONWS;
-	float3 Tangent : TANGENT; //Normal maps
-	float3 Binormal :BINORMAL; //Normal maps
+	float3 TangentWS : TANGENTWS; //Normal maps
+	float3 BinormalWS : BINORMALWS; //Normal maps
 };
 
 cbuffer CB_PER_FRAME : register(b0)
@@ -46,6 +46,8 @@ void GSmain(triangle GSInput input[3], inout TriangleStream<GSOutput> theOutput)
 	//float o3 = input[0].pos;
 
 
+
+
 	//backgface culling here
 	float3 tempPos = mul(float4(pos0, 1.0f), world).xyz;
 	float3 direction = camPos - input[0].PositionWS.xyz;
@@ -61,8 +63,8 @@ void GSmain(triangle GSInput input[3], inout TriangleStream<GSOutput> theOutput)
 			output.NormalWS = normal;
 			output.Tex = input[i].Tex;
 
-			output.Tangent = normalize(mul(input[i].Tangent, (float3x3)world));
-			output.Binormal = normalize(mul(input[i].Binormal, (float3x3)world));
+			output.TangentWS = input[i].TangentWS;//normalize(input[i].Tangent, (float3x3)world));
+			output.BinormalWS = input[i].BinormalWS;// normalize(mul(input[i].Binormal, (float3x3)world));
 
 			theOutput.Append(output);
 		}

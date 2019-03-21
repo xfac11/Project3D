@@ -98,6 +98,9 @@ bool Model::createTheVertexBuffer(ID3D11Device *& gDevice)
 		return false;
 	}
 	delete[] temp;
+
+	this->calculateModelVectors();
+
 	return true;
 }
 
@@ -112,6 +115,7 @@ void Model::setVertexBandTexture(ID3D11DeviceContext *& gDeviceContext)
 	gDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	gDeviceContext->PSSetSamplers(0, 1, &this->SamplerState);
 	//gDeviceContext->GSSetShader(nullptr, nullptr, 0); //already initilized?+
+	//this->calculateModelVectors();
 }
 
 int Model::getVertexCount() const
@@ -144,12 +148,13 @@ void Model::setSampler(ID3D11Device*& gDevice)
 		
 	}
 }
-void Model::loadOBJ(const char * file, ID3D11Device * device, ID3D11DeviceContext * deviceContext) //directX::XMFLOAT3
+void Model::loadOBJ(char * file, char* normal, ID3D11Device * device, ID3D11DeviceContext * deviceContext) //directX::XMFLOAT3
 {
 	std::string txt = load.loadFile(file, body);
 	if (txt == "")
 		return;
 	this->texture.setTexture(device, deviceContext, txt);
+	this->normal.setTexture(device, deviceContext, normal);
 	this->vertexCount += body.size();
 }
 

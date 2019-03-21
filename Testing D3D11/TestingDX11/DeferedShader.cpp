@@ -129,10 +129,10 @@ void DeferedShader::Shutdown()
 	}
 }
 
-bool DeferedShader::Render(ID3D11DeviceContext *& deviceContext, int count, DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix)
-{
-	return false;
-}
+//bool DeferedShader::Render(ID3D11DeviceContext *& deviceContext, int count, DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix)
+//{
+//	return false;
+//}
 
 void DeferedShader::RenderShader(ID3D11DeviceContext * deviceContext, int count)
 {
@@ -337,7 +337,7 @@ bool DeferedShader::InitializeShader(ID3D11Device *& device, HWND hwnd)
 			D3D11_APPEND_ALIGNED_ELEMENT,							
 			D3D11_INPUT_PER_VERTEX_DATA,
 			0
-		}
+		},
 
 	};
 	result = device->CreateInputLayout(inputDesc, ARRAYSIZE(inputDesc), pVS->GetBufferPointer(), pVS->GetBufferSize(), &vertexLayout);

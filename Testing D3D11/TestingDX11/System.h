@@ -27,8 +27,9 @@ private:
 	Keyboard* theKeyboard;
 	Mouse* theMouse;
 
-
+	bool mouseLeft;
 	bool mouseSwitch;
+	bool mouseShow;
 	bool flySwitch;
 	bool moveScreen;
 

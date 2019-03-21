@@ -52,8 +52,9 @@ public:
 	void BeginScene(float color[4]);
 	void EndScene();
 
-	void setBackBuffer(ID3D11DepthStencilView* view);
+
 	void setBackBuffer();
+	void setBackBuffer(ID3D11DepthStencilView* view);
 	void turnOnZ();
 	void turnOffZ();
 	void resetViewPort();

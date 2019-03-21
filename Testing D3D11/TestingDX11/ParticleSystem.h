@@ -3,6 +3,7 @@
 #include <d3d11.h>
 #include <directxmath.h>
 #include <string>
+#include <vector>
 #include "Texture.h"
 #include "Vertex3D.h"
 #include "colorShader.h"
@@ -42,16 +43,18 @@ private:
 	float accumulatedTime;
 
 	Texture theTexture;
+	Texture normal;
 	ParticleType* particleList;
 
 	int vertexCount;
 	int indexCount;
-	Vertex3D* vertices;
+	//Vertex3D* vertices;
+	std::vector<Vertex3D> body;
 	ID3D11Buffer *vertexBuffer;
 	ID3D11Buffer *indexBuffer;
 	ID3D11SamplerState* SamplerState;
 
-	bool LoadTexture(ID3D11Device*& device, ID3D11DeviceContext*& deviceContext, std::string filename);
+	bool LoadTexture(ID3D11Device*& device, ID3D11DeviceContext*& deviceContext, std::string filename, std::string normalFileName);
 	
 	bool InitializeParticleSystem();
 
@@ -63,13 +66,16 @@ private:
 
 	bool UpdateBuffers(ID3D11DeviceContext* deviceContext);
 
-	//void RenderBuffers(ColorShader & shader, ID3D11DeviceContext* deviceContext);
+	void calculateModelVectors();     //NORMAL MAPS
+	void calculateTangentBinormal(NM_Vertex vertex1, NM_Vertex vertex2, NM_Vertex vertex3, DirectX::XMFLOAT3& tangent, DirectX::XMFLOAT3& binormal, DirectX::XMFLOAT3& normal);
+	void calculateNormal(DirectX::XMFLOAT3 tangent, DirectX::XMFLOAT3 binormal, DirectX::XMFLOAT3 & normal);     //NORMAL MAPS
+
 
 public:
 	ParticleSystem();
 	~ParticleSystem();
 
-	bool Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext, std::string textureName);
+	bool Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext, std::string textureName, std::string normalFileName);
 	void Shutdown();
 	bool Frame(float frameTime, ID3D11DeviceContext* deviceContext);
 	void Render(ColorShader & shader, ID3D11DeviceContext* deviceContext);

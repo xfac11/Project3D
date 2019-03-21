@@ -4,8 +4,8 @@ struct PS_IN
 	float2 Tex : TEXCOORD;
 	float3 NormalWS : NORMALWS; //Normal maps
 	float3 PositionWS : POSITIONWS;
-	float3 Tangent : TANGENT; //Normal maps
-	float3 Binormal :BINORMAL; //Normal maps
+	float3 TangentWS : TANGENTWS; //Normal maps
+	float3 BinormalWS : BINORMALWS; //Normal maps
 
 };
 struct PS_OUT
@@ -62,13 +62,19 @@ PS_OUT PS_main(PS_IN input)
 	
 	normalColor = (normalColor*2.f) - 1.f;
 	
-	bumpNormal = (normalColor.x* input.Tangent) + (normalColor.y*input.Binormal) + (normalColor.z*input.NormalWS);
+	bumpNormal = (normalColor.x* input.TangentWS) + (normalColor.y*input.BinormalWS) +(normalColor.z*input.NormalWS);
 	bumpNormal = normalize(bumpNormal);
+
 
 	//  [-1...1] to [0...1]
 	float x = (0.5f*input.NormalWS.x) + 0.5f;  //bumpNormal //input.NormalWS.xyz
 	float y = (0.5f*input.NormalWS.y) + 0.5f;
 	float z = (0.5f*input.NormalWS.z) + 0.5f;
+
+	//float bux = (0.5f*bumpNormal.x) + 0.5f;  //bumpNormal //input.NormalWS.xyz
+	//float buy = (0.5f*bumpNormal.y) + 0.5f;
+	//float buz = (0.5f*bumpNormal.z) + 0.5f;
+
 	//float xP = (0.5f*input.PositionWS.x) + 0.5f;
 	//float yP = (0.5f*input.PositionWS.y) + 0.5f;
 	//float zP = (0.5f*input.PositionWS.z) + 0.5f;
@@ -76,9 +82,10 @@ PS_OUT PS_main(PS_IN input)
 	float yP = input.PositionWS.y;
 	float zP = input.PositionWS.z;
 	float3 norScale = float3(x, y, z);
-	output.Normal = float4(norScale, 1.0f); //bumpNormal
+	output.Normal = float4(norScale, 1.0f); 
 	output.Pos = float4(xP, yP, zP, 1.0f);
-	output.BumpNor = float4(bumpNormal, 1.0f);
+
+	output.BumpNor = float4(bumpNormal, 1.f);;//float4(bux,buy,buz, 1.0f);
 
 	
 	//output.Pos = mul(world,float4(input.PositionWS, 1.0f));

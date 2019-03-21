@@ -43,7 +43,7 @@ private:
 	//Vertex3D* terrainModel;
 
 
-	bool LoadSetupFile(const char* filename);
+	bool LoadSetupFile(char* filename);
 	bool LoadBitmapHeightMap();
 
 	void SetTerrainCoordinates();
@@ -58,12 +58,14 @@ private:
 public:
 	Terrain();
 	~Terrain();
-	bool Initialize(ID3D11Device*& device, const char* fileName);
-	void Render(ColorShader & shader, ID3D11DeviceContext* deviceContext);
+	bool Initialize(ID3D11Device*& device, char* fileName);
+	//void Render(ColorShader & shader, ID3D11DeviceContext* deviceContext);
 	void Render(DeferedShader & shader, ID3D11DeviceContext* deviceContext);
 	//int GetIndexCount();
 	void setTheTexture(ID3D11Device *& gDevice, ID3D11DeviceContext *&gDeviceContext, std::string filename, std::string normalFileName);
 	void Shutdown();
+
+	bool checkCollision(DirectX::XMFLOAT3 camPos);
 
 	void setWorld();
 	DirectX::XMFLOAT4X4 getWorld();

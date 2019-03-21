@@ -30,7 +30,7 @@ public:
 	void setTheTexture(ID3D11Device*& gDevice, ID3D11DeviceContext *&gDeviceContext,std::string filename, std::string normalFileName );
 	void setSampler(ID3D11Device*& gDevice);
 
-	void loadOBJ(const char* file, ID3D11Device* device, ID3D11DeviceContext* deviceContext);
+	void loadOBJ(char* file, char* normal, ID3D11Device* device, ID3D11DeviceContext* deviceContext);
 	void draw(ColorShader &shader, ID3D11DeviceContext * deviceContext); //forawrd
 	void draw(DeferedShader &shader, ID3D11DeviceContext * deviceContext);
 	

@@ -1,6 +1,7 @@
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
 #include <string>
+#include <math.h> 
 #include "D3D.h"
 #include "Camera.h"
 #include "GBuffer.h"
@@ -10,7 +11,7 @@
 #include "Triangle.h"
 #include "Terrain.h" 
 #include "particlesystem.h"
-//#include "ParticleHandler.h"
+#include "SkyBox.h"
 //#include "bth_image.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_win32.h"
@@ -29,6 +30,7 @@ private:
 
 	Terrain* theTerrain;
 	ParticleSystem* particles;
+	SkyBox* theSky;
 
 	//defered render
 	DeferedShader* dShader;
@@ -48,11 +50,21 @@ private:
 	float gIncrement; //scene class
 
 	DirectX::XMVECTOR rotaxis;
+	
+
+	std::string mouseObject;
+	bool beginCheck;
+	int daScreenWidth;
+	int daScreenHeight;
 
 	void renderImgui();
 	bool render(); //float [4]color
 	void renderToTexture();
 	void deferredRender();
+
+	void intersectionTest(int posX, int posY, DirectX::XMFLOAT3 ObjPosition,float radius);
+	bool sphereRayIntersection(DirectX::XMFLOAT3 rayOrigin, DirectX::XMFLOAT3 rayDirection, DirectX::XMFLOAT3 pos, float radius);
+	bool boxRayIntersection(DirectX::XMFLOAT3 rayOrigin, DirectX::XMFLOAT3 rayDirection, DirectX::XMFLOAT3 pos, float radius);
 public:
 	Graphics();
 	~Graphics();
@@ -66,7 +78,8 @@ public:
 		_mm_free(p);
 	}
 	void initImgui(HWND & hWnd);
-	void move(Direction forward, Direction left_right, Direction up_down, bool flyMode, int mouseX, int mouseY);// Direction forward, Direction left_Right, Direction, Direction upDown);
+	void move(Direction forward, Direction left_right, Direction up_down, bool flyMode, int mouseX, int mouseY, 
+		int mousePosX, int mousePosY, bool mouseLeft);// Direction forward, Direction left_Right, Direction, Direction upDown);
 	bool Initialize(int screenWidth, int screenHeight, HWND hwnd);
 
 	void Shutdown();

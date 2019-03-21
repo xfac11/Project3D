@@ -4,7 +4,7 @@ ParticleSystem::ParticleSystem()
 {
 	
 	particleList = nullptr;
-	vertices = nullptr;
+	//vertices = nullptr;
 	this->vertexBuffer = nullptr;
 	this->indexBuffer = nullptr;
 	this->SamplerState = nullptr;
@@ -25,12 +25,12 @@ ParticleSystem::~ParticleSystem()
 {
 }
 
-bool ParticleSystem::Initialize(ID3D11Device * device, ID3D11DeviceContext* deviceContext, std::string textureName)
+bool ParticleSystem::Initialize(ID3D11Device * device, ID3D11DeviceContext* deviceContext, std::string textureName, std::string normalFileName)
 { 
 	bool result;
 
 	// Load the texture that is used for the particles.
-	result = LoadTexture(device, deviceContext, textureName);
+	result = LoadTexture(device, deviceContext, textureName,normalFileName);
 	if (!result)
 	{
 		return false;
@@ -75,13 +75,13 @@ void ParticleSystem::Shutdown() //copied
 		delete[] particleList;
 		this->particleList = nullptr;
 	}
-	if (this->vertices)
-	{
-		delete[] vertices;
-		this->vertices = nullptr;
-	}
+	//if (this->vertices)
+	//{
+	//	delete[] vertices;
+	//	this->vertices = nullptr;
+	//}
 	theTexture.cleanUp();
-	
+	normal.cleanUp();
 }
 
 bool ParticleSystem::Frame(float frameTime, ID3D11DeviceContext * deviceContext)
@@ -104,7 +104,7 @@ void ParticleSystem::Render(ColorShader & shader, ID3D11DeviceContext * deviceCo
 	unsigned int stride = sizeof(Vertex3D);
 	unsigned int offset = 0;
 	deviceContext->PSSetShaderResources(0, 1, &this->theTexture.getTexture());
-
+	deviceContext->PSSetShaderResources(1, 1, &this->normal.getTexture());
 	// Set the vertex buffer to active in the input assembler so it can be rendered.
 	deviceContext->IASetVertexBuffers(0, 1, &this->vertexBuffer, &stride, &offset);
 
@@ -116,6 +116,7 @@ void ParticleSystem::Render(ColorShader & shader, ID3D11DeviceContext * deviceCo
 
 	deviceContext->PSSetSamplers(0, 1, &this->SamplerState);
 	shader.RenderShader(deviceContext, indexCount);
+	//this->calculateModelVectors();
 }
 
 void ParticleSystem::draw(DeferedShader & shader, ID3D11DeviceContext * deviceContext)
@@ -199,10 +200,11 @@ void ParticleSystem::setSampler(ID3D11Device *& gDevice)
 	}
 }
 
-bool ParticleSystem::LoadTexture(ID3D11Device *& device, ID3D11DeviceContext*& deviceContext, std::string filename)
+bool ParticleSystem::LoadTexture(ID3D11Device *& device, ID3D11DeviceContext*& deviceContext, std::string filename, std::string normalFileName)
 { 
 	// Initialize the texture object.
 	theTexture.setTexture(device, deviceContext, filename);
+	normal.setTexture(device, deviceContext, normalFileName);
 	return true;
 }
 
@@ -218,8 +220,8 @@ bool ParticleSystem::InitializeParticleSystem()
 	this->particleVelocityVariation = 2.f;
 
 	this->particleSize = 0.1f; 
-	this->particlesPerSecond = 5.0f; 
-	this->maxParticles = 5000;
+	this->particlesPerSecond = 2.0f; 
+	this->maxParticles = 100;
 	this->particleList = new ParticleType[this->maxParticles];
 	for (int i = 0; i < this->maxParticles; i++)// Initialize the particle list.
 	{
@@ -248,13 +250,15 @@ bool ParticleSystem::InitializeBuffers(ID3D11Device * device)
 	this->indexCount = this->vertexCount;
 
 	// Create the vertex array for the particles that will be rendered.
-	this->vertices = new Vertex3D[this->vertexCount];
+	//this->vertices = new Vertex3D[this->vertexCount];
+	//this->body.capacity = this->vertexCount;
+	this->body.resize(this->vertexCount);
 
 	// Create the index array.
 	unsigned long* indices = new unsigned long[this->indexCount];
 
 	// Initialize vertex array to zeros at first.
-	memset(this->vertices, 0, (sizeof(Vertex3D) * this->vertexCount));
+	//memset(this->vertices, 0, (sizeof(Vertex3D) * this->vertexCount));
 
 	// Initialize the index array.
 	for (int i = 0; i < this->indexCount; i++)
@@ -271,7 +275,7 @@ bool ParticleSystem::InitializeBuffers(ID3D11Device * device)
 	vertexBufferDesc.StructureByteStride = 0;
 
 	// Give the subresource structure a pointer to the vertex data.
-	vertexData.pSysMem = this->vertices;
+	vertexData.pSysMem = this->body.data();
 	vertexData.SysMemPitch = 0;
 	vertexData.SysMemSlicePitch = 0;
 
@@ -428,7 +432,7 @@ bool ParticleSystem::UpdateBuffers(ID3D11DeviceContext * deviceContext) //copied
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	Vertex3D* verticesPtr;
 	// Initialize vertex array to zeros at first.
-	memset(this->vertices, 0, (sizeof(Vertex3D) * this->vertexCount));
+	//memset(this->vertices, 0, (sizeof(Vertex3D) * this->vertexCount));
 
 	// Now build the vertex array from the particle list array.  Each particle is a quad made out of two triangles.
 
@@ -436,51 +440,51 @@ bool ParticleSystem::UpdateBuffers(ID3D11DeviceContext * deviceContext) //copied
 	{
 		DirectX::XMFLOAT4 color = DirectX::XMFLOAT4(this->particleList[i].rgb.x, this->particleList[i].rgb.y, this->particleList[i].rgb.z, 1.0f);
 		// Bottom left.
-		this->vertices[index].x = this->particleList[i].position.x - this->particleSize;
-		this->vertices[index].y = this->particleList[i].position.y - this->particleSize;
-		this->vertices[index].z = this->particleList[i].position.z;
-		this->vertices[index].u = 0.0f;
-		this->vertices[index].v = 1.0f;
+		this->body.at(index).x = this->particleList[i].position.x - this->particleSize;
+		this->body.at(index).y = this->particleList[i].position.y - this->particleSize;
+		this->body.at(index).z = this->particleList[i].position.z;
+		this->body.at(index).u = 0.0f;
+		this->body.at(index).v = 1.0f;
 		index++;
 
 		// Top left.
-		this->vertices[index].x = this->particleList[i].position.x - this->particleSize;
-		this->vertices[index].y = this->particleList[i].position.y + this->particleSize;
-		this->vertices[index].z = this->particleList[i].position.z;
-		this->vertices[index].u = 0.f;
-		this->vertices[index].v = 0.f;
+		this->body.at(index).x = this->particleList[i].position.x - this->particleSize;
+		this->body.at(index).y = this->particleList[i].position.y + this->particleSize;
+		this->body.at(index).z = this->particleList[i].position.z;
+		this->body.at(index).u = 0.f;
+		this->body.at(index).v = 0.f;
 		index++;
 
 		// Bottom right.
-		this->vertices[index].x = this->particleList[i].position.x + this->particleSize;
-		this->vertices[index].y = this->particleList[i].position.y - this->particleSize;
-		this->vertices[index].z = this->particleList[i].position.z;
-		this->vertices[index].u = 1.f;
-		this->vertices[index].v = 1.f;
+		this->body.at(index).x = this->particleList[i].position.x + this->particleSize;
+		this->body.at(index).y = this->particleList[i].position.y - this->particleSize;
+		this->body.at(index).z = this->particleList[i].position.z;
+		this->body.at(index).u = 1.f;
+		this->body.at(index).v = 1.f;
 		index++;
 
 		// Bottom right.
-		this->vertices[index].x = this->particleList[i].position.x + this->particleSize;
-		this->vertices[index].y = this->particleList[i].position.y - this->particleSize;
-		this->vertices[index].z = this->particleList[i].position.z;
-		this->vertices[index].u = 1.f;
-		this->vertices[index].v = 1.f;
+		this->body.at(index).x = this->particleList[i].position.x + this->particleSize;
+		this->body.at(index).y = this->particleList[i].position.y - this->particleSize;
+		this->body.at(index).z = this->particleList[i].position.z;
+		this->body.at(index).u = 1.f;
+		this->body.at(index).v = 1.f;
 		index++;
 
 		// Top left.
-		this->vertices[index].x = this->particleList[i].position.x - this->particleSize;
-		this->vertices[index].y = this->particleList[i].position.y + this->particleSize;
-		this->vertices[index].z = this->particleList[i].position.z;
-		this->vertices[index].u = 0.f;
-		this->vertices[index].v = 0.f;
+		this->body.at(index).x = this->particleList[i].position.x - this->particleSize;
+		this->body.at(index).y = this->particleList[i].position.y + this->particleSize;
+		this->body.at(index).z = this->particleList[i].position.z;
+		this->body.at(index).u = 0.f;
+		this->body.at(index).v = 0.f;
 		index++;
 
 		// Top right.
-		this->vertices[index].x = this->particleList[i].position.x + this->particleSize;
-		this->vertices[index].y = this->particleList[i].position.y + this->particleSize;
-		this->vertices[index].z = this->particleList[i].position.z;
-		this->vertices[index].u = 1.f;
-		this->vertices[index].v = 0.f;
+		this->body.at(index).x = this->particleList[i].position.x + this->particleSize;
+		this->body.at(index).y = this->particleList[i].position.y + this->particleSize;
+		this->body.at(index).z = this->particleList[i].position.z;
+		this->body.at(index).u = 1.f;
+		this->body.at(index).v = 0.f;
 		index++;
 	}
 
@@ -495,9 +499,157 @@ bool ParticleSystem::UpdateBuffers(ID3D11DeviceContext * deviceContext) //copied
 	verticesPtr = (Vertex3D*)mappedResource.pData;
 
 	// Copy the data into the vertex buffer.
-	memcpy(verticesPtr, (void*)this->vertices, (sizeof(Vertex3D) * this->vertexCount));
+	memcpy(verticesPtr, (void*)this->body.data(), (sizeof(Vertex3D) * this->vertexCount));
 
 	// Unlock the vertex buffer.
 	deviceContext->Unmap(this->vertexBuffer, 0);
 	return true;
+}
+
+void ParticleSystem::calculateModelVectors()
+{
+	int faceCount = vertexCount / 3;
+	int index = 0;
+	NM_Vertex vertex1;
+	NM_Vertex vertex2;
+	NM_Vertex vertex3;
+	DirectX::XMFLOAT3 tangent;
+	DirectX::XMFLOAT3 binormal;
+	DirectX::XMFLOAT3 normal;
+
+	// Go through all the faces and calculate the the tangent, binormal, and normal vectors.
+	for (int i = 0; i < faceCount; i++)
+	{
+		// Get the three vertices for this face from the model.
+		vertex1.x = body.at(index).x;
+		vertex1.y = body.at(index).y;
+		vertex1.z = body.at(index).z;
+		vertex1.u = body.at(index).u;
+		vertex1.v = body.at(index).v;
+		vertex1.nx = body.at(index).nx;
+		vertex1.ny = body.at(index).ny;
+		vertex1.nz = body.at(index).nz;
+		index++;
+
+		vertex2.x = body.at(index).x;
+		vertex2.y = body.at(index).y;
+		vertex2.z = body.at(index).z;
+		vertex2.u = body.at(index).u;
+		vertex2.v = body.at(index).v;
+		vertex2.nx = body.at(index).nx;
+		vertex2.ny = body.at(index).ny;
+		vertex2.nz = body.at(index).nz;
+		index++;
+
+		vertex3.x = body.at(index).x;
+		vertex3.y = body.at(index).y;
+		vertex3.z = body.at(index).z;
+		vertex3.u = body.at(index).u;
+		vertex3.v = body.at(index).v;
+		vertex3.nx = body.at(index).nx;
+		vertex3.ny = body.at(index).ny;
+		vertex3.nz = body.at(index).nz;
+		index++;
+		// Calculate the tangent and binormal of that face.
+		calculateTangentBinormal(vertex1, vertex2, vertex3, tangent, binormal, normal);
+
+		// Calculate the new normal using the tangent and binormal.
+		calculateNormal(tangent, binormal, normal);
+
+		// Store the normal, tangent, and binormal for this face back in the model structure.
+		body.at(index - 1).nx = normal.x;
+		body.at(index - 1).ny = normal.y;
+		body.at(index - 1).nz = normal.z;
+		body.at(index - 1).tx = tangent.x;
+		body.at(index - 1).ty = tangent.y;
+		body.at(index - 1).tz = tangent.z;
+		body.at(index - 1).bx = binormal.x;
+		body.at(index - 1).by = binormal.y;
+		body.at(index - 1).bz = binormal.z;
+
+		body.at(index - 2).nx = normal.x;
+		body.at(index - 2).ny = normal.y;
+		body.at(index - 2).nz = normal.z;
+		body.at(index - 2).tx = tangent.x;
+		body.at(index - 2).ty = tangent.y;
+		body.at(index - 2).tz = tangent.z;
+		body.at(index - 2).bx = binormal.x;
+		body.at(index - 2).by = binormal.y;
+		body.at(index - 2).bz = binormal.z;
+
+		body.at(index - 3).nx = normal.x;
+		body.at(index - 3).ny = normal.y;
+		body.at(index - 3).nz = normal.z;
+		body.at(index - 3).tx = tangent.x;
+		body.at(index - 3).ty = tangent.y;
+		body.at(index - 3).tz = tangent.z;
+		body.at(index - 3).bx = binormal.x;
+		body.at(index - 3).by = binormal.y;
+		body.at(index - 3).bz = binormal.z;
+	}
+}
+
+void ParticleSystem::calculateTangentBinormal(NM_Vertex vertex1, NM_Vertex vertex2, NM_Vertex vertex3, DirectX::XMFLOAT3 & tangent, DirectX::XMFLOAT3 & binormal, DirectX::XMFLOAT3 & normal)
+{
+	// Calculate the two vectors for this face.
+	float vector1[3];
+	vector1[0] = vertex2.x - vertex1.x;
+	vector1[1] = vertex2.y - vertex1.y;
+	vector1[2] = vertex2.z - vertex1.z;
+	float vector2[3];
+	vector2[0] = vertex3.x - vertex1.x;
+	vector2[1] = vertex3.y - vertex1.y;
+	vector2[2] = vertex3.z - vertex1.z;
+
+	// Calculate the tu and tv texture space vectors.
+	float tuVector[2];
+	float tvVector[2];
+	tuVector[0] = vertex2.u - vertex1.u;
+	tvVector[0] = vertex2.v - vertex1.v;
+	tuVector[1] = vertex3.u - vertex1.u;
+	tvVector[1] = vertex3.v - vertex1.v;
+
+	// Calculate the denominator of the tangent/binormal equation.
+	float den = 1.0f / (tuVector[0] * tvVector[1] - tuVector[1] * tvVector[0]);
+
+	// Calculate the cross products and multiply by the coefficient to get the tangent and binormal.
+	tangent.x = (tvVector[1] * vector1[0] - tvVector[0] * vector2[0]) * den;
+	tangent.y = (tvVector[1] * vector1[1] - tvVector[0] * vector2[1]) * den;
+	tangent.z = (tvVector[1] * vector1[2] - tvVector[0] * vector2[2]) * den;
+
+	binormal.x = (tuVector[0] * vector2[0] - tuVector[1] * vector1[0]) * den;
+	binormal.y = (tuVector[0] * vector2[1] - tuVector[1] * vector1[1]) * den;
+	binormal.z = (tuVector[0] * vector2[2] - tuVector[1] * vector1[2]) * den;
+
+	// Calculate the length of this normal.
+	float length = sqrt((tangent.x * tangent.x) + (tangent.y * tangent.y) + (tangent.z * tangent.z));
+
+	// Normalize the normal and then store it
+	tangent.x = tangent.x / length;
+	tangent.y = tangent.y / length;
+	tangent.z = tangent.z / length;
+
+	// Calculate the length of this normal.
+	length = sqrt((binormal.x * binormal.x) + (binormal.y * binormal.y) + (binormal.z * binormal.z));
+
+	// Normalize the normal and then store it
+	binormal.x = binormal.x / length;
+	binormal.y = binormal.y / length;
+	binormal.z = binormal.z / length;
+}
+
+void ParticleSystem::calculateNormal(DirectX::XMFLOAT3 tangent, DirectX::XMFLOAT3 binormal, DirectX::XMFLOAT3 & normal)
+{
+	// Calculate the cross product of the tangent and binormal which will give the normal vector.
+	normal.x = (tangent.y * binormal.z) - (tangent.z * binormal.y);
+	normal.y = (tangent.z * binormal.x) - (tangent.x * binormal.z);
+	normal.z = (tangent.x * binormal.y) - (tangent.y * binormal.x);
+
+	// Calculate the length of the normal.
+	float length = sqrt((normal.x * normal.x) + (normal.y * normal.y) + (normal.z * normal.z));
+
+	// Normalize the normal.
+	normal.x = normal.x / length;
+	normal.y = normal.y / length;
+	normal.z = normal.z / length;
 }

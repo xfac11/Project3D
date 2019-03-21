@@ -7,55 +7,7 @@ SkyBox::SkyBox()
 	this->vertexBuffer = nullptr;
 	this->cube = new Vertex[8];
 	this->index = new int[36];
-	/*Vertex cubeTemp[] = {
-	-1.0f, -1.0f, 1.0f,1.0f,
-	1.0f, -1.0f, 1.0f,1.0f,
-	-1.0f, 1.0f, 1.0f,1.0f,
 
-	-1.0f, 1.0f, 1.0f,1.0f,
-	1.0f, -1.0f, 1.0f,1.0f,
-	1.0f, 1.0f, 1.0f,1.0f,
-
-	-1.0f, 1.0f, 1.0f,1.0f,
-	1.0f, 1.0f, 1.0f,1.0f,
-	-1.0f, 1.0f, -1.0f,1.0f,
-
-	-1.0f, 1.0f, -1.0f,1.0f,
-	1.0f, 1.0f, 1.0f,1.0f,
-	1.0f, 1.0f, -1.0f,1.0f,
-
-	-1.0f, 1.0f, -1.0f,1.0f,
-	1.0f, 1.0f, -1.0f,1.0f,
-	-1.0f, -1.0f, -1.0f,1.0f,
-
-	-1.0f, -1.0f, -1.0f,1.0f,
-	1.0f, 1.0f, -1.0f,1.0f,
-	1.0f, -1.0f, -1.0f,1.0f,
-
-	-1.0f, -1.0f, -1.0f,1.0f,
-	1.0f, -1.0f, -1.0f,1.0f,
-	-1.0f, -1.0f, 1.0f,1.0f,
-
-	-1.0f, -1.0f, 1.0f,1.0f,
-	1.0f, -1.0f, -1.0f,1.0f,
-	1.0f, -1.0f, 1.0f,1.0f,
-
-	1.0f, -1.0f, 1.0f,1.0f,
-	1.0f, -1.0f, -1.0f,1.0f,
-	1.0f, 1.0f, 1.0f,1.0f,
-
-	1.0f, 1.0f, 1.0f,1.0f,
-	1.0f, -1.0f - 1.0f,1.0f,
-	1.0f, 1.0f - 1.0f,1.0f,
-
-	-1.0f, -1.0f, -1.0f,1.0f,
-	-1.0f, -1.0f, 1.0f,1.0f,
-	-1.0f ,1.0f, -1.0f,1.0f,
-
-	-1.0f, 1.0f, -1.0f,1.0f,
-	-1.0f, -1.0f, 1.0f,1.0f,
-	-1.0f, 1.0f, 1.0f,1.0f
-	};*/
 	Vertex cubeTemp[] =
 	{
 		-1.0f,  1.0f, -1.0f,1.0f,
@@ -70,52 +22,7 @@ SkyBox::SkyBox()
 
 	int indices[] = { 0, 1, 2, 2, 3, 0, 4, 1, 0, 0, 5, 4, 2, 6, 7, 7, 3, 2, 4, 5, 7, 7, 6, 4, 0, 3, 7, 7, 5, 0, 1, 4, 2, 2, 4, 6 };
 
-	/*Vertex cubeTemp[] = {
-		// Positions
-		-SIZE,  SIZE, -SIZE,SIZE,
-		-SIZE, -SIZE, -SIZE,SIZE,
-		SIZE, -SIZE, -SIZE,SIZE,
-		SIZE, -SIZE, -SIZE,SIZE, //1
-		SIZE,  SIZE, -SIZE,SIZE,
-		-SIZE,  SIZE, -SIZE,SIZE,
-
-		-SIZE, -SIZE,  SIZE,SIZE,
-		-SIZE, -SIZE, -SIZE,SIZE,
-		-SIZE,  SIZE, -SIZE,SIZE,
-		-SIZE,  SIZE, -SIZE,SIZE,//2
-		-SIZE,  SIZE,  SIZE,SIZE,
-		-SIZE, -SIZE,  SIZE,SIZE,
-
-		SIZE, -SIZE, -SIZE,SIZE,
-		SIZE, -SIZE,  SIZE,SIZE,
-		SIZE,  SIZE,  SIZE,SIZE,//3
-		SIZE,  SIZE,  SIZE,SIZE,
-		SIZE,  SIZE, -SIZE,SIZE,
-		SIZE, -SIZE, -SIZE,SIZE,
-
-		-SIZE, -SIZE,  SIZE,SIZE,
-		-SIZE,  SIZE,  SIZE,SIZE,
-		SIZE,  SIZE,  SIZE,SIZE,//4
-		SIZE,  SIZE,  SIZE,SIZE,
-		SIZE, -SIZE,  SIZE,SIZE,
-		-SIZE, -SIZE,  SIZE,SIZE,
-
-		-SIZE,  SIZE, -SIZE,SIZE,
-		SIZE,  SIZE, -SIZE,SIZE,
-		SIZE,  SIZE,  SIZE,SIZE,
-		SIZE,  SIZE,  SIZE,SIZE,//5
-		-SIZE,  SIZE,  SIZE,SIZE,
-		-SIZE,  SIZE, -SIZE,SIZE,
-
-		-SIZE, -SIZE, -SIZE,SIZE,
-		-SIZE, -SIZE,  SIZE,SIZE,
-		SIZE, -SIZE, -SIZE,SIZE,
-		SIZE, -SIZE, -SIZE,SIZE,//6
-		-SIZE, -SIZE,  SIZE,SIZE,
-		SIZE, -SIZE,  SIZE,SIZE
-	};*/
 	//all the vertices inserted into cubetemp then into this->cube
-
 	for (int i = 0; i < 8; i++)
 	{
 		this->cube[i] = cubeTemp[i];

@@ -14,7 +14,7 @@ struct VS_IN
 	float3 Normal : NORMALPOS;
 	float3 ThePoint : THEPOINT;
 	float3 Tangent : TANGENT; //Normal maps
-	float3 Binormal :BINORMAL; //Normal maps
+	float3 Binormal : BINORMAL; //Normal maps
 };
 
 struct VS_OUT
@@ -23,8 +23,8 @@ struct VS_OUT
 	float2 Tex : TEXCOORD;
 	float3 NormalWS : NORMALWS;
 	float4 PositionWS : POSITIONWS;
-	float3 Tangent : TANGENT; //Normal maps
-	float3 Binormal :BINORMAL; //Normal maps
+	float3 TangentWS : TANGENTWS; //Normal maps
+	float3 BinormalWS : BINORMALWS; //Normal maps
 };
 
 
@@ -47,8 +47,8 @@ VS_OUT VS_main(VS_IN input)
 	//output.Tex = input.Tex;
 
 	//// Calculate the normal vector against the world matrix only.
-	output.NormalWS = normalize(mul(float4((input.Normal), 0.0f), world)).xyz;//=
-
+	output.NormalWS = mul(float4(input.Normal,0.0f), world);
+	output.NormalWS = normalize(output.NormalWS);
 	//// Normalize the normal vector.
 	//output.NormalWS = normalize(input.Normal);
 
@@ -67,8 +67,17 @@ VS_OUT VS_main(VS_IN input)
 	output.PositionWS = mul(float4(input.Pos, 1.0f), world);
 	//output.PositionWS = input.Pos.xyz;
 	output.Tex = input.Tex;
-	output.Tangent = input.Tangent;
-	output.Binormal = input.Binormal;
+
+	output.BinormalWS = mul(world, float4(input.Binormal, 0.0f));
+	output.TangentWS = mul( world,float4(input.Tangent,0.0f));
+	output.TangentWS = normalize(output.TangentWS);
+	
+	//output.BinormalWS = cross(output.NormalWS, output.TangentWS);
+	output.BinormalWS = normalize(output.BinormalWS);
+	
+	//output.Binormal = output.Tangent;
+	//output.Binormal = output.NormalWS;
+
 	//Color shader vertex shader
 	//output.PosCS = mul(proj, input.Pos);
 	////output.PosCS = input.Pos;

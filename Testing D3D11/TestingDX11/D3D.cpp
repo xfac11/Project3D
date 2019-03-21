@@ -291,11 +291,7 @@ void D3D::Shutdown()
 		deviceContext->Release();
 		deviceContext = nullptr;
 	}
-	if (device)
-	{
-		device->Release();
-		device = nullptr;
-	}
+
 	if (swapChain)
 	{
 		swapChain->Release();
@@ -312,7 +308,13 @@ void D3D::Shutdown()
 		alphaDisableBlendingState->Release();
 		alphaDisableBlendingState = nullptr;
 	}
-
+	debug->ReportLiveDeviceObjects(D3D11_RLDO_SUMMARY | D3D11_RLDO_DETAIL);
+	if (device)
+	{
+		device->Release();
+		device = nullptr;
+	}
+	
 	if (debug)
 	{
 		debug->Release();
@@ -361,6 +363,7 @@ void D3D::setBackBuffer(ID3D11DepthStencilView* view)
 {
 	deviceContext->OMSetRenderTargets(1, &renderTargetView, view);
 }
+
 void D3D::turnOffZ()
 {
 	deviceContext->OMSetDepthStencilState(this->disableDepthStencilState, 1); //1

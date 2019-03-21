@@ -15,7 +15,7 @@ public:
 	bool Render(ID3D11DeviceContext*& deviceContext, int count, DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix);
 	void RenderShader(ID3D11DeviceContext* deviceContext, int count);
 	bool SetShaderParameters(ID3D11DeviceContext	*& deviceContext, DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix, 
-		  PointLight light[], DirectX::XMFLOAT3 camPos);
+		  PointLight light, DirectX::XMFLOAT3 camPos);
 
 private:
 
