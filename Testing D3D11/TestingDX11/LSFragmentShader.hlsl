@@ -104,7 +104,7 @@ float4 PS_main(PS_IN input) : SV_Target0
 	normals = NormalTex.Sample(SampSt, input.TexCoord).xyz *2.0f - 1.0f;// back to [-1...1] 
 	if (length(normals) > 0.0f) //normals with that 
 	{
-		float3 final_colour = float3(0.0f, 0.0f, 0.0f);
+		float3 final_colour = float3(0.8f, 0.8f, 0.8f);
 		float3 ambient = colors * final_colour;
 		//for (int i = 0; i < 2; i++)
 		//{

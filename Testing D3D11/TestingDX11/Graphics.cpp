@@ -629,14 +629,12 @@ void Graphics::deferredRender()
 
 	//this->lShader->SetShaderParameters(this->Direct3D->GetDeviceContext(), DirectX::XMLoadFloat4x4(&this->theModel[2]->getId()), this->theCamera->GetViewMatrix(), this->Direct3D->GetOrthoMatrix(), this->gBuffer->getShaderResView(0), this->gBuffer->getShaderResView(1), lPos, lColor, 1.0f, 1.0f);
 	//Fix properties in the shaders. Entrypoint and shader type
-	//Fix properties in the shaders. Entrypoint and shader type
 
 	//this->theModel[2]->draw(*this->theColorShader, this->Direct3D->GetDeviceContext());
 	this->lShader->RenderShader(this->Direct3D->GetDeviceContext(), 6);
-	this->lShader->SetShaderParameters(this->Direct3D->GetDeviceContext(), worldID2, this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix(), light2, this->camPos);
-	this->lShader->RenderShader(this->Direct3D->GetDeviceContext(), 6);
-	//this->lShader->SetShaderParameters(this->Direct3D->GetDeviceContext(), worldID, this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix(), light2, this->camPos);
+	//this->lShader->SetShaderParameters(this->Direct3D->GetDeviceContext(), worldID2, this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix(), light2, this->camPos);
 	//this->lShader->RenderShader(this->Direct3D->GetDeviceContext(), 6);
+
 
 	this->Direct3D->turnOnZ();
 
