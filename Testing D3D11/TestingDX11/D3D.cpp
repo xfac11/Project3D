@@ -357,7 +357,10 @@ void D3D::setBackBuffer()
 {
 	deviceContext->OMSetRenderTargets(1, &renderTargetView, this->depthStencilView);
 }
-
+void D3D::setBackBuffer(ID3D11DepthStencilView* view)
+{
+	deviceContext->OMSetRenderTargets(1, &renderTargetView, view);
+}
 void D3D::turnOffZ()
 {
 	deviceContext->OMSetDepthStencilState(this->disableDepthStencilState, 1); //1
