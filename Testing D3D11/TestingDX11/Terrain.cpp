@@ -2,8 +2,9 @@
 
 bool Terrain::InitializeBuffers(ID3D11Device *& device)
 {
-// Set the index count to the same as the vertex count.
+	// Set the index count to the same as the vertex count.
 	this->indexCount = this->vertexCount;
+
 
 	Vertex3D* vertices = new Vertex3D[this->vertexCount];
 	unsigned long* indices = new unsigned long[this->indexCount];
@@ -640,6 +641,7 @@ Terrain::Terrain()
 	this->position = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
 	scaleTemp = DirectX::XMLoadFloat4x4(&this->Scale);
 	translTemp = DirectX::XMLoadFloat4x4(&this->Translation);
+
 }
 
 Terrain::~Terrain()
@@ -868,6 +870,14 @@ bool Terrain::checkCollision(DirectX::XMFLOAT3 camPos)
 
 	}
 	return result;
+}
+
+float Terrain::getHeightOfTerrain(DirectX::XMFLOAT3 camPos)
+{
+	//float terrainX= camPos.x - 
+	//	float 
+	//	float float floatfloa 
+	return 0.0f;
 }
 
 void Terrain::setWorld()

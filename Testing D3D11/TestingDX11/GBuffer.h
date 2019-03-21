@@ -2,7 +2,7 @@
 #define GBUFFER_H
 #include <d3d11.h>
 #include <directxmath.h>
-const int GBUFFERCAP = 3;
+const int GBUFFERCAP = 4;
 class GBuffer
 {
 public:

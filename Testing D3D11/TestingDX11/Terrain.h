@@ -24,7 +24,8 @@ private:
 
 	Texture texture;
 	Texture normal;
-	//grid stuff
+
+	float* *heights;
 	int terrainWidth;
 	int terrainHeight;
 	int vertexCount;
@@ -66,6 +67,7 @@ public:
 	void Shutdown();
 
 	bool checkCollision(DirectX::XMFLOAT3 camPos);
+	float getHeightOfTerrain(DirectX::XMFLOAT3 camPos);
 
 	void setWorld();
 	DirectX::XMFLOAT4X4 getWorld();
