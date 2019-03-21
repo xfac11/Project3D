@@ -6,7 +6,7 @@ cbuffer CB_PER_FRAME : register(b0)
 };
 struct VS_IN
 {
-	float3 position : POSITION;
+	float4 position : POSITION;
 };
 
 struct VS_OUT
@@ -27,9 +27,8 @@ VS_OUT VS_main(VS_IN input)
 
 	output.Pos = pos.xyww;
 	output.Tex = input.position;*/
-
-	output.Pos = mul(float4(input.position, 1.0f), proj).xyww;//proj is worldviewproj
-	output.Pos.z = 1.0f;
-	output.Tex = input.position;
+	output.Pos = mul(proj,input.position).xyww;//proj is worldviewproj
+	//output.Pos.z = 1.0f;
+	output.Tex = input.position.xyz;
 	return output;
 }

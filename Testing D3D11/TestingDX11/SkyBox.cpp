@@ -5,58 +5,126 @@ SkyBox::SkyBox()
 	this->constantBuffer = nullptr;
 	this->samplerState = nullptr;
 	this->vertexBuffer = nullptr;
-	this->cube = new Vertex[36];
-	Vertex cubeTemp[] = {
-		// Positions
+	this->cube = new Vertex[8];
+	this->index = new int[36];
+	/*Vertex cubeTemp[] = {
+	-1.0f, -1.0f, 1.0f,1.0f,
+	1.0f, -1.0f, 1.0f,1.0f,
+	-1.0f, 1.0f, 1.0f,1.0f,
+
+	-1.0f, 1.0f, 1.0f,1.0f,
+	1.0f, -1.0f, 1.0f,1.0f,
+	1.0f, 1.0f, 1.0f,1.0f,
+
+	-1.0f, 1.0f, 1.0f,1.0f,
+	1.0f, 1.0f, 1.0f,1.0f,
+	-1.0f, 1.0f, -1.0f,1.0f,
+
+	-1.0f, 1.0f, -1.0f,1.0f,
+	1.0f, 1.0f, 1.0f,1.0f,
+	1.0f, 1.0f, -1.0f,1.0f,
+
+	-1.0f, 1.0f, -1.0f,1.0f,
+	1.0f, 1.0f, -1.0f,1.0f,
+	-1.0f, -1.0f, -1.0f,1.0f,
+
+	-1.0f, -1.0f, -1.0f,1.0f,
+	1.0f, 1.0f, -1.0f,1.0f,
+	1.0f, -1.0f, -1.0f,1.0f,
+
+	-1.0f, -1.0f, -1.0f,1.0f,
+	1.0f, -1.0f, -1.0f,1.0f,
+	-1.0f, -1.0f, 1.0f,1.0f,
+
+	-1.0f, -1.0f, 1.0f,1.0f,
+	1.0f, -1.0f, -1.0f,1.0f,
+	1.0f, -1.0f, 1.0f,1.0f,
+
+	1.0f, -1.0f, 1.0f,1.0f,
+	1.0f, -1.0f, -1.0f,1.0f,
+	1.0f, 1.0f, 1.0f,1.0f,
+
+	1.0f, 1.0f, 1.0f,1.0f,
+	1.0f, -1.0f - 1.0f,1.0f,
+	1.0f, 1.0f - 1.0f,1.0f,
+
+	-1.0f, -1.0f, -1.0f,1.0f,
+	-1.0f, -1.0f, 1.0f,1.0f,
+	-1.0f ,1.0f, -1.0f,1.0f,
+
+	-1.0f, 1.0f, -1.0f,1.0f,
+	-1.0f, -1.0f, 1.0f,1.0f,
+	-1.0f, 1.0f, 1.0f,1.0f
+	};*/
+	Vertex cubeTemp[] =
+	{
 		-1.0f,  1.0f, -1.0f,1.0f,
 		-1.0f, -1.0f, -1.0f,1.0f,
-		1.0f, -1.0f, -1.0f,1.0f,
-		1.0f, -1.0f, -1.0f,1.0f, //1
-		1.0f,  1.0f, -1.0f,1.0f,
-		-1.0f,  1.0f, -1.0f,1.0f,
-
-		-1.0f, -1.0f,  1.0f,1.0f,
-		-1.0f, -1.0f, -1.0f,1.0f,
-		-1.0f,  1.0f, -1.0f,1.0f,
-		-1.0f,  1.0f, -1.0f,1.0f,//2
-		-1.0f,  1.0f,  1.0f,1.0f,
-		-1.0f, -1.0f,  1.0f,1.0f,
-
-		1.0f, -1.0f, -1.0f,1.0f,
-		1.0f, -1.0f,  1.0f,1.0f,
-		1.0f,  1.0f,  1.0f,1.0f,//3
-		1.0f,  1.0f,  1.0f,1.0f,
-		1.0f,  1.0f, -1.0f,1.0f,
-		1.0f, -1.0f, -1.0f,1.0f,
-
+		 1.0f, -1.0f, -1.0f,1.0f,
+		 1.0f,  1.0f, -1.0f,1.0f,
 		-1.0f, -1.0f,  1.0f,1.0f,
 		-1.0f,  1.0f,  1.0f,1.0f,
-		1.0f,  1.0f,  1.0f,1.0f,//4
-		1.0f,  1.0f,  1.0f,1.0f,
-		1.0f, -1.0f,  1.0f,1.0f,
-		-1.0f, -1.0f,  1.0f,1.0f,
-
-		-1.0f,  1.0f, -1.0f,1.0f,
-		1.0f,  1.0f, -1.0f,1.0f,
-		1.0f,  1.0f,  1.0f,1.0f,
-		1.0f,  1.0f,  1.0f,1.0f,//5
-		-1.0f,  1.0f,  1.0f,1.0f,
-		-1.0f,  1.0f, -1.0f,1.0f,
-
-		-1.0f, -1.0f, -1.0f,1.0f,
-		-1.0f, -1.0f,  1.0f,1.0f,
-		1.0f, -1.0f, -1.0f,1.0f,
-		1.0f, -1.0f, -1.0f,1.0f,//6
-		-1.0f, -1.0f,  1.0f,1.0f,
-		1.0f, -1.0f,  1.0f,1.0f
+		 1.0f, -1.0f,  1.0f,1.0f,
+		 1.0f,  1.0f,  1.0f,1.0f
 	};
+
+	int indices[] = { 0, 1, 2, 2, 3, 0, 4, 1, 0, 0, 5, 4, 2, 6, 7, 7, 3, 2, 4, 5, 7, 7, 6, 4, 0, 3, 7, 7, 5, 0, 1, 4, 2, 2, 4, 6 };
+
+	/*Vertex cubeTemp[] = {
+		// Positions
+		-SIZE,  SIZE, -SIZE,SIZE,
+		-SIZE, -SIZE, -SIZE,SIZE,
+		SIZE, -SIZE, -SIZE,SIZE,
+		SIZE, -SIZE, -SIZE,SIZE, //1
+		SIZE,  SIZE, -SIZE,SIZE,
+		-SIZE,  SIZE, -SIZE,SIZE,
+
+		-SIZE, -SIZE,  SIZE,SIZE,
+		-SIZE, -SIZE, -SIZE,SIZE,
+		-SIZE,  SIZE, -SIZE,SIZE,
+		-SIZE,  SIZE, -SIZE,SIZE,//2
+		-SIZE,  SIZE,  SIZE,SIZE,
+		-SIZE, -SIZE,  SIZE,SIZE,
+
+		SIZE, -SIZE, -SIZE,SIZE,
+		SIZE, -SIZE,  SIZE,SIZE,
+		SIZE,  SIZE,  SIZE,SIZE,//3
+		SIZE,  SIZE,  SIZE,SIZE,
+		SIZE,  SIZE, -SIZE,SIZE,
+		SIZE, -SIZE, -SIZE,SIZE,
+
+		-SIZE, -SIZE,  SIZE,SIZE,
+		-SIZE,  SIZE,  SIZE,SIZE,
+		SIZE,  SIZE,  SIZE,SIZE,//4
+		SIZE,  SIZE,  SIZE,SIZE,
+		SIZE, -SIZE,  SIZE,SIZE,
+		-SIZE, -SIZE,  SIZE,SIZE,
+
+		-SIZE,  SIZE, -SIZE,SIZE,
+		SIZE,  SIZE, -SIZE,SIZE,
+		SIZE,  SIZE,  SIZE,SIZE,
+		SIZE,  SIZE,  SIZE,SIZE,//5
+		-SIZE,  SIZE,  SIZE,SIZE,
+		-SIZE,  SIZE, -SIZE,SIZE,
+
+		-SIZE, -SIZE, -SIZE,SIZE,
+		-SIZE, -SIZE,  SIZE,SIZE,
+		SIZE, -SIZE, -SIZE,SIZE,
+		SIZE, -SIZE, -SIZE,SIZE,//6
+		-SIZE, -SIZE,  SIZE,SIZE,
+		SIZE, -SIZE,  SIZE,SIZE
+	};*/
 	//all the vertices inserted into cubetemp then into this->cube
 
-	for (int i = 0; i < 36; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		this->cube[i] = cubeTemp[i];
 	}
-	
+
+	for (int i = 0; i < 36; i++)
+	{
+		this->index[i] = indices[i];
+	}
 }
 
 SkyBox::~SkyBox()
@@ -65,14 +133,24 @@ SkyBox::~SkyBox()
 
 void SkyBox::shutDown()
 {
+	for (int i = 0; i < 6; i++)
+	{
+		this->textureLoad[i].Shutdown();
+	}
 	this->constantBuffer->Release();
 	delete[] this->cube;
+	delete[] this->index;
 	this->cubeSRV->Release();
 	this->cubeTex->Release();
-	this->textureLoad->Shutdown();
+	//this->textureLoad->Shutdown();
+	if (this->WVPdata)
+	{
+		_aligned_free(this->WVPdata);
+	}
 	this->ps->Release();
 	this->vs->Release();
 	this->samplerState->Release();
+	this->indexBuffer->Release();
 	this->vertexBuffer->Release();
 	this->vertexLayout->Release();
 }
@@ -125,9 +203,10 @@ bool SkyBox::render(ID3D11DeviceContext * deviceContext, DirectX::XMMATRIX world
 	UINT32 offset = 0;
 	deviceContext->PSSetShaderResources(0, 1, &this->cubeSRV);
 	deviceContext->IASetVertexBuffers(0, 1, &this->vertexBuffer, &vertexSize, &offset);
+	deviceContext->IASetIndexBuffer(this->indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	deviceContext->PSSetSamplers(0, 1, &this->samplerState);
-
+	
 	//render shader
 	deviceContext->VSSetShader(this->vs, nullptr, 0);
 	deviceContext->HSSetShader(nullptr, nullptr, 0);
@@ -136,33 +215,31 @@ bool SkyBox::render(ID3D11DeviceContext * deviceContext, DirectX::XMMATRIX world
 	deviceContext->PSSetShader(this->ps, nullptr, 0);
 	deviceContext->IASetInputLayout(this->vertexLayout);
 
-	//deviceContext->DrawIndexed(count, 0, 0);
+	deviceContext->DrawIndexed(36, 0, 0);
 	//36 for 6 faces with 6 vertecies for each face 6*6=36
-	deviceContext->Draw(36, 0);
 	return true;
 }
 
 bool SkyBox::initializeTexture(ID3D11DeviceContext * deviceContext, ID3D11Device* device, std::string file)
 {
-	std::string fileName = "OBJ/" + file + "_ft.tga";//forward
+	
+	std::string fileName = "SkyBoxes/" + file + "_rt.tga";//right
 	textureLoad[0].Initialize(device, deviceContext, fileName.c_str());
-	fileName = "OBJ/" + file + "_lf.tga";//left
+	fileName = "SkyBoxes/" + file + "_lf.tga";//left
 	textureLoad[1].Initialize(device, deviceContext, fileName.c_str());
-	fileName = "OBJ/" + file + "_rt.tga";//right
+	fileName = "SkyBoxes/" + file + "_up.tga";//up
 	textureLoad[2].Initialize(device, deviceContext, fileName.c_str());
-	fileName = "OBJ/" + file + "_bk.tga";//back
+	fileName = "SkyBoxes/" + file + "_dn.tga";//down
 	textureLoad[3].Initialize(device, deviceContext, fileName.c_str());
-	fileName = "OBJ/" + file + "_up.tga";//up
+	fileName = "SkyBoxes/" + file + "_bk.tga";//back
 	textureLoad[4].Initialize(device, deviceContext, fileName.c_str());
-	fileName = "OBJ/" + file + "_dn.tga";//down
+	fileName = "SkyBoxes/" + file + "_ft.tga";//forward
 	textureLoad[5].Initialize(device, deviceContext, fileName.c_str());
 	D3D11_TEXTURE2D_DESC texDesc;
 	texDesc.Width = textureLoad[0].getWidth();//Every texture has the same width and height
 	texDesc.Height = textureLoad[0].getHeight();
 	texDesc.MipLevels = 1;
-	texDesc.ArraySize = 6;
-	//texDesc.Depth=textureLoad[0].getHeight();
-	//texDesc.ArraySize = 6;//6 for all the faces of a cube
+	texDesc.ArraySize = 6;//6 for all the faces of a cube
 	texDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	texDesc.CPUAccessFlags = 0;
 	texDesc.SampleDesc.Count = 1;
@@ -171,7 +248,6 @@ bool SkyBox::initializeTexture(ID3D11DeviceContext * deviceContext, ID3D11Device
 	texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 	texDesc.CPUAccessFlags = 0;
 	texDesc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;//TextureCube
-
 	D3D11_SHADER_RESOURCE_VIEW_DESC SMViewDesc;
 	SMViewDesc.Format = texDesc.Format;
 	SMViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
@@ -179,25 +255,14 @@ bool SkyBox::initializeTexture(ID3D11DeviceContext * deviceContext, ID3D11Device
 	SMViewDesc.TextureCube.MostDetailedMip = 0;
 
 	D3D11_SUBRESOURCE_DATA pData[6];
-	//std::vector<vector4b> d[6]; // 6 images of type vector4b = 4 * unsigned char
-
 	for (int cubeMapFaceIndex = 0; cubeMapFaceIndex < 6; cubeMapFaceIndex++)
 	{
-		//d[cubeMapFaceIndex].resize(description.width * description.height);
-
-		// fill with red color  
-		/*std::fill(
-			d[cubeMapFaceIndex].begin(),
-			d[cubeMapFaceIndex].end(),
-			vector4b(255, 0, 0, 255));*/
-		pData[cubeMapFaceIndex].pSysMem = this->textureLoad[cubeMapFaceIndex].getTextureCharArray();//&d[cubeMapFaceIndex][0];// description.data;
+		pData[cubeMapFaceIndex].pSysMem = this->textureLoad[cubeMapFaceIndex].getTextureCharArray();
 		pData[cubeMapFaceIndex].SysMemPitch = this->textureLoad[cubeMapFaceIndex].getWidth() * 4;
 		pData[cubeMapFaceIndex].SysMemSlicePitch = 0;
 	}
-
 	HRESULT hr = device->CreateTexture2D(&texDesc,
 		pData, &cubeTex);
-	//assert(hr == S_OK);
 	if (FAILED(hr))
 	{
 		return false;
@@ -325,7 +390,7 @@ bool SkyBox::initializeShaders(ID3D11Device* device)
 	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc.MipLODBias = 0.0f;
 	samplerDesc.MaxAnisotropy = 1;
-	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	samplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
 	samplerDesc.BorderColor[0] = 0;
 	samplerDesc.BorderColor[1] = 0;
 	samplerDesc.BorderColor[2] = 0;
@@ -350,23 +415,31 @@ bool SkyBox::initializeVertex(ID3D11Device* device)
 	memset(&bufferDesc, 0, sizeof(bufferDesc));
 	bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	bufferDesc.ByteWidth = 36 * sizeof(Vertex);
-	data.pSysMem = &this->cube;
+	bufferDesc.ByteWidth = 8 * sizeof(Vertex);
+	data.pSysMem = this->cube;
 	hr = device->CreateBuffer(&bufferDesc, &data, &this->vertexBuffer);
 	if (FAILED(hr))
 	{
 		return false;
 	}
-	return true;
-		//body.push_back(
-	
+	D3D11_SUBRESOURCE_DATA pData;
+	memset(&bufferDesc, 0, sizeof(bufferDesc));
+	bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	bufferDesc.ByteWidth = 36 * sizeof(int);
+	pData.pSysMem = this->index;
+	hr = device->CreateBuffer(&bufferDesc, &pData, &this->indexBuffer);
+	if (FAILED(hr))
+	{
+		return false;
+	}
+	return true;	
 }
 
 bool SkyBox::setShaderParams(ID3D11DeviceContext* deviceContext,DirectX::XMMATRIX world, DirectX::XMMATRIX view, DirectX::XMMATRIX proj)
 {
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedMemory;
-	D3D11_MAPPED_SUBRESOURCE mappedMemorySpec;
 	world = XMMatrixTranspose(world);
 	view = XMMatrixTranspose(view);
 	proj = XMMatrixTranspose(proj);
@@ -384,7 +457,6 @@ bool SkyBox::setShaderParams(ID3D11DeviceContext* deviceContext,DirectX::XMMATRI
 	{
 		return false;
 	}
-
 	// Get a pointer to the data in the constant buffer.
 	memcpy(mappedMemory.pData, this->WVPdata, sizeof(Matrices));
 
@@ -392,7 +464,6 @@ bool SkyBox::setShaderParams(ID3D11DeviceContext* deviceContext,DirectX::XMMATRI
 	deviceContext->Unmap(constantBuffer, 0);
 
 	deviceContext->VSSetConstantBuffers(0, 1, &constantBuffer); //Set the constantbuffer in vs
-
 
 	return true;
 }
