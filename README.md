@@ -50,13 +50,13 @@ Texturing and Lighting (1,2):
 
 Projection Techniques (1,1): 
   - Shadow mapping 
-  - Skybox ((Filip)om denna ger poäng, gör denna)
+  - Skybox (Filip,DONE)
 
 
 
 Acceleration Techniques (2,1): 
   - Portal Culling 
-  - Front to Back rendering (Daniel)
+  - Front to Back rendering (Daniel,DONE)
   - Back face culling using Geometry Shader (Karlos DONE with a tiny help from Filip)
  
 Other techniques (2,3):
