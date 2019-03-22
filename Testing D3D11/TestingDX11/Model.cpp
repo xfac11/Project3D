@@ -11,17 +11,18 @@ Model::Model()
 
 	this->rot = 0;
 	this->moveM = 0;
+	DirectX::XMStoreFloat4x4(&this->world, DirectX::XMMatrixIdentity());
 	DirectX::XMVECTOR rotaxis = DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 	DirectX::XMMATRIX rotTemp = DirectX::XMMatrixRotationAxis(rotaxis, 0);
-	DirectX::XMMATRIX scaleTemp = DirectX::XMMatrixScaling(0.0f, 0.0f, 0.0f);
+	DirectX::XMMATRIX scaleTemp = DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f);
 	DirectX::XMMATRIX translTemp = DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f);
 	DirectX::XMStoreFloat4x4(&this->Rotation, rotTemp);
 	DirectX::XMStoreFloat4x4(&this->Scale, scaleTemp);
 	DirectX::XMStoreFloat4x4(&this->Translation, translTemp);
 	this->position = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
+	this->scale = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
 	scaleTemp = DirectX::XMLoadFloat4x4(&this->Scale);
 	translTemp = DirectX::XMLoadFloat4x4(&this->Translation);
-
 }
 
 Model::~Model()
@@ -33,7 +34,7 @@ bool Model::addQuads(DirectX::XMFLOAT3 pos, float width, float height, float dep
 {//Will change vertexbuffer and vertexcount
 	this->vertexCount += 6;
 	return quads.addQuad(pos, width, height, depth, face, this->vertexCount);
-	
+
 }
 
 bool Model::addCube(DirectX::XMFLOAT3 pos, float width, float height, float depth)
@@ -98,7 +99,6 @@ bool Model::createTheVertexBuffer(ID3D11Device *& gDevice)
 		return false;
 	}
 	delete[] temp;
-
 	this->calculateModelVectors();
 
 	return true;
@@ -115,7 +115,6 @@ void Model::setVertexBandTexture(ID3D11DeviceContext *& gDeviceContext)
 	gDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	gDeviceContext->PSSetSamplers(0, 1, &this->SamplerState);
 	//gDeviceContext->GSSetShader(nullptr, nullptr, 0); //already initilized?+
-	//this->calculateModelVectors();
 }
 
 int Model::getVertexCount() const
@@ -145,10 +144,10 @@ void Model::setSampler(ID3D11Device*& gDevice)
 	{
 		//MessageBox(hwnd, "Error compiling shader.  Check shader-error.txt for message.", "error", MB_OK);
 		//deal with error. Log it maybe
-		
+
 	}
 }
-void Model::loadOBJ(char * file, char* normal, ID3D11Device * device, ID3D11DeviceContext * deviceContext) //directX::XMFLOAT3
+void Model::loadOBJ(const char * file, const char* normal, ID3D11Device * device, ID3D11DeviceContext * deviceContext) //directX::XMFLOAT3
 {
 	std::string txt = load.loadFile(file, body);
 	if (txt == "")
@@ -192,7 +191,7 @@ void Model::setWorld()
 	rotTemp = DirectX::XMLoadFloat4x4(&this->Rotation);
 	scaleTemp = DirectX::XMLoadFloat4x4(&this->Scale);
 	translTemp = DirectX::XMLoadFloat4x4(&this->Translation);
-	DirectX::XMStoreFloat4x4(&this->world, (translTemp));
+	DirectX::XMStoreFloat4x4(&this->world, (scaleTemp*rotTemp*translTemp));
 
 }
 
@@ -216,8 +215,18 @@ void Model::move(float x, float y, float z)
 
 void Model::rotate(DirectX::XMVECTOR axis, float angle)
 {
+	//DirectX::XMMatrixRotationRollPitchYaw
 	DirectX::XMMATRIX tempRot = DirectX::XMMatrixRotationAxis(axis, angle);
 	DirectX::XMStoreFloat4x4(&this->Rotation, tempRot);
+}
+
+void Model::setScale(float x, float y, float z)
+{
+	this->scale.x = x;
+	this->scale.y = y;
+	this->scale.z = z;
+	DirectX::XMMATRIX tempScale = DirectX::XMMatrixScaling(this->scale.x, this->scale.y, this->scale.z);
+	DirectX::XMStoreFloat4x4(&this->Scale, tempScale);
 }
 
 void Model::billboard(DirectX::XMFLOAT3 camPos)
@@ -229,13 +238,13 @@ void Model::billboard(DirectX::XMFLOAT3 camPos)
 	double angle1 = atan2(position.x - camPos.x, position.z - camPos.z)* (180.0 / DirectX::XM_PI);
 	//double angle2 = atan( position.z - camPos.z)* (180.0 / DirectX::XM_PI);
 	float rotation = (float)angle * 0.0174532925f;
-	float rotation1  = (float)angle1 * 0.0174532925f;
+	float rotation1 = (float)angle1 * 0.0174532925f;
 	// rotation2 = (float)angle2 * 0.0174532925f;
-	
+
 
 	worldMatrix = DirectX::XMLoadFloat4x4(&world);
 	//worldMatrix = DirectX::XMMatrixMultiply(DirectX::XMMatrixRotationX(-rotation1), DirectX::XMMatrixRotationZ(-rotation2));
-	worldMatrix =DirectX::XMMatrixRotationY(rotation);
+	worldMatrix = DirectX::XMMatrixRotationY(rotation);
 
 	// Setup the translation matrix from the billboard model.
 	translateMatrix = DirectX::XMMatrixTranslation(position.x, position.y, position.z);
