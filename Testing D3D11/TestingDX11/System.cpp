@@ -412,7 +412,7 @@ void System::run()
 							this->change(this->mouseShow);
 							ShowCursor(this->mouseShow);
 						}
-						if (theKey == 9) //tab
+						if (theKey == 'V') //tab
 						{
 							moveScreen = false;
 						}
@@ -444,7 +444,7 @@ void System::run()
 							up_down = Neutral;
 						else if (theKey == 16) //shift
 							up_down = Neutral;
-						if (theKey == 9) //tab
+						if (theKey == 'V') //tab
 						{
 							moveScreen = true;
 						}

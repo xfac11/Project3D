@@ -98,27 +98,6 @@ bool ParticleSystem::Frame(float frameTime, ID3D11DeviceContext * deviceContext)
 	return true;
 }
 
-void ParticleSystem::Render(ColorShader & shader, ID3D11DeviceContext * deviceContext)
-{
-	// Set vertex buffer stride and offset.
-	unsigned int stride = sizeof(Vertex3D);
-	unsigned int offset = 0;
-	deviceContext->PSSetShaderResources(0, 1, &this->theTexture.getTexture());
-	deviceContext->PSSetShaderResources(1, 1, &this->normal.getTexture());
-	// Set the vertex buffer to active in the input assembler so it can be rendered.
-	deviceContext->IASetVertexBuffers(0, 1, &this->vertexBuffer, &stride, &offset);
-
-	// Set the index buffer to active in the input assembler so it can be rendered.
-	deviceContext->IASetIndexBuffer(this->indexBuffer, DXGI_FORMAT_R32_UINT, 0);
-
-	// Set the type of primitive that should be rendered from this vertex buffer.
-	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	deviceContext->PSSetSamplers(0, 1, &this->SamplerState);
-	shader.RenderShader(deviceContext, indexCount);
-	//this->calculateModelVectors();
-}
-
 void ParticleSystem::draw(DeferedShader & shader, ID3D11DeviceContext * deviceContext)
 {
 	// Set vertex buffer stride and offset.
@@ -166,9 +145,7 @@ void ParticleSystem::billboard( DirectX::XMFLOAT3 camPos) //can do this in GS?
 
 	worldMatrix = DirectX::XMLoadFloat4x4(&world);
 	worldMatrix = DirectX::XMMatrixRotationY(rotation);
-	// Setup the translation matrix from the billboard model.
 	translateMatrix = DirectX::XMMatrixTranslation(position.x, position.y, position.z);
-	// Finally combine the rotation and translation matrices to create the final world matrix for the billboard model.
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, translateMatrix);
 	DirectX::XMStoreFloat4x4(&this->world, worldMatrix);
 }
@@ -401,7 +378,7 @@ void ParticleSystem::UpdateParticles(float frameTime)
 
 void ParticleSystem::KillParticles() 
 {
-	// Kill all the particles that have gone below a certain height range.
+
 	for (int i = 0; i < this->maxParticles; i++)
 	{
 		if ((this->particleList[i].active == true) && (this->particleList[i].position.y < -10.0f)) //rather how deep from start pos will it go

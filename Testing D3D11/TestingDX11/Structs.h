@@ -21,7 +21,7 @@ struct MatrixBuffers
 	DirectX::XMMATRIX view;
 	DirectX::XMMATRIX projection;
 	DirectX::XMFLOAT3 camPos; //12
-	float padding;
+	float choice;
 };
 struct Specular
 {

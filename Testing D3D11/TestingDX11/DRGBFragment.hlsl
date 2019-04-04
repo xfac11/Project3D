@@ -60,7 +60,7 @@ PS_OUT PS_main(PS_IN input)
 	output.TexColor = Tex.Sample(SampSt, input.Tex);
 	float3 normalColor = Nor.Sample(SampSt, input.Tex);
 	
-	normalColor = (normalColor*2.f) - 1.f;
+	normalColor = normalColor*2.f - 1.f;
 	
 	bumpNormal = (normalColor.x* input.TangentWS) + (normalColor.y*input.BinormalWS) +(normalColor.z*input.NormalWS);
 	bumpNormal = normalize(bumpNormal);
@@ -71,9 +71,9 @@ PS_OUT PS_main(PS_IN input)
 	float y = (0.5f*input.NormalWS.y) + 0.5f;
 	float z = (0.5f*input.NormalWS.z) + 0.5f;
 
-	//float bux = (0.5f*bumpNormal.x) + 0.5f;  //bumpNormal //input.NormalWS.xyz
-	//float buy = (0.5f*bumpNormal.y) + 0.5f;
-	//float buz = (0.5f*bumpNormal.z) + 0.5f;
+	float bux = (0.5f*bumpNormal.x) + 0.5f;  //bumpNormal //input.NormalWS.xyz
+	float buy = (0.5f*bumpNormal.y) + 0.5f;
+	float buz = (0.5f*bumpNormal.z) + 0.5f;
 
 	//float xP = (0.5f*input.PositionWS.x) + 0.5f;
 	//float yP = (0.5f*input.PositionWS.y) + 0.5f;
@@ -85,10 +85,9 @@ PS_OUT PS_main(PS_IN input)
 	output.Normal = float4(norScale, 1.0f); 
 	output.Pos = float4(xP, yP, zP, 1.0f);
 
-	output.BumpNor = float4(bumpNormal, 1.f);;//float4(bux,buy,buz, 1.0f);
+	output.BumpNor = float4(bux,buy,buz, 1.f);;//float4(bux,buy,buz, 1.0f);
 
-	
-	//output.Pos = mul(world,float4(input.PositionWS, 1.0f));
+
 
 	return output;
 }

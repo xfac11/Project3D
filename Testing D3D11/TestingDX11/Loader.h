@@ -1,14 +1,14 @@
 #ifndef LOADER_H
 #define LOADER_H
-#include<iostream>
-#include<vector>
-#include<fstream>
+#include <iostream>
+#include <vector>
+#include <fstream>
 #include <d3d11.h>
 #include <directxmath.h>
-#include<direct.h>
-#include<string>
-#include"Texture.h"
-#include"Vertex3D.h"
+#include <direct.h>
+#include <string>
+#include "Texture.h"
+#include "Vertex3D.h"
 class Loader
 {
 public:

@@ -13,9 +13,10 @@ void Graphics::initImgui(HWND & hWnd)
 void Graphics::move(Direction forward, Direction left_right, Direction up_down, bool flyMode, int mouseX, int mouseY, 
 	int mousePosX, int mousePosY, bool mouseLeft)
 {
-
-	float ground_level = 0.f;
-	float gravity = -2.82f;
+	float height_of_player = 2.f;
+	float ground_level = 0;
+	ground_level = this->theTerrain->getHeightOfTerrain(camPos);
+	float gravity = -2.2f;
 	this->height = this->camPos.y - ground_level;
 	
 	float timePassed = sqrt(2 * height / abs(gravity));
@@ -24,14 +25,14 @@ void Graphics::move(Direction forward, Direction left_right, Direction up_down, 
 	float speed = 0.22f*ImGui::GetIO().DeltaTime;
 	int sensitivity = 30;
 
-	bool onGround = false;
+	//bool onGround = false;
 
-	if (theTerrain->checkCollision(camPos) == true)
-	{
-		mouseObject = "Terrain collide";
-		onGround = true;
-	}
-	else mouseObject = "NULL";
+	//if (theTerrain->checkCollision(camPos) == true)
+	//{
+	//	mouseObject = "Terrain collide";
+	//	onGround = true;
+	//}
+	//else mouseObject = "NULL";
 
 
 	if (abs(camRot.x) > 87.f)
@@ -47,7 +48,7 @@ void Graphics::move(Direction forward, Direction left_right, Direction up_down, 
 	if(this->camRot.y < -180)
 		this->camRot.y = 180;
 	
-	if (onGround==true && up_down==Positive) //change this to collision checks with platforms  this->camPos.y <= ground_level
+	if (this->camPos.y  <= ground_level+ height_of_player && up_down==Positive) //change this to collision checks with platforms  this->camPos.y <= ground_level
 	{
 		this->isJumping = true;
 	}
@@ -60,10 +61,11 @@ void Graphics::move(Direction forward, Direction left_right, Direction up_down, 
 	}
 	else //no flying
 	{
-		if (onGround == false)//this->camPos.y > ground_level
+		if (this->camPos.y > height_of_player+ ground_level)//onGround == false)
 		{
 			this->camPos.y += velocity*ImGui::GetIO().DeltaTime; //fall
 		}
+		else this->camPos.y += 2.f*ImGui::GetIO().DeltaTime;
 
 		if (this->isJumping == true)
 		{
@@ -109,12 +111,12 @@ void Graphics::move(Direction forward, Direction left_right, Direction up_down, 
 	}
 	
 
+	//mouse picking check
 	if(mouseLeft == true)
 	{
 		if (beginCheck == false)
 		{
 			beginCheck = true;
-			
 			intersectionTest(mousePosX, mousePosY, this->theModel[4]->getPosition(), 2.f);
 		}
 	}
@@ -138,19 +140,17 @@ void Graphics::renderImgui()
 	ImGui::SliderFloat("Camera Z-Position", &camPos.z, -10.0f, 256.0f); //W & S
 	ImGui::SliderFloat("Camera X-Rotation", &camRot.x, -90.0f, 90.0f); //Mouse
 	ImGui::SliderFloat("Camera Y-Rotation", &camRot.y, -180.0f, 180.0f);//Mouse
-	ImGui::SliderFloat("[unused]Camera Z-Rotation", &camRot.z, -360.0f, 360.0f);//Mouse
-	ImGui::SliderFloat("World Rotation", &gIncrement, -6.0f, 6.0f);
-	ImGui::ColorEdit3("bg-color", (float*)&this->color);
-
-	//textUse = "Fly - Mode[true / false]: [" + std::to_string();
-	//ImGui::Text(textUse);
+//	ImGui::SliderFloat("[unused]Camera Z-Rotation", &camRot.z, -360.0f, 360.0f);//Mouse
+//	ImGui::SliderFloat("World Rotation", &gIncrement, -6.0f, 6.0f);
+//	ImGui::ColorEdit3("bg-color", (float*)&this->color);
+	ImGui::SliderInt("Deferred Render", &this->texToShow, 0, 4);
+	ImGui::Checkbox("Freeze culling ", &freezeCheck);
 	textUse = "Mouse pick: " + this->mouseObject + ". ";
 	ImGui::Text(textUse.c_str());
-
 	textUse = "Height from 'Ground': " + std::to_string(this->height)+ "m";
 	ImGui::Text(textUse.c_str());
 	ImGui::CaptureKeyboardFromApp(true);
-	//ImGui::ColorEdit4("Triangle data", (float*)gConstantBufferData);
+
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	ImGui::End();
 }
@@ -203,8 +203,8 @@ Graphics::Graphics()
 	{
 		this->theModel[i] = nullptr;
 	}
-	this->theColorShader[0] = nullptr; 
-	this->theColorShader[1] = nullptr;
+	//this->theColorShader[0] = nullptr; 
+	//this->theColorShader[1] = nullptr;
 	this->theTerrain = nullptr;
 	this->particles = nullptr;
 
@@ -227,8 +227,16 @@ Graphics::Graphics()
 
 	this->rotaxis = DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 
+	//backfaceCull
+	this->freezeCheck = false;
+	this->cullingPos = { 0,0,0 };
+
+	//mousepick
 	this->mouseObject = "NULL";
 	this->beginCheck =false;
+
+	//deferred render
+	this->texToShow = 0;
 }
 
 Graphics::~Graphics()
@@ -241,6 +249,11 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	bool result = false;
 	this->daScreenWidth = screenWidth;
 	this->daScreenHeight = screenHeight;
+
+	for (int i = 0; i < cap; i++) {
+		modelDistArray[i] = i;
+	}
+
 	//if (this->Direct3D == nullptr)
 	//	throw std::bad_alloc();
 	this->Direct3D = new D3D;
@@ -273,28 +286,28 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		result = false;
 	}
 
-	theColorShader[0] = new ColorShader;
-	//if (theColorShader[0]==nullptr)
+	//theColorShader[0] = new ColorShader;
+	////if (theColorShader[0]==nullptr)
+	////{
+	////	MessageBox(hwnd, "Could not create the color shader object.", "Error", MB_OK);
+	////	return false;
+	////}
+	//result = theColorShader[0]->Initialize(Direct3D->GetDevice(), hwnd, L"GeometryGrid.hlsl"); //grid init
+	//if (result == false)
 	//{
-	//	MessageBox(hwnd, "Could not create the color shader object.", "Error", MB_OK);
-	//	return false;
+	//	MessageBox(hwnd, "Could not initialize the color shader object.", "Error", MB_OK);
+
 	//}
-	result = theColorShader[0]->Initialize(Direct3D->GetDevice(), hwnd, L"GeometryGrid.hlsl"); //grid init
-	if (result == false)
-	{
-		MessageBox(hwnd, "Could not initialize the color shader object.", "Error", MB_OK);
+	//theColorShader[1] = new ColorShader;
+	//result = theColorShader[1]->Initialize(Direct3D->GetDevice(), hwnd, L"GeometryShader.hlsl");//objects init
+	//if (result == false)
+	//{
+	//	MessageBox(hwnd, "Could not initialize the color shader object.", "Error", MB_OK);
 
-	}
-	theColorShader[1] = new ColorShader;
-	result = theColorShader[1]->Initialize(Direct3D->GetDevice(), hwnd, L"GeometryShader.hlsl");//objects init
-	if (result == false)
-	{
-		MessageBox(hwnd, "Could not initialize the color shader object.", "Error", MB_OK);
-
-	}
+	//}
 	
 	//defered render
-	this->fullQuad = new OrthoWindow;
+	this->fullQuad = new FullscreenQuad;
 	if (!fullQuad)
 		return false;
 	result = fullQuad->Initialize(this->Direct3D->GetDevice(), screenWidth, screenHeight);
@@ -353,9 +366,7 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	this->theModel[1]->loadOBJ("eb_house_plant_01.obj","smooth_32.tga", this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext());
 	this->theModel[1]->createTheVertexBuffer(this->Direct3D->GetDevice());
 
-	this->theModel[2]->addCube({ 0,0,0 }, 2, 2, 2);
-	this->theModel[2]->insertCubesInVec();
-	this->theModel[2]->setTheTexture(this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext(), "pebbles_color_1024_32.tga", "pebbles_normal_1024_32.tga");
+	this->theModel[2]->loadOBJ("cube.obj", "normal_test_32.tga", this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext());
 	this->theModel[2]->createTheVertexBuffer(this->Direct3D->GetDevice());
 
 	this->theModel[3]->loadOBJ("cube.obj", "smooth_32.tga", this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext());
@@ -369,11 +380,8 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 	this->theModel[5]->addCube({ 0,0,0 }, 2, 2, 2);
 	this->theModel[5]->insertCubesInVec();
-	this->theModel[5]->setTheTexture(this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext(), "pebbles_color_1024_32.tga", "pebbles_normal_1024_32.tga");
+	this->theModel[5]->setTheTexture(this->Direct3D->GetDevice(), this->Direct3D->GetDeviceContext(), "lovelive.tga", "pebbles_normal_1024_32.tga");
 	this->theModel[5]->createTheVertexBuffer(this->Direct3D->GetDevice());
-
-
-	//load sphere for
 
 	this->theModel[0]->setSampler(this->Direct3D->GetDevice());
 	this->theModel[1]->setSampler(this->Direct3D->GetDevice());
@@ -409,10 +417,10 @@ void Graphics::Shutdown()
 		delete this->theModel[i];
 	}
 	delete[] theModel;
-	this->theColorShader[0]->Shutdown();
-	this->theColorShader[1]->Shutdown();
-	delete theColorShader[0];
-	delete theColorShader[1];
+	//this->theColorShader[0]->Shutdown();
+	//this->theColorShader[1]->Shutdown();
+	//delete theColorShader[0];
+	//delete theColorShader[1];
 	
 	this->Direct3D->Shutdown();
 	delete Direct3D;
@@ -508,29 +516,66 @@ void Graphics::renderToTexture()
 	// Rotate the world matrix by the rotation value so that the cube will spin.
 	DirectX::XMFLOAT3 spec(0.1f, 0.1f, 0.0f);
 
-	this->dShader->setCamPosToMatricesPerFrame(this->camPos); //this->camPos
+	if (freezeCheck == false)
+	{
+		this->cullingPos = this->camPos;
+		this->dShader->setCamPosToMatricesPerFrame(this->camPos); //this->camPos
+	}
+	else this->dShader->setCamPosToMatricesPerFrame(this->cullingPos);
 
-	this->dShader->SetShaderParameters(this->Direct3D->GetDeviceContext(), DirectX::XMLoadFloat4x4(&this->theTerrain->getWorld()), this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix(), spec, 0.1f);
-	theTerrain->Render(*this->dShader, this->Direct3D->GetDeviceContext());
 
+	DirectX::XMVECTOR rotaxis = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	this->theModel[2]->rot += 0.01f;
+	float movex = sin(this->theModel[2]->rot);
+	//this->theModel[2]->move(0.0f, movex, 0.0f);
+	if (this->theModel[2]->rot > 3.141590f * 2)
+	{
+		this->theModel[2]->rot = 0;
+	}
+	this->theModel[2]->rotate(rotaxis, this->theModel[2]->rot);
 
 	// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
-	this->dShader->SetShaderParameters(this->Direct3D->GetDeviceContext(), DirectX::XMLoadFloat4x4(&this->theModel[2]->getId()), this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix(), spec, 1.0f);
-	this->theModel[2]->draw(*this->dShader, this->Direct3D->GetDeviceContext());
-	this->dShader->SetShaderParameters(this->Direct3D->GetDeviceContext(), DirectX::XMLoadFloat4x4(&this->theModel[3]->getId()), this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix(), spec, 1.0f);
-	this->theModel[3]->draw(*this->dShader, this->Direct3D->GetDeviceContext());
-	this->dShader->SetShaderParameters(this->Direct3D->GetDeviceContext(), DirectX::XMLoadFloat4x4(&this->theModel[1]->getId()), this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix(), spec, 1.0f);
-	this->theModel[1]->draw(*this->dShader, this->Direct3D->GetDeviceContext());
-	this->dShader->SetShaderParameters(this->Direct3D->GetDeviceContext(), DirectX::XMLoadFloat4x4(&this->theModel[0]->getId()), this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix(), spec, 1.0f);
-	this->theModel[0]->draw(*this->dShader, Direct3D->GetDeviceContext());
-	this->dShader->SetShaderParameters(this->Direct3D->GetDeviceContext(), DirectX::XMLoadFloat4x4(&this->theModel[5]->getId()), this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix(), spec, 1.0f);
-	this->theModel[5]->draw(*this->dShader, Direct3D->GetDeviceContext());
+	//this->dShader->SetShaderParameters(this->Direct3D->GetDeviceContext(), DirectX::XMLoadFloat4x4(&this->theModel[2]->getId()), this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix(), spec, 1.0f);
+	//this->theModel[2]->draw(*this->dShader, this->Direct3D->GetDeviceContext());
+	//this->dShader->SetShaderParameters(this->Direct3D->GetDeviceContext(), DirectX::XMLoadFloat4x4(&this->theModel[3]->getId()), this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix(), spec, 1.0f);
+	//this->theModel[3]->draw(*this->dShader, this->Direct3D->GetDeviceContext());
+	//this->dShader->SetShaderParameters(this->Direct3D->GetDeviceContext(), DirectX::XMLoadFloat4x4(&this->theModel[1]->getId()), this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix(), spec, 1.0f);
+	//this->theModel[1]->draw(*this->dShader, this->Direct3D->GetDeviceContext());
+	//this->dShader->SetShaderParameters(this->Direct3D->GetDeviceContext(), DirectX::XMLoadFloat4x4(&this->theModel[0]->getId()), this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix(), spec, 1.0f);
+	//this->theModel[0]->draw(*this->dShader, Direct3D->GetDeviceContext());
+	//this->dShader->SetShaderParameters(this->Direct3D->GetDeviceContext(), DirectX::XMLoadFloat4x4(&this->theModel[5]->getId()), this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix(), spec, 1.0f);
+	//this->theModel[5]->draw(*this->dShader, Direct3D->GetDeviceContext());
 	// Render the model using the deferred shader.
-
-	//
 	this->theModel[4]->billboard(this->camPos);
-	this->dShader->SetShaderParameters(this->Direct3D->GetDeviceContext(), DirectX::XMLoadFloat4x4(&this->theModel[4]->getId()), this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix(),spec, 1.0f );
-	this->theModel[4]->draw(*this->dShader, Direct3D->GetDeviceContext());
+
+	for (int i = 0; i < cap; i++)
+	{
+		this->theModel[i]->setDistanceToCam(camPos);
+	}
+	float temp = 0;
+	int maxPos = 0;
+	
+	for (int i = 0; i < cap - 1; i++) {
+		maxPos = i;
+		for (int j = i + 1; j < cap; j++) {
+			if (this->theModel[modelDistArray[maxPos]]->getDistanceToCam() > this->theModel[modelDistArray[j]]->getDistanceToCam()) {
+
+				maxPos = j;
+
+			}
+		}
+		temp = (float)modelDistArray[maxPos];
+		modelDistArray[maxPos] = modelDistArray[i];
+		modelDistArray[i] = (int)temp;
+	}
+	for (int i = 0; i < cap; i++)
+	{
+		this->dShader->SetShaderParameters(this->Direct3D->GetDeviceContext(), DirectX::XMLoadFloat4x4(&this->theModel[modelDistArray[i]]->getId()), this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix(), spec, 1.0f);
+		this->theModel[modelDistArray[i]]->draw(*this->dShader, this->Direct3D->GetDeviceContext());
+
+	}
+	//
+	
 
 	//this->Direct3D->EnableAlphaBlending();
 	this->particles->billboard(this->camPos);
@@ -538,9 +583,8 @@ void Graphics::renderToTexture()
 	this->particles->draw(*this->dShader, Direct3D->GetDeviceContext());
 	//this->Direct3D->DisableAlphaBlending();
 
-
-
-
+	this->dShader->SetShaderParameters(this->Direct3D->GetDeviceContext(), DirectX::XMLoadFloat4x4(&this->theTerrain->getWorld()), this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix(), spec, 0.1f);
+	theTerrain->Render(*this->dShader, this->Direct3D->GetDeviceContext());
 
 	ID3D11RenderTargetView* nullRTV = nullptr;
 	this->Direct3D->GetDeviceContext()->OMSetRenderTargets(1, &nullRTV, nullptr);
@@ -558,24 +602,17 @@ void Graphics::deferredRender()
 	Direct3D->BeginScene(this->color);
 
 	Direct3D->turnOffZ();
-	fullQuad->Render(this->Direct3D->GetDeviceContext());//Prepares and sets the vertex buffer 
-
-	DirectX::XMVECTOR rotaxis = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-	this->theModel[2]->rot += 0.01f;
-	float movex = sin(this->theModel[2]->rot);
-	//this->theModel[2]->move(0.0f, movex, 0.0f);
-	if (this->theModel[2]->rot > 3.141590f * 2)
-	{
-		this->theModel[2]->rot = 0;
-	}
+	fullQuad->insertBuffers(this->Direct3D->GetDeviceContext());//Prepares and sets the vertex buffer 
 	//this->theModel[2]->setWorld();
+
+
 	//this->theModel[1]->setWorld();
 
 	PointLight light1;
 	DirectX::XMMATRIX worldID1 = DirectX::XMMatrixIdentity();
-	worldID1 = DirectX::XMMatrixTranslation(20.0f,2.0f, 40.0f);//Sets the position of the light to the sphere
-	DirectX::XMFLOAT4 lPos(0.0f, 0.0f, 0.0f, 20.0f);
-	DirectX::XMFLOAT4 lColor(0.4f, 0.4f,0.4f, 1.0f);
+	worldID1 = DirectX::XMMatrixTranslation(18.0f,5.0f, 25.0f);//Sets the position of the light to the sphere
+	DirectX::XMFLOAT4 lPos(0.0f, 0.0f, 0.0f, 25.0f);
+	DirectX::XMFLOAT4 lColor(0.8f, 0.8f,0.8f, 10.0f);
 	light1.position=lPos;
 	light1.world= worldID1;
 	light1.color= lColor;
@@ -625,7 +662,7 @@ void Graphics::deferredRender()
 
 	//this->gBuffer->setShaderResViews(this->Direct3D->GetDeviceContext());
 	//this->theColorShader->SetShaderParameters(this->Direct3D->GetDeviceContext(), DirectX::XMLoadFloat4x4(&this->theModel[2]->getId()), this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix());// lPos, lColor, 1.0f, 1.0f);
-	this->lShader->SetShaderParameters(this->Direct3D->GetDeviceContext(), worldID1, this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix(), light1, this->camPos);
+	this->lShader->SetShaderParameters(this->Direct3D->GetDeviceContext(), worldID1, this->theCamera->GetViewMatrix(), this->Direct3D->GetProjectionMatrix(), light1, this->camPos, this->texToShow);
 
 	//this->lShader->SetShaderParameters(this->Direct3D->GetDeviceContext(), DirectX::XMLoadFloat4x4(&this->theModel[2]->getId()), this->theCamera->GetViewMatrix(), this->Direct3D->GetOrthoMatrix(), this->gBuffer->getShaderResView(0), this->gBuffer->getShaderResView(1), lPos, lColor, 1.0f, 1.0f);
 	//Fix properties in the shaders. Entrypoint and shader type
@@ -642,21 +679,18 @@ void Graphics::deferredRender()
 
 void Graphics::intersectionTest(int posX, int posY, DirectX::XMFLOAT3 ObjPosition, float radius)
 {
-	float pointX;
-	float pointY;
-	DirectX::XMMATRIX inverseViewMatrix;
 	DirectX::XMMATRIX worldMatrix = Direct3D->GetWorldMatrix();
 	DirectX::XMMATRIX translateMatrix;
-	DirectX::XMMATRIX inverseWorldMatrix;
-	DirectX::XMFLOAT3 direction;
-	DirectX::XMFLOAT3 origin;
-	DirectX::XMFLOAT3 rayOrigin;
+	DirectX::XMMATRIX inverseViewMatrix = DirectX::XMMatrixInverse(NULL, this->theCamera->GetViewMatrix());
+	DirectX::XMMATRIX inverseWorldMatrix = DirectX::XMMatrixInverse(NULL, worldMatrix);
+	//DirectX::XMFLOAT3 origin;
+	//DirectX::XMFLOAT3 rayOrigin;
 	DirectX::XMFLOAT3 rayDirection;
-	bool intersect;
+	bool intersect = false;
 
 	// Move the mouse cursor coordinates into the -1 to +1 range.
-	pointX = ((2.0f * (float)posX) / (float)daScreenWidth) - 1.0f;
-	pointY = (((2.0f * (float)posY) / (float)this->daScreenHeight) - 1.0f) * -1.0f;
+	float pointX = ((2.0f * (float)posX) / (float)daScreenWidth) - 1.0f;
+	float pointY = (((2.0f * (float)posY) / (float)this->daScreenHeight) - 1.0f) * -1.0f;
 
 	// Adjust the points using the projection matrix to account for the aspect ratio of the viewport.
 	DirectX::XMFLOAT4X4 tempView; 
@@ -665,36 +699,30 @@ void Graphics::intersectionTest(int posX, int posY, DirectX::XMFLOAT3 ObjPositio
 	DirectX::XMStoreFloat4x4(&tempView, Direct3D->GetProjectionMatrix());
 	pointY = pointY / tempView._22;
 
-	// Get the inverse of the view matrix.
-	inverseViewMatrix = DirectX::XMMatrixInverse(NULL, this->theCamera->GetViewMatrix());
-	
 	DirectX::XMFLOAT4X4 tempInv;
 	DirectX::XMStoreFloat4x4(&tempInv, inverseViewMatrix);
 
 	// Calculate the direction of the picking ray in view space.
+	DirectX::XMFLOAT3 direction;
 	direction.x = (pointX * tempInv._11) + (pointY * tempInv._21) + tempInv._31;
 	direction.y = (pointX * tempInv._12) + (pointY * tempInv._22) + tempInv._32;
 	direction.z = (pointX * tempInv._13) + (pointY * tempInv._23) + tempInv._33;
 
 	// Get the origin of the picking ray which is the position of the camera.
-	origin = camPos;
-
+	//origin = camPos;
 	// Get the world matrix and translate to the location of the sphere.
 	translateMatrix = DirectX::XMMatrixTranslation(ObjPosition.x,ObjPosition.y,ObjPosition.z);//sphere location
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix,translateMatrix);
 
-	// Now get the inverse of the translated world matrix.
-	inverseWorldMatrix = DirectX::XMMatrixInverse(NULL, worldMatrix);
-
 	// Now transform the ray origin and the ray direction from view space to world space.
-	DirectX::XMVECTOR tempRayOrigin = DirectX::XMVector3TransformCoord(DirectX::XMLoadFloat3(&origin), inverseWorldMatrix);
-	DirectX::XMStoreFloat3(&rayOrigin, tempRayOrigin);
+	//DirectX::XMVECTOR tempRayOrigin = DirectX::XMVector3TransformCoord(DirectX::XMLoadFloat3(&origin), inverseWorldMatrix);
+	//DirectX::XMStoreFloat3(&rayOrigin, tempRayOrigin);
 
 	DirectX::XMVECTOR tempRayDirection = DirectX::XMVector3TransformNormal(DirectX::XMLoadFloat3(&direction), inverseWorldMatrix);
 	tempRayDirection= DirectX::XMVector3Normalize(tempRayDirection);
 	DirectX::XMStoreFloat3(&rayDirection, tempRayDirection);
 
-	// Now perform the ray-sphere intersection test.
+	//only spheres atm
 	intersect = sphereRayIntersection(camPos, rayDirection,ObjPosition, radius); //using campos directly instead of origin calcul
 	if (intersect == false)
 	{
@@ -704,20 +732,14 @@ void Graphics::intersectionTest(int posX, int posY, DirectX::XMFLOAT3 ObjPositio
 
 bool Graphics::sphereRayIntersection(DirectX::XMFLOAT3 rayOrigin, DirectX::XMFLOAT3 rayDirection, DirectX::XMFLOAT3 pos, float radius)
 {
-	//DirectX::XMLoadFloat3(&rayOrigin)
 	DirectX::XMVECTOR rayToPos = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&rayOrigin), DirectX::XMLoadFloat3(&pos));
-	
 	DirectX::XMVECTOR b = DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&rayDirection), rayToPos);
-	//float b = dot(rayDirection, rayOrigin - pos);
 	DirectX::XMFLOAT3 bb;
 	DirectX::XMStoreFloat3(&bb, b);
-
 	DirectX::XMVECTOR c = DirectX::XMVector3Dot(rayToPos, rayToPos); 
-	//float c = dot(rayOrigin - pos, rayOrigin - pos) - pow(radius, 2);
 	DirectX::XMFLOAT3 cc;
 	DirectX::XMStoreFloat3(&cc, c);
 	cc.x = cc.x - pow(radius, 2);
-
 	float root = pow(bb.x, 2) - cc.x;
 	if (root < 0.f)
 	{
@@ -725,50 +747,55 @@ bool Graphics::sphereRayIntersection(DirectX::XMFLOAT3 rayOrigin, DirectX::XMFLO
 	}
 	else
 	{
-		float t1 = (-bb.x + sqrt(root));
-		float t2 = (-bb.x - sqrt(root));
+		//float t1 = (-bb.x + sqrt(root));
+		//float t2 = (-bb.x - sqrt(root));
 		this->mouseObject = "Sphere";
 		return true;
 	}
 }
 
-bool Graphics::boxRayIntersection(DirectX::XMFLOAT3 rayOrigin, DirectX::XMFLOAT3 rayDirection, DirectX::XMFLOAT3 pos, float radius)
+bool Graphics::boxRayIntersection(DirectX::XMFLOAT3 rayOrigin, DirectX::XMFLOAT3 rayDirection, DirectX::XMFLOAT3 center, DirectX::XMFLOAT4 u_hu, DirectX::XMFLOAT4 v_hv, DirectX::XMFLOAT4 w_hw )
 {
 	//vec4 centre, u_hu, v_hv, w_hw,
 	float tmax = 1000000000;
 	float tmin = -1000000000;
 
-	//float t1;
-	//float t2;
-	//vec4 hArray[3] = { o.u_hu, o.v_hv, o.w_hw };
-	//vec3 p = o.centre.xyz - rayOrigin;
-	//for (int j = 0; j < 3; j++)
-	//{
-	//	float e = dot(hArray[j].xyz, p);
-	//	float f = dot(hArray[j].xyz, rayDir);
-	//	if (abs(f) != 0)
-	//	{
-	//		t1 = (e + hArray[j].w) / f;
-	//		t2 = (e - hArray[j].w) / f;
-	//		if (t1 > t2)
-	//		{
-	//			float temp = t1;
-	//			t1 = t2;
-	//			t2 = temp;
-	//		}
-	//		if (t1 > tmin)
-	//			tmin = t1;
-	//		if (t2 < tmax)
-	//			tmax = t2;
-	//		if (tmin > tmax || tmax < 0)
-	//			return -1;
-	//	}
-	//	else if (-e - hArray[j].w > 0 || -e + hArray[j].w < 0)
-	//		return -1;
-	//}
-	//if (tmin > 0)
-	//	return tmin;
-	//else
-	//	return tmax;
-	return false;
+	float t1;
+	float t2;
+	DirectX::XMFLOAT4 hArray[3] = { u_hu, v_hv, w_hw };
+	DirectX::XMFLOAT3 p = DirectX::XMFLOAT3(center.x - rayOrigin.x, center.y - rayOrigin.y, center.z - rayOrigin.z);
+	for (int j = 0; j < 3; j++)
+	{
+		DirectX::XMVECTOR e = DirectX::XMVector3Dot(DirectX::XMLoadFloat4(&hArray[j]), DirectX::XMLoadFloat3(&p));
+		DirectX::XMFLOAT3 ee;
+		DirectX::XMStoreFloat3(&ee, e);
+	
+		DirectX::XMVECTOR f = DirectX::XMVector3Dot(DirectX::XMLoadFloat4(&hArray[j]), DirectX::XMLoadFloat3(&rayDirection));
+		DirectX::XMFLOAT3 ff;
+		DirectX::XMStoreFloat3(&ff, f);
+
+		if (abs(ff.x) != 0)
+		{
+			t1 = (ee.x + hArray[j].w) / ff.x;
+			t2 = (ee.x - hArray[j].w) / ff.x;
+			if (t1 > t2)
+			{
+				float temp = t1;
+				t1 = t2;
+				t2 = temp;
+			}
+			if (t1 > tmin)
+				tmin = t1;
+			if (t2 < tmax)
+				tmax = t2;
+			if (tmin > tmax || tmax < 0)
+				return false;
+		}
+		else if (-ee.x - hArray[j].w > 0 || -ee.x + hArray[j].w < 0)
+			false;
+	}
+	if (tmin > 0)
+		return true;//tmin;
+	else
+		return true;//tmax;
 }

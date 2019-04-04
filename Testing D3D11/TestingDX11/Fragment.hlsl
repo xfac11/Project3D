@@ -6,23 +6,16 @@ struct VS_OUT
 	float3 Normal : NORMAL;
 	float3 ThePoint : MYVALUE;
 };
-cbuffer CB_PER_FRAME : register(b1)
-{
-	float4x4 worldMat;
-}
 Texture2D Tex:register(t0);
 SamplerState SampSt :register(s0);
 float4 PS_main(VS_OUT input) : SV_Target
 {
 	float3 color = Tex.Sample(SampSt, input.Tex).xyz;
-	float4 colorT= Tex.Sample(SampSt, input.Tex).xyzw;
 	float3 final_colour = float3(0.2f, 0.2f, 0.2f);
 	// diffuse, no attenuation.
 
 	float3 ambient = color * final_colour;
-	float3 light_pos = { 0.f,2.0f,-10.f };
-	
-	light_pos=mul((float3x3)worldMat, light_pos);//sending the worldmat to the fragment shader 
+	float3 light_pos = { 0.f,0.f,-3.f };
 	float3 light_colour = { 1.f,1.f,1.f };
 	// IMPLEMENT HERE DIFFUSE SHADING
 	float3 normal = normalize(input.Normal);
@@ -43,10 +36,11 @@ float4 PS_main(VS_OUT input) : SV_Target
 		float diffuse = max(theShade,0);*/
 	float diffuse = max(dot(normal, vecToLight),0); //smooth
 	float3 diffusefinal = color * light_colour*diffuse * 1.f *(1 / length(vecToLight));
-	final_colour = float3(ambient + diffusefinal);
+	final_colour = ambient + diffusefinal;
 
 	// UPDATE THIS LINE TO ACCOUNT FOR SATURATION (PIXEL COLOUR CANNOT GO OVER 1.0)
 		final_colour = min(final_colour,float3(1.0,1.0,1.0));
-		return float4(final_colour,0.0f);
+
+		return float4(final_colour,1.0f);
 		//return float4(diffuse, diffuse, diffuse, diffuse);
 }

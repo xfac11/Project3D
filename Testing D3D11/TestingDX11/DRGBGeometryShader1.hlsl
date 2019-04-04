@@ -38,14 +38,6 @@ void GSmain(triangle GSInput input[3], inout TriangleStream<GSOutput> theOutput)
 	float3 normal = cross(u, v);
 	normal = normalize(normal);
 
-	//float3 normal = mul(float4(normalize(cross(u, v)), 0.0f), worldMat).xyz;
-
-
-	//normal = mul(world,float4(normal, 1.0f)).xyz;
-	//float o1 = input[2].pos;
-	//float o3 = input[0].pos;
-
-
 
 
 	//backgface culling here
@@ -59,6 +51,7 @@ void GSmain(triangle GSInput input[3], inout TriangleStream<GSOutput> theOutput)
 			//output.PosCS = mul(input[i].PosCS, proj);
 			//output.PositionWS = mul(float4(input[i].PositionWS.xyz, 1.0f), world).xyz;
 			output.PositionWS = input[i].PositionWS;
+			//
 			//output.NormalWS = input[i].NormalWS;
 			output.NormalWS = normal;
 			output.Tex = input[i].Tex;

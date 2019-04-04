@@ -52,7 +52,6 @@ public:
 	void BeginScene(float color[4]);
 	void EndScene();
 
-
 	void setBackBuffer();
 	void setBackBuffer(ID3D11DepthStencilView* view);
 	void turnOnZ();
@@ -60,7 +59,6 @@ public:
 	void resetViewPort();
 	void EnableAlphaBlending();
 	void DisableAlphaBlending();
-
 
 	ID3D11Device*& GetDevice();
 	ID3D11DeviceContext*& GetDeviceContext();

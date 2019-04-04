@@ -6,7 +6,7 @@
 #include <vector>
 #include "Texture.h"
 #include "Vertex3D.h"
-#include "colorShader.h"
+//#include "colorShader.h"
 #include "DeferedShader.h"
 class ParticleSystem
 {
@@ -78,7 +78,7 @@ public:
 	bool Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext, std::string textureName, std::string normalFileName);
 	void Shutdown();
 	bool Frame(float frameTime, ID3D11DeviceContext* deviceContext);
-	void Render(ColorShader & shader, ID3D11DeviceContext* deviceContext);
+	//void Render(ColorShader & shader, ID3D11DeviceContext* deviceContext);
 	void draw(DeferedShader & shader, ID3D11DeviceContext* deviceContext);
 
 	//int GetIndexCount();

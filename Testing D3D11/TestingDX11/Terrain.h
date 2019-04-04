@@ -5,7 +5,7 @@
 #include <fstream>
 #include <vector>
 #include "Vertex3D.h"
-#include "ColorShader.h"
+//#include "ColorShader.h"
 #include "DeferedShader.h"
 #include "Texture.h"
 class Terrain
@@ -42,6 +42,8 @@ private:
 	HeightMapType* heightMap;
 	std::vector<Vertex3D> body;
 	//Vertex3D* terrainModel;
+	float findMod(float a, float b);
+	float baryCentric(DirectX::XMFLOAT3 p1, DirectX::XMFLOAT3 p2, DirectX::XMFLOAT3 p3, DirectX::XMFLOAT2 pos);
 
 
 	bool LoadSetupFile(char* filename);
@@ -66,8 +68,7 @@ public:
 	void setTheTexture(ID3D11Device *& gDevice, ID3D11DeviceContext *&gDeviceContext, std::string filename, std::string normalFileName);
 	void Shutdown();
 
-	bool checkCollision(DirectX::XMFLOAT3 camPos);
-	float getHeightOfTerrain(DirectX::XMFLOAT3 camPos);
+	float getHeightOfTerrain(DirectX::XMFLOAT3 currentPos);
 
 	void setWorld();
 	DirectX::XMFLOAT4X4 getWorld();

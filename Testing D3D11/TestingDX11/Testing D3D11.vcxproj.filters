@@ -22,11 +22,35 @@
     <Filter Include="Source Files\Project cpp">
       <UniqueIdentifier>{43d06b5a-a608-4e03-8bdd-dbb118db4591}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Project Headers\Inputs">
+      <UniqueIdentifier>{fc13b5ee-e71f-46a6-82d1-10d250922636}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Project cpp\Inputs">
+      <UniqueIdentifier>{0c13c986-571f-4c08-982e-b37ebfbec3a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Project Headers\Graphics">
+      <UniqueIdentifier>{f6882ec6-9d44-4bda-8e82-5646de9d4b57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Project cpp\graphics">
+      <UniqueIdentifier>{553e0857-38a4-4990-a0e2-18fbc0328d21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Project Headers\Graphics\Deferred Render">
+      <UniqueIdentifier>{248eac9c-1782-4ba4-b460-e465bab51c72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Project Headers\Graphics\HeightMap">
+      <UniqueIdentifier>{489d140b-04fa-432c-96ee-46a0569eee3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Project cpp\Forward Render Shader">
+      <UniqueIdentifier>{b686b8ce-2b22-4036-86bd-53fa5627f3aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Project cpp\graphics\Deferred Render">
+      <UniqueIdentifier>{7104136b-58d3-4c1b-bf5a-cebeb65facfd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Project Headers\Graphics\skybox">
+      <UniqueIdentifier>{a2dc89a7-9eb3-402e-824f-8fbcbdcf5053}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="imgui\imgui.cpp">
       <Filter>Source Files\imgui</Filter>
     </ClCompile>
@@ -45,9 +69,6 @@
     <ClCompile Include="imgui\imgui_widgets.cpp">
       <Filter>Source Files\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="QuadHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="D3DMain.cpp">
       <Filter>Source Files\Project cpp</Filter>
     </ClCompile>
@@ -57,38 +78,80 @@
     <ClCompile Include="Graphics.cpp">
       <Filter>Source Files\Project cpp</Filter>
     </ClCompile>
-    <ClCompile Include="D3D.cpp">
-      <Filter>Source Files\Project cpp</Filter>
+    <ClCompile Include="Keyboard.cpp">
+      <Filter>Source Files\Project cpp\Inputs</Filter>
     </ClCompile>
-    <ClCompile Include="myCamera.cpp">
-      <Filter>Source Files\Project cpp</Filter>
+    <ClCompile Include="KeyboardEvent.cpp">
+      <Filter>Source Files\Project cpp\Inputs</Filter>
+    </ClCompile>
+    <ClCompile Include="Mouse.cpp">
+      <Filter>Source Files\Project cpp\Inputs</Filter>
+    </ClCompile>
+    <ClCompile Include="MouseEvent.cpp">
+      <Filter>Source Files\Project cpp\Inputs</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">
-      <Filter>Source Files\Project cpp</Filter>
-    </ClCompile>
-    <ClCompile Include="Model.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture.cpp">
-      <Filter>Source Files\Project cpp</Filter>
+      <Filter>Source Files\Project cpp\graphics</Filter>
     </ClCompile>
     <ClCompile Include="ColorShader.cpp">
-      <Filter>Source Files\Project cpp</Filter>
+      <Filter>Source Files\Project cpp\graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Triangle.cpp">
-      <Filter>Source Files\Project cpp</Filter>
+    <ClCompile Include="D3D.cpp">
+      <Filter>Source Files\Project cpp\graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Cube.cpp">
-      <Filter>Source Files\Project cpp</Filter>
+    <ClCompile Include="Model.cpp">
+      <Filter>Source Files\Project cpp\graphics</Filter>
     </ClCompile>
-    <ClCompile Include="CubeHandler.cpp">
-      <Filter>Source Files\Project cpp</Filter>
-    </ClCompile>
-    <ClCompile Include="QuadVertex.cpp">
-      <Filter>Source Files\Project cpp</Filter>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Source Files\Project cpp\graphics</Filter>
     </ClCompile>
     <ClCompile Include="TextureLoad.cpp">
-      <Filter>Source Files\Project cpp</Filter>
+      <Filter>Source Files\Project cpp\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Cube.cpp">
+      <Filter>Source Files\Project cpp\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="CubeHandler.cpp">
+      <Filter>Source Files\Project cpp\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Terrain.cpp">
+      <Filter>Source Files\Project cpp\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleSystem.cpp">
+      <Filter>Source Files\Project cpp\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Loader.cpp">
+      <Filter>Source Files\Project cpp\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Particle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DeferedShader.cpp">
+      <Filter>Source Files\Project cpp\graphics\Deferred Render</Filter>
+    </ClCompile>
+    <ClCompile Include="GBuffer.cpp">
+      <Filter>Source Files\Project cpp\graphics\Deferred Render</Filter>
+    </ClCompile>
+    <ClCompile Include="LightShader.cpp">
+      <Filter>Source Files\Project cpp\graphics\Deferred Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Triangle.cpp">
+      <Filter>Source Files\Project cpp\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="QuadVertex.cpp">
+      <Filter>Source Files\Project cpp\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="QuadHandler.cpp">
+      <Filter>Source Files\Project cpp\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="SkyBox.cpp">
+      <Filter>Source Files\Project cpp\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="FullscreenQuad.cpp">
+      <Filter>Source Files\Project cpp\graphics\Deferred Render</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -122,6 +185,9 @@
     <ClInclude Include="bth_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="QuadVertex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Vertex3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -134,64 +200,123 @@
     <ClInclude Include="Graphics.h">
       <Filter>Header Files\Project Headers</Filter>
     </ClInclude>
-    <ClInclude Include="Input.h">
-      <Filter>Header Files\Project Headers</Filter>
+    <ClInclude Include="Keyboard.h">
+      <Filter>Header Files\Project Headers\Inputs</Filter>
     </ClInclude>
-    <ClInclude Include="Model.h">
-      <Filter>Header Files\Project Headers</Filter>
+    <ClInclude Include="KeyboardEvent.h">
+      <Filter>Header Files\Project Headers\Inputs</Filter>
     </ClInclude>
-    <ClInclude Include="D3D.h">
-      <Filter>Header Files\Project Headers</Filter>
+    <ClInclude Include="Mouse.h">
+      <Filter>Header Files\Project Headers\Inputs</Filter>
     </ClInclude>
-    <ClInclude Include="TextureShader.h">
-      <Filter>Header Files\Project Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>Header Files\Project Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="headerFiles.h">
-      <Filter>Header Files\Project Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="myCamera.h">
-      <Filter>Header Files\Project Headers</Filter>
+    <ClInclude Include="MouseEvent.h">
+      <Filter>Header Files\Project Headers\Inputs</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
-      <Filter>Header Files\Project Headers</Filter>
+      <Filter>Header Files\Project Headers\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="ColorShader.h">
-      <Filter>Header Files\Project Headers</Filter>
+      <Filter>Header Files\Project Headers\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Triangle.h">
-      <Filter>Header Files\Project Headers</Filter>
+    <ClInclude Include="D3D.h">
+      <Filter>Header Files\Project Headers\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Cube.h">
-      <Filter>Header Files\Project Headers</Filter>
+    <ClInclude Include="Model.h">
+      <Filter>Header Files\Project Headers\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="CubeHandler.h">
-      <Filter>Header Files\Project Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="QuadVertex.h">
-      <Filter>Header Files\Project Headers</Filter>
+    <ClInclude Include="Texture.h">
+      <Filter>Header Files\Project Headers\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="TextureLoad.h">
-      <Filter>Header Files\Project Headers</Filter>
+      <Filter>Header Files\Project Headers\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Cube.h">
+      <Filter>Header Files\Project Headers\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="CubeHandler.h">
+      <Filter>Header Files\Project Headers\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Triangle.h">
+      <Filter>Header Files\Project Headers\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Loader.h">
+      <Filter>Header Files\Project Headers\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleSystem.h">
+      <Filter>Header Files\Project Headers\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Particle.h">
+      <Filter>Header Files\Project Headers\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleHandler.h">
+      <Filter>Header Files\Project Headers\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Terrain.h">
+      <Filter>Header Files\Project Headers\Graphics\HeightMap</Filter>
+    </ClInclude>
+    <ClInclude Include="LightShader.h">
+      <Filter>Header Files\Project Headers\Graphics\Deferred Render</Filter>
+    </ClInclude>
+    <ClInclude Include="GBuffer.h">
+      <Filter>Header Files\Project Headers\Graphics\Deferred Render</Filter>
+    </ClInclude>
+    <ClInclude Include="DeferedShader.h">
+      <Filter>Header Files\Project Headers\Graphics\Deferred Render</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>Header Files\Project Headers\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="SkyBox.h">
+      <Filter>Header Files\Project Headers\Graphics\skybox</Filter>
+    </ClInclude>
+    <ClInclude Include="FullscreenQuad.h">
+      <Filter>Header Files\Project Headers\Graphics\Deferred Render</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui\imgui.ini">
       <Filter>Source Files\imgui</Filter>
     </None>
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Fragment.hlsl">
-      <Filter>Source Files</Filter>
-    </FxCompile>
-    <FxCompile Include="Vertex.hlsl">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Project cpp\Forward Render Shader</Filter>
     </FxCompile>
     <FxCompile Include="GeometryShader.hlsl">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Project cpp\Forward Render Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Vertex.hlsl">
+      <Filter>Source Files\Project cpp\Forward Render Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="VertexGrid.hlsl">
+      <Filter>Source Files\Project cpp\Forward Render Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="GeometryGrid.hlsl">
+      <Filter>Source Files\Project cpp\Forward Render Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="FragmentGrid.hlsl">
+      <Filter>Source Files\Project cpp\Forward Render Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="DRGBFragment.hlsl">
+      <Filter>Header Files\Project Headers\Graphics\Deferred Render</Filter>
+    </FxCompile>
+    <FxCompile Include="LSFragmentShader.hlsl">
+      <Filter>Header Files\Project Headers\Graphics\Deferred Render</Filter>
+    </FxCompile>
+    <FxCompile Include="DRGBVertexShader.hlsl">
+      <Filter>Header Files\Project Headers\Graphics\Deferred Render</Filter>
+    </FxCompile>
+    <FxCompile Include="DRGBGeometryShader1.hlsl">
+      <Filter>Header Files\Project Headers\Graphics\Deferred Render</Filter>
+    </FxCompile>
+    <FxCompile Include="LSVertexShader.hlsl">
+      <Filter>Header Files\Project Headers\Graphics\Deferred Render</Filter>
+    </FxCompile>
+    <FxCompile Include="SkyFragment.hlsl">
+      <Filter>Header Files\Project Headers\Graphics\skybox</Filter>
+    </FxCompile>
+    <FxCompile Include="SkyVertexShader.hlsl">
+      <Filter>Header Files\Project Headers\Graphics\skybox</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

@@ -190,7 +190,7 @@ void LightShader::RenderShader(ID3D11DeviceContext * deviceContext, int count)
 }
 
 bool LightShader::SetShaderParameters(ID3D11DeviceContext *& deviceContext, DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix,
-		 PointLight light, DirectX::XMFLOAT3 camPos)
+		PointLight light, DirectX::XMFLOAT3 camPos, int choice)
 {
 	/*PointLight *temp = new PointLight[4];
 	for (int i = 0; i < 4; i++)
@@ -216,6 +216,8 @@ bool LightShader::SetShaderParameters(ID3D11DeviceContext *& deviceContext, Dire
 	data->world = worldMatrix;//light.world;
 	data->view = XMMatrixTranspose(WorldView);
 	data->projection = WorldViewProj;
+	data->camPos = camPos;
+	data->choice = choice;
 	//for (int i = 0; i < 2; i++) //array  type
 	//{
 		dataSpec->position.x = light.position.x;//lightPos.x;//temp[0].x; 

@@ -5,12 +5,11 @@ bool Terrain::InitializeBuffers(ID3D11Device *& device)
 	// Set the index count to the same as the vertex count.
 	this->indexCount = this->vertexCount;
 
-
 	Vertex3D* vertices = new Vertex3D[this->vertexCount];
 	unsigned long* indices = new unsigned long[this->indexCount];
 	int index = 0; // Initialize the index to the vertex array.
-	float positionX = 0.f;
-	float positionZ = 0.f;
+	//float positionX = 0.f;
+	//float positionZ = 0.f;
 	D3D11_BUFFER_DESC vertexBufferDesc;
 	D3D11_BUFFER_DESC indexBufferDesc;
 	D3D11_SUBRESOURCE_DATA vertexData;
@@ -184,11 +183,35 @@ bool Terrain::InitializeBuffers(ID3D11Device *& device)
 	// Release the arrays now that the buffers have been created and loaded.
 	delete[] vertices;
 	vertices = nullptr;
-
 	delete[] indices;
 	indices = nullptr;
-
 	return true;
+}
+
+float Terrain::findMod(float a, float b)
+{
+	if (a < 0)
+		a = -a;
+	if (b < 0)
+		b = -b;
+
+	//repeatedly subtract
+	float mod = a;
+	while (mod >= b)
+		mod = mod - b;
+
+	if (a < 0)
+		return -mod;
+	return mod;
+}
+
+float Terrain::baryCentric(DirectX::XMFLOAT3 p1, DirectX::XMFLOAT3 p2, DirectX::XMFLOAT3 p3, DirectX::XMFLOAT2 pos)
+{
+	float det = (p2.z - p3.z)* (p1.x - p3.x) + (p3.x - p2.x)*(p1.z - p3.z);
+	float l1 = ((p2.z - p3.z)*(pos.x - p3.x) + (p3.x - p2.x)*(pos.y - p3.z)) / det;
+	float l2 = ((p3.z - p1.z)*(pos.x - p3.x) + (p1.x - p3.x)*(pos.y - p3.z)) / det;
+	float l3 = 1.f - l1 - l2;
+	return l1 * p1.y + l2 * p2.y + l3 * p3.y;
 }
 
 bool Terrain::LoadSetupFile(char * filename)
@@ -255,7 +278,6 @@ bool Terrain::LoadSetupFile(char * filename)
 
 bool Terrain::LoadBitmapHeightMap()
 {
-	int error;
 	int imageSize;
 	int index;
 	int k = 0;// Initialize the position in the image data buffer.
@@ -266,28 +288,25 @@ bool Terrain::LoadBitmapHeightMap()
 	unsigned char* bitmapImage;
 	unsigned char height;
 
-	// Start by creating the array structure to hold the height map data.
 	this->heightMap = new HeightMapType[this->terrainWidth * this->terrainHeight];
-	if (!heightMap)
+	this->heights = new float*[this->terrainWidth];
+	for (int i = 0; i < this->terrainWidth; i++)
 	{
-		return false;
+		this->heights[i] = new float[this->terrainHeight];
 	}
-
-	// Open the bitmap map file in binary.
-	error = fopen_s(&filePtr, terrainFilename, "rb");
+	
+	int error = fopen_s(&filePtr, terrainFilename, "rb");
 	if (error != 0)
 	{
 		return false;
 	}
 
-	// Read in the bitmap file header.
 	count = fread(&bitmapFileHeader, sizeof(BITMAPFILEHEADER), 1, filePtr);
 	if (count != 1)
 	{
 		return false;
 	}
-
-	// Read in the bitmap info header.
+	
 	count = fread(&bitmapInfoHeader, sizeof(BITMAPINFOHEADER), 1, filePtr);
 	if (count != 1)
 	{
@@ -304,83 +323,63 @@ bool Terrain::LoadBitmapHeightMap()
 	// Since we use non-divide by 2 dimensions (eg. 257x257) we need to add an extra byte to each line.
 	imageSize = terrainHeight * ((terrainWidth * 3) + 1);
 
-	// Allocate memory for the bitmap image data.
 	bitmapImage = new unsigned char[imageSize];
 	if (!bitmapImage)
 	{
 		return false;
 	}
-
-	// Move to the beginning of the bitmap data.
 	fseek(filePtr, bitmapFileHeader.bfOffBits, SEEK_SET);
 
-	// Read in the bitmap image data.
-	count = fread(bitmapImage, 1, imageSize, filePtr);
+	count = fread(bitmapImage, 1, imageSize, filePtr);//bitmap data.
 	if (count != imageSize)
 	{
 		return false;
 	}
 
-	// Close the file.
 	error = fclose(filePtr);
 	if (error != 0)
 	{
 		return false;
 	}
-
-
-	// Read the image data into the height map array.
 	for (int j = 0; j < terrainHeight; j++)
 	{
 		for (int i = 0; i < terrainWidth; i++)
 		{
-			// Bitmaps are upside down so load bottom to top into the height map array.
+			// load the height map array bottom to top because bitmaps are upside down
 			index = (terrainWidth * (terrainHeight - 1 - j)) + i;
-
-			// Get the grey scale pixel value from the bitmap image data at this location.
-			height = bitmapImage[k];
-
-			// Store the pixel value as the height at this point in the height map array.
-			heightMap[index].y = (float)height;
-
+			height = bitmapImage[k]; //grey scale pixel value
+			heightMap[index].y = (float)height; //pixel value as height
+			heights[i][j] = (float)height;;
 			// Increment the bitmap image data index.
 			k += 3;
 		}
-
 		// Compensate for the extra byte at end of each line in non-divide by 2 bitmaps (eg. 257x257).
 		k++;
 	}
-
-	// Release the bitmap image data now that the height map array has been loaded.
 	delete[] bitmapImage;
-	bitmapImage = nullptr;
-
-	// Release the terrain filename now that is has been read in.
 	delete[] terrainFilename;
-	terrainFilename = nullptr;
-
 	return true;
 }
 
 
 void Terrain::SetTerrainCoordinates()
 {
-	// Loop through all the elements in the height map array and adjust their coordinates correctly.
 	for (int j = 0; j < this->terrainHeight; j++)
 	{
 		for (int i = 0; i < this->terrainWidth; i++)
 		{
 			int index = (this->terrainWidth * j) + i;
 
-			// Set the X and Z coordinates.
+			// X and Z coord
 			this->heightMap[index].x = (float)i;
-			this->heightMap[index].z = -(float)j;
+			this->heightMap[index].z = -(float)j; //-
 
-			// Move the terrain depth into the positive range.  For example from (0, -256) to (256, 0).
+			// Move the terrain depth into the positive range. (0, -256) to (256, 0).
 			this->heightMap[index].z += (float)(this->terrainHeight - 1);
 
-			// Scale the height.
+			// Scale heights.
 			this->heightMap[index].y /= this->heightScale;
+			this->heights[i][j] /= this->heightScale;
 		}
 	}
 }
@@ -388,15 +387,9 @@ void Terrain::SetTerrainCoordinates()
 bool Terrain::BuildTerrainModel()
 {
 	int index = 0; // Initialize the index into the height map array.
-	//int index1, index2, index3, index4;
 
 	// Calculate the number of vertices in the 3D terrain model.
 	this->vertexCount = (this->terrainHeight - 1) * (this->terrainWidth - 1) * 6;
-
-	// Create the 3D terrain model array.
-	//this->terrainModel = new Vertex3D[this->vertexCount];
-	//if (!this->terrainModel)
-	//	return false;
 
 	// Load the 3D terrain model with the height map terrain data.
 	// We will be creating 2 triangles for each of the four points in a quad.
@@ -426,7 +419,6 @@ bool Terrain::BuildTerrainModel()
 			temp.u = 0.f;
 			temp.v = 0.f;
 			body.push_back(temp);
-		
 
 			// Triangle 1 - Upper right.
 			temp.x = this->heightMap[index2].x;
@@ -634,7 +626,7 @@ Terrain::Terrain()
 	DirectX::XMVECTOR rotaxis = DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 	DirectX::XMMATRIX rotTemp = DirectX::XMMatrixRotationAxis(rotaxis, 0);
 	DirectX::XMMATRIX scaleTemp = DirectX::XMMatrixScaling(0.0f, 0.0f, 0.0f);
-	DirectX::XMMATRIX translTemp = DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f);
+	DirectX::XMMATRIX translTemp = DirectX::XMMatrixTranslation(0.f, 0.f, 0.f);
 	DirectX::XMStoreFloat4x4(&this->Rotation, rotTemp);
 	DirectX::XMStoreFloat4x4(&this->Scale, scaleTemp);
 	DirectX::XMStoreFloat4x4(&this->Translation, translTemp);
@@ -654,54 +646,28 @@ bool Terrain::Initialize(ID3D11Device *&device, char* fileName)
 	result = LoadSetupFile(fileName);
 	if (!result)
 		return false;
-
 	result = LoadBitmapHeightMap();
 	if (!result)
 		return false;
 	SetTerrainCoordinates();
-
-	// Now build the 3D model of the terrain.
 	result = BuildTerrainModel();
 	if (!result)
 		return false;
 
-	if (this->heightMap)
+	/*if (this->heightMap)
 	{
 		delete[] heightMap;
 		this->heightMap = nullptr;
-	}
+	}*/
 
 	// Initialize the vertex and index buffer that hold the geometry for the terrain.
 	result = InitializeBuffers(device);
 	if (result)
 		result = true;
-
-	// Release the terrain model now that the rendering buffers have been loaded.
 	this->texture.cleanUp();
 	this->normal.cleanUp();
 	return result;
 }
-
-//void Terrain::Render(ColorShader & shader, ID3D11DeviceContext * deviceContext)
-//{
-//	// Set vertex buffer stride and offset.
-//	unsigned int stride = sizeof(Vertex3D);
-//	unsigned int offset = 0;
-//
-//	deviceContext->PSSetShaderResources(0, 1, &this->texture.getTexture());
-//	deviceContext->PSSetShaderResources(1, 1, &this->normal.getTexture());
-//	// Set the vertex buffer to active in the input assembler so it can be rendered.
-//	deviceContext->IASetVertexBuffers(0, 1, &this->vertexBuffer, &stride, &offset);
-//
-//	// Set the index buffer to active in the input assembler so it can be rendered.
-//	deviceContext->IASetIndexBuffer(this->indexBuffer, DXGI_FORMAT_R32_UINT, 0);
-//
-//	// Set the type of primitive that should be rendered from this vertex buffer, in this case a line list.
-//	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);// D3D11_PRIMITIVE_TOPOLOGY_LINELIST); //D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);// 
-//
-//	deviceContext->PSSetSamplers(0, 1, &this->SamplerState);
-//	shader.RenderShader(deviceContext, indexCount);
-//}
 
 void Terrain::Render(DeferedShader & shader, ID3D11DeviceContext * deviceContext)
 {
@@ -725,11 +691,6 @@ void Terrain::Render(DeferedShader & shader, ID3D11DeviceContext * deviceContext
 	//this->calculateModelVectors();
 }
 
-//int Terrain::GetIndexCount()
-//{
-//	return this->indexCount;
-//}
-
 void Terrain::setTheTexture(ID3D11Device *& gDevice, ID3D11DeviceContext *&gDeviceContext, std::string filename, std::string normalFileName)
 {
 	this->texture.setTexture(gDevice, gDeviceContext, filename);
@@ -744,7 +705,6 @@ void Terrain::Shutdown()
 		this->indexBuffer->Release();
 		this->indexBuffer = nullptr;
 	}
-
 	// Release the vertex buffer.
 	if (this->vertexBuffer)
 	{
@@ -764,120 +724,55 @@ void Terrain::Shutdown()
 		delete[] heightMap;
 		this->heightMap = nullptr;
 	}
-}
-
-bool Terrain::checkCollision(DirectX::XMFLOAT3 camPos)
-{
-	bool result = false;
-	bool found = false;
-	int faceCount = terrainWidth* 5 * 6;//this->vertexCount/3;
-	int index = 0;
-	DirectX::XMFLOAT3 vertex1 = {};
-	DirectX::XMFLOAT3 vertex2 = {};
-	DirectX::XMFLOAT3 vertex3 = {};
-
-	for (int i =0; i < faceCount&&found ==false; i++)
-	{	
-		vertex1.x = body.at(index).x;
-		vertex1.y = body.at(index).y;
-		vertex1.z = body.at(index).z;
-		index++;
-		vertex2.x = body.at(index).x;
-		vertex2.y = body.at(index).y;
-		vertex2.z = body.at(index).z;
-		index++;
-		vertex3.x = body.at(index).x;
-		vertex3.y = body.at(index).y;
-		vertex3.z = body.at(index).z;
-		index++;
-
-
-
-
-		//DirectX::XMFLOAT3 u = (vertex2.z - vertex1.z);
-		//DirectX::XMFLOAT3 v= (vertex3.z - vertex1.z);
-		//DirectX::XMFLOAT3 w = (camPos.z - vertex1);
-		
-
-		float w1 = ((vertex1.x*(vertex3.z - vertex1.z)) + ((camPos.z - vertex1.z)*(vertex3.x - vertex1.x)) - (camPos.x*(vertex3.z - vertex1.z))) /
-			(((vertex2.z - vertex1.z)*(vertex3.x - vertex1.x)) - ((vertex2.x - vertex1.x)*(vertex3.z - vertex1.z)));
-		
-		float temp = vertex3.z - vertex1.z;
-		if (temp == 0.f)
-			temp = 0.001f;
-		
-		float w2 = (camPos.z - vertex1.z - (w1 * (vertex2.z - vertex1.z))) /
-			temp;
-		if (w1 >= 0 && w2 >= 0 && (w1 + w2) <= 1.f)
-		{
- 			found = true;
-		}
-	}
-	// IMPLEMENT HERE
-	if (found == true)
+	if (this->heights)
 	{
-		DirectX::XMFLOAT3 rayDir = DirectX::XMFLOAT3(0, -1.f, 0);
-		DirectX::XMFLOAT3 w;  // ray vectors
-		float r; // params to calc ray-plane intersect
-
-		// tri vectors and normal
-		DirectX::XMFLOAT3 u = DirectX::XMFLOAT3(vertex2.x - vertex1.x, vertex2.y - vertex1.y, vertex2.z - vertex1.z);
-		DirectX::XMFLOAT3 v = DirectX::XMFLOAT3(vertex3.x - vertex1.x, vertex3.y - vertex1.y, vertex3.z - vertex1.z);
-		DirectX::XMFLOAT3 normal;
-		DirectX::XMStoreFloat3(&normal, DirectX::XMVector3Cross(DirectX::XMLoadFloat3(&u), DirectX::XMLoadFloat3(&v)));
-
-		DirectX::XMFLOAT3 w0 = DirectX::XMFLOAT3(camPos.x - vertex1.x, camPos.y - vertex1.y, camPos.z - vertex1.z); //ray vector from origin to tri
-		float a;// = -dot(normal, w0);
-		DirectX::XMStoreFloat(&a, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&normal), DirectX::XMLoadFloat3(&w0)));
-		a = -a;
-
-		float b;// = dot(normal, rayDir);
-		DirectX::XMStoreFloat(&b, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&normal), DirectX::XMLoadFloat3(&rayDir)));
-
-		if (abs(b) < 0)
-			result = false;
-		r = a / b;
-		if (r < 0.f)
-			result = false;
-
-		DirectX::XMFLOAT3 I = DirectX::XMFLOAT3(camPos.x + r * rayDir.x, camPos.y + r * rayDir.y, camPos.z + r * rayDir.z);
-		float uu, uv, vv, wu, wv, D;
-		//uu = dot(u, u);
-		DirectX::XMStoreFloat(&uu, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&u), DirectX::XMLoadFloat3(&u)));
-		//uv = dot(u, v);
-		DirectX::XMStoreFloat(&uv, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&u), DirectX::XMLoadFloat3(&v)));
-		//vv = dot(v, v);
-		DirectX::XMStoreFloat(&vv, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&v), DirectX::XMLoadFloat3(&v)));
-
-		w = DirectX::XMFLOAT3(I.x - vertex1.x, I.y - vertex1.y, I.z - vertex1.z);
-		//wu = dot(w, u);
-		DirectX::XMStoreFloat(&wu, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&w), DirectX::XMLoadFloat3(&u)));
-		//wv = dot(w, v);
-		DirectX::XMStoreFloat(&wv, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&w), DirectX::XMLoadFloat3(&v)));
-		D = uv * uv - uu * vv;
-
-		//parametric coords
-		float s = (uv * wv - vv * wu) / D;
-		float t = (uv * wu - uu * wv) / D;
-		if (s < 0.f || s > 1.f)
-			result = false;
-		if (t < 0.f || (s + t) > 1.f)
-			result = false;
-		if (r > 2.f&&r < 4.f)
-			result = true;
-		else
-			result = false;
-
+		for (int i = 0; i < terrainWidth; i++)
+		{
+			delete[i] heights[i];
+		}
+		delete[] heights;
+		
 	}
-	return result;
 }
 
-float Terrain::getHeightOfTerrain(DirectX::XMFLOAT3 camPos)
+float Terrain::getHeightOfTerrain(DirectX::XMFLOAT3 currentPos) //new
 {
-	//float terrainX= camPos.x - 
-	//	float 
-	//	float float floatfloa 
-	return 0.0f;
+	float height_level = 0.f;
+	float terrainX = currentPos.x - this->position.x;
+	float terrainZ = currentPos.z - this->position.z;
+	//size is 256 but our terrain quad is 1x1
+	float gridSquare = 1.f;// 256/(float)terrainWidth-1; 
+	int gridX = (int)floor(terrainX / gridSquare);
+	int gridZ = (int)floor(terrainZ / gridSquare);
+
+	//width and height should be same 'cus not sure which is which
+	if (gridX >= terrainWidth - 1 || gridZ >= terrainHeight - 1 ||
+		gridX < 0 || gridZ < 0)
+	{
+		//not currently located in the terrain
+		height_level = -10.f;
+		return height_level;
+	}
+	float xCoord = findMod(terrainX,gridSquare) / gridSquare;
+	float zCoord = findMod(terrainZ, gridSquare) / gridSquare;
+
+	if (xCoord <= (1 - zCoord))
+	{
+		height_level = this->baryCentric(
+			DirectX::XMFLOAT3(0, this->heights[gridX][gridZ], 0),
+			DirectX::XMFLOAT3(1, this->heights[gridX + 1][gridZ], 0),
+			DirectX::XMFLOAT3(0, this->heights[gridX][gridZ + 1], 1),
+			DirectX::XMFLOAT2(xCoord, zCoord));
+	}
+	else
+	{
+		height_level = this->baryCentric(
+			DirectX::XMFLOAT3(1, this->heights[gridX + 1][gridZ], 0),
+			DirectX::XMFLOAT3(1, this->heights[gridX + 1][gridZ + 1], 1),
+			DirectX::XMFLOAT3(0, this->heights[gridX ][gridZ + 1], 1),
+			DirectX::XMFLOAT2(xCoord, zCoord));
+	}
+	return height_level;
 }
 
 void Terrain::setWorld()
@@ -888,7 +783,7 @@ void Terrain::setWorld()
 	rotTemp = DirectX::XMLoadFloat4x4(&this->Rotation);
 	scaleTemp = DirectX::XMLoadFloat4x4(&this->Scale);
 	translTemp = DirectX::XMLoadFloat4x4(&this->Translation);
-	DirectX::XMStoreFloat4x4(&this->world, (translTemp));
+	DirectX::XMStoreFloat4x4(&this->world, (rotTemp*translTemp));
 }
 
 DirectX::XMFLOAT4X4 Terrain::getWorld()

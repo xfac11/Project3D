@@ -14,7 +14,7 @@ Texture::~Texture()
 
 void Texture::setTexture(ID3D11Device*& gDevice, ID3D11DeviceContext *& gDeviceContext, std::string fileName)
 {
-	std::string fileTexture = "OBJ/" + fileName;
+	std::string fileTexture = "textures/" + fileName;
 	const char *file = fileTexture.c_str();
 	testTexture.Initialize(gDevice, gDeviceContext, file);
 	/*if (!testTexture.Initialize(gDevice, gDeviceContext, fileName))

@@ -6,7 +6,7 @@
 #include "Camera.h"
 #include "GBuffer.h"
 #include "LightShader.h"
-#include "OrthoWindow.h"
+#include "FullscreenQuad.h"
 #include "Model.h"
 #include "Triangle.h"
 #include "Terrain.h" 
@@ -26,7 +26,7 @@ private:
 	D3D* Direct3D;
 	Camera* theCamera;
 	Model* *theModel;
-	ColorShader* theColorShader[2];//forward
+	//ColorShader* theColorShader[2];//forward
 
 	Terrain* theTerrain;
 	ParticleSystem* particles;
@@ -36,7 +36,7 @@ private:
 	DeferedShader* dShader;
 	LightShader* lShader;
 	GBuffer* gBuffer;
-	OrthoWindow* fullQuad;
+	FullscreenQuad* fullQuad;
 
 	int cap; //models cap
 
@@ -49,9 +49,13 @@ private:
 	DirectX::XMFLOAT3 camRot; //scene class
 	float gIncrement; //scene class
 
-	DirectX::XMVECTOR rotaxis;
-	
+	//fron to back render holder
+	int modelDistArray[4];
 
+	DirectX::XMVECTOR rotaxis;
+	int texToShow;
+	bool freezeCheck;
+	DirectX::XMFLOAT3 cullingPos; //freezed culling position
 	std::string mouseObject;
 	bool beginCheck;
 	int daScreenWidth;
@@ -64,7 +68,9 @@ private:
 
 	void intersectionTest(int posX, int posY, DirectX::XMFLOAT3 ObjPosition,float radius);
 	bool sphereRayIntersection(DirectX::XMFLOAT3 rayOrigin, DirectX::XMFLOAT3 rayDirection, DirectX::XMFLOAT3 pos, float radius);
-	bool boxRayIntersection(DirectX::XMFLOAT3 rayOrigin, DirectX::XMFLOAT3 rayDirection, DirectX::XMFLOAT3 pos, float radius);
+	bool boxRayIntersection(DirectX::XMFLOAT3 rayOrigin, DirectX::XMFLOAT3 rayDirection, DirectX::XMFLOAT3 center, DirectX::XMFLOAT4 u_hu, DirectX::XMFLOAT4 v_hv, DirectX::XMFLOAT4 w_hw);
+	//bool triangleIntersection();
+	int selectionSort();
 public:
 	Graphics();
 	~Graphics();

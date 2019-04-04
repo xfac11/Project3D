@@ -106,6 +106,7 @@ void TextureLoad::Shutdown()
 		delete[] m_targaData;
 		m_targaData = 0;
 	}
+	
 
 	return;
 }
@@ -167,7 +168,7 @@ bool TextureLoad::LoadTarga(const char* filename, int& height, int& width)
 	// Check that it is 32 bit and not 24 bit.
 	if (bpp != 32)
 	{
-		//return false;
+		return false;
 	}
 
 	// Calculate the size of the 32 bit image data.
@@ -177,14 +178,14 @@ bool TextureLoad::LoadTarga(const char* filename, int& height, int& width)
 	targaImage = new unsigned char[imageSize];
 	if (!targaImage)
 	{
-		//return false;
+		return false;
 	}
 
 	// Read in the targa image data.
 	count = (unsigned int)fread(targaImage, 1, imageSize, filePtr);
 	if (count != imageSize)
 	{
-		//return false;
+		return false;
 	}
 
 	// Close the file.
